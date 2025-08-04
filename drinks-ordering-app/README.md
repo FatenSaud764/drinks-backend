@@ -1,4 +1,4 @@
-# Drinks Ordering App — Makefile Usage
+# Drinks Ordering App
 
 This project contains two Vite React apps (`admin` and `client`), a backend and a shared package.  
 
@@ -12,8 +12,6 @@ This project contains two Vite React apps (`admin` and `client`), a backend and 
 ---
 
 ## Available Makefile Commands
-
-### `make dev`
 
 Starts both development servers (bar-end and client-end) simultaneously.
 
