@@ -6,6 +6,7 @@ SHARED_DIR = packages/shared
 BACKEND_DIR = backend
 PYTHON ?= python3
 VENV_ACTIVATE = source env/bin/activate
+VENV_DIR = env
 
 # Start all dev servers
 .PHONY: dev
@@ -45,7 +46,14 @@ clean:
 	       $(SHARED_DIR)/node_modules \
 	       $(BAR_DIR)/package-lock.json \
 	       $(CLIENT_DIR)/package-lock.json \
-	       $(SHARED_DIR)/package-lock.json
+	       $(SHARED_DIR)/package-lock.json \
+		   $(BACKEND_DIR)/$(VENV_DIR) \
+	       $(BACKEND_DIR)/__pycache__ \
+	       $(BACKEND_DIR)/*.sqlite3 \
+	       $(BACKEND_DIR)/.pytest_cache \
+	       $(BACKEND_DIR)/*.log
+	find $(BACKEND_DIR) -name '*.pyc' -delete
+	find $(BACKEND_DIR) -name '*.pyo' -delete
 
 # Reinstall everything (frontend + backend)
 .PHONY: install
