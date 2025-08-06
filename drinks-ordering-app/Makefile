@@ -5,7 +5,7 @@ CLIENT_DIR = client
 SHARED_DIR = packages/shared
 BACKEND_DIR = backend
 PYTHON ?= python3
-VENV_ACTIVATE = source env/bin/activate
+VENV_ACTIVATE = . env/bin/activate
 VENV_DIR = env
 
 # Start all dev servers
