@@ -1,0 +1,75 @@
+/* Ocean Depths Theme */
+:root {
+  /* Light mode colors */
+  --bg-primary: linear-gradient(135deg, #16296b 0%, #1e3a8a 100%);
+  --bg-secondary: #e0f2fe;
+  --bg-card: #ffffff;
+  --bg-muted: #bae6fd;
+  --text-primary: #000000;
+  --text-secondary: #075985;
+  --text-muted: #0369a1;
+  --border-color: #7dd3fc;
+  --accent-color: #0ea5e9;
+  --accent-hover: #0284c7;
+  --accent-secondary: #06b6d4;
+  --success-color: #059669;
+  --danger-color: #dc2626;
+  --shadow: 0 2px 4px rgba(22, 41, 107, 0.15);
+  --shadow-hover: 0 8px 25px rgba(22, 41, 107, 0.25);
+  --gradient-accent: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+  --gradient-background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+  --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(255,255,255,0.9));
+}
+
+[data-theme="dark"] {
+  /* Dark mode colors */
+  --bg-primary: linear-gradient(135deg, #0c1e3d 0%, #16296b 50%, #1e3a8a 100%);
+  --bg-secondary: rgba(12, 74, 110, 0.15);
+  --bg-card: rgba(30, 58, 138, 0.1);
+  --bg-muted: rgba(22, 41, 107, 0.2);
+  /* Text */
+  --text-primary: #e0f2fe;
+  --text-secondary: #bae6fd;
+  --text-muted: #7dd3fc;
+  /* Accents */
+  --accent-color: #0ea5e9;
+  --accent-hover: #0284c7;
+  --accent-secondary: #06b6d4;
+  /* Borders & Effects */
+  --border-color: rgba(14, 165, 233, 0.2);
+  --glass-border: rgba(14, 165, 233, 0.3);
+  
+  /* Status Colors */
+  --success-color: #10b981;
+  --danger-color: #ef4444;
+  /* Shadows & Glass Effects */
+  --shadow: 0 4px 8px rgba(14, 165, 233, 0.2);
+  --shadow-hover: 0 8px 16px rgba(14, 165, 233, 0.3);
+  --glass-backdrop: blur(16px) saturate(180%);
+  
+  /* Gradients */
+  --gradient-accent: linear-gradient(135deg, #0ea5e9 0%, #06b6d4 100%);
+  --gradient-background: linear-gradient(135deg, #0c1e3d 0%, #16296b 50%, #1e3a8a 100%);
+  --gradient-card: linear-gradient(135deg, rgba(14, 165, 233, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%);
+}
+
+/* Theme toggle button styles */
+.theme-toggle {
+  background: var(--gradient-accent);
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  box-shadow: var(--shadow);
+}
+.theme-toggle:hover {
+  transform: scale(1.1) rotate(15deg);
+  box-shadow: var(--shadow-hover);
+}
