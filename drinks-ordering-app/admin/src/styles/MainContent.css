@@ -1,0 +1,7 @@
+/* MainContent.css - Main content area styles */
+.main-content {
+  flex: 1;
+  min-width: 0;
+  background-color: var(--bg-primary);
+  overflow-x: hidden;
+}

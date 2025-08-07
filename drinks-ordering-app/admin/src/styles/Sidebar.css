@@ -1,0 +1,141 @@
+.sidebar {
+  width: 300px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-colour);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: static;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.sidebar.closed {
+  width: 0;
+  border-right: none;
+}
+
+.sidebar.mobile {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  height: calc(100vh - 60px);
+  z-index: 999;
+  box-shadow: 2px 0 10px var(--shadow);
+  width: 280px;
+}
+
+.sidebar.mobile.closed {
+  transform: translateX(-100%);
+  width: 280px;
+}
+
+.sidebar-content {
+  width: 280px;
+  height: 100%;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navigation */
+.sidebar-nav {
+  position: static;
+  overflow: hidden;
+}
+
+.nav-item {
+  padding: 0.75rem;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-accent);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.nav-item:hover {
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+  border-color: var(--hover);
+}
+
+.nav-item:hover::before {
+  left: 0;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem 0;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin: 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1.5rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+}
+
+.nav-link:hover {
+  background-color: var(--hover);
+  color: white;
+  border-left-color: var(--border-colour);
+}
+
+.nav-icon {
+  font-size: 1.1rem;
+  margin-right: 0.75rem;
+  width: 20px;
+  text-align: center;
+}
+
+.nav-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Mobile specific styles */
+@media (max-width: 768px) {
+  .sidebar.mobile {
+    top: 50px;
+    height: calc(100vh - 50px);
+  }
+
+  .nav-link {
+    padding: 0.875rem 1rem;
+  }
+}
+
+/* Animation for mobile sidebar */
+@media (max-width: 768px) {
+  .sidebar.mobile {
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.mobile.open {
+    transform: translateX(0);
+  }
+}
