@@ -9,7 +9,6 @@ const Sidebar = ({ isOpen, isMobile, onClose }) => {
     { href: 'orders', icon: <GlassIcon/>, label: 'Orders' },
     { href: 'history', icon: <HistoryIcon/>, label: 'History' },
     { href: 'inventory', icon: <InventoryIcon/>, label: 'Inventory' },
-    { href: 'settings', icon: <SettingsIcon/>, label: 'Settings' }
   ];
 
   return (
