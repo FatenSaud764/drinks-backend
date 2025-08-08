@@ -1,0 +1,26 @@
+/* Pages.css - Common styles for all pages */
+
+.page {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.page-header {
+  margin-bottom: 2rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 1rem;
+}
+
+.page-header h1 {
+  margin: 0 0 0.5rem 0;
+  color: var(--text-primary);
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.page-header p {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}

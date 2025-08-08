@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
-import MainContent from './components/MainContent';
+import OrdersPage from './pages/OrdersPage';
+import HistoryPage from './pages/HistoryPage';
+import InventoryPage from './pages/InventoryPage';
 import 'shared/styles/Global.css';
 import 'shared/styles/Theme.css';
 import { ThemeProvider } from 'shared/contexts/ThemeContext';
@@ -50,30 +53,39 @@ function App() {
 
   return (
     <ThemeProvider>
-    <div className="app">
-      <Header 
-        toggleSidebar={toggleSidebar} 
-        isSidebarOpen={isSidebarOpen}
-      />
-      
-      <div className={`app-layout ${isSidebarOpen && !isMobile ? 'with-sidebar' : ''}`}>
-        <Sidebar 
-          isOpen={isSidebarOpen}
-          isMobile={isMobile}
-          onClose={closeSidebar}
-        />
-
-        {/* Mobile Overlay */}
-        {isMobile && isSidebarOpen && (
-          <div 
-            className="sidebar-overlay active"
-            onClick={closeSidebar}
+      <Router>
+        <div className="app">
+          <Header 
+            toggleSidebar={toggleSidebar} 
+            isSidebarOpen={isSidebarOpen}
           />
-        )}
+          
+          <div className={`app-layout ${isSidebarOpen && !isMobile ? 'with-sidebar' : ''}`}>
+            <Sidebar 
+              isOpen={isSidebarOpen}
+              isMobile={isMobile}
+              onClose={closeSidebar}
+            />
 
-        <MainContent />
-      </div>
-    </div>
+            {/* Mobile Overlay */}
+            {isMobile && isSidebarOpen && (
+              <div 
+                className="sidebar-overlay active"
+                onClick={closeSidebar}
+              />
+            )}
+
+            <main className="main-content">
+              <Routes>
+                <Route path="/" element={<OrdersPage />} />
+                <Route path="/orders" element={<OrdersPage />} />
+                <Route path="/history" element={<HistoryPage />} />
+                <Route path="/inventory" element={<InventoryPage />} />
+              </Routes>
+            </main>
+          </div>
+        </div>
+      </Router>
     </ThemeProvider>
   );
 }
