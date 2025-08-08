@@ -1,20 +1,22 @@
 /* Enhanced Ocean Depths Theme - Refined */
 :root {
   /* Light mode - Clean & Simplistic */
-  --bg-primary: linear-gradient(135deg, #ffffff 0%, #f8fafc 25%, #f1f5f9 100%);
-  --bg-secondary: linear-gradient(135deg, #89b6ff 0%, #b7ceff 50%, #517fff 100%);
-  --bg-card: rgba(255, 255, 255, 0.95);
-  --bg-muted: #f8fafc;
-  
+  --bg-primary: #ffffff;
+  --bg-secondary: #89b6ff;
+  --bg-card: #b7ceff;
+  --bg-muted: rgba(255, 255, 255, 0.3);
+
   /* Clean text hierarchy */
   --text-primary: #0f172a;
   --text-secondary: #334155;
   --text-muted: #64748b;
+  --text-meta: #64748b;;
   
   /* Subtle blue accents */
   --border-color: rgba(59, 130, 246, 0.15);
   --accent-color: #2563eb;
   --hover: #f97316;
+  --focus: #f97316;
   --hover-secondary: #ea580c;
   --accent-hover: #1d4ed8;
   --accent-secondary: #0ea5e9;
@@ -36,19 +38,22 @@
 
 [data-theme="dark"] {
   /* Dark mode - Rich Ocean Depths with Orange Accents */
-  --bg-primary: linear-gradient(135deg, #0c1426 0%, #1e293b 25%, #334155 75%, #475569 100%);
-  --bg-secondary: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-  --bg-card: rgba(30, 41, 59, 0.8);
-  --bg-muted: rgba(51, 65, 85, 0.4);
+  --bg-primary: #1e293b;
+  --bg-secondary: #334155;
+  --bg-card: #0f172a;
+  --bg-muted: rgba(255, 255, 255, 0.3);
   
   /* High contrast text for readability */
-  --text-primary: #f1f5f9;
+  --text-primary: #ffffff;
   --text-secondary: #e2e8f0;
   --text-muted: #cbd5e1;
+  --text-meta: #cbd5e1;
   
   /* Vibrant orange and blue accents */
   --accent-color: #3b82f6;
   --hover: #ff8c42;
+  --focus: #f97316;
+
   --hover-secondary: #ff6b1a;
   --accent-hover: #60a5fa;
   --accent-secondary: #06b6d4;

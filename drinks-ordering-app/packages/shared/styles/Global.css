@@ -36,7 +36,6 @@ body.sidebar-mobile-open {
   display: flex;
   flex: 1;
   margin-top: 60px; /* Account for fixed header */
-  position: relative;
 }
 
 /* Mobile overlay */
@@ -60,12 +59,6 @@ body.sidebar-mobile-open {
 }
 
 /* Responsive breakpoints */
-@media (max-width: 768px) {
-  .app-layout.with-sidebar {
-    /* Override desktop sidebar styles on mobile */
-  }
-}
-
 @media (max-width: 480px) {
   .app-layout {
     margin-top: 50px; /* Smaller header on very small screens */
