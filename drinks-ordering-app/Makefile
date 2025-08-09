@@ -36,7 +36,16 @@ install-frontend:
 # Install backend dependencies
 .PHONY: install-backend
 install-backend:
-	cd $(BACKEND_DIR) && ${PYTHON} -m venv env && ${VENV_ACTIVATE} && pip install -r requirements.txt
+	cd $(BACKEND_DIR) && ${PYTHON} -m venv env && \
+	${VENV_ACTIVATE} && \
+	pip install -r requirements.txt && \
+	psql -U postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='baruser'" | grep -q 1 || \
+	psql -U postgres -c "CREATE USER baruser WITH PASSWORD 'barpass';" && \
+	psql -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname='barapp_db'" | grep -q 1 || \
+	psql -U postgres -c "CREATE DATABASE barapp_db OWNER baruser;" && \
+	${PYTHON} manage.py makemigrations && \
+	${PYTHON} manage.py migrate
+
 
 # Clean all node_modules and lock files
 .PHONY: clean
