@@ -52,7 +52,8 @@ class Order(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
         ('preparing', 'Preparing'),
-        ('served', 'Served'),
+        ('ready', 'Ready'),
+        ('completed', 'Completed'),
         ('cancelled', 'Cancelled'),
     ]
 
