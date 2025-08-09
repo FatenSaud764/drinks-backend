@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Pages.css';
+// Toast alerts for undo and notification system
+import { toast } from 'react-toastify';
 
 const OrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [undoAction, setUndoAction] = useState(null);
-  const [undoTimer, setUndoTimer] = useState(null);
 
   // Enhanced mock data with more orders for better grid demonstration
   useEffect(() => {
@@ -120,15 +120,6 @@ const OrdersPage = () => {
 
   const updateOrderStatus = (orderId, newStatus) => {
     const order = orders.find(o => o.id === orderId);
-    const previousStatus = order.status;
-
-    // Store undo information
-    const undoInfo = {
-      orderId,
-      previousStatus,
-      newStatus,
-      orderNumber: order.orderNumber
-    };
 
     // Update the order immediately
     setOrders(prevOrders =>
@@ -137,68 +128,53 @@ const OrdersPage = () => {
       )
     );
 
-    // Clear any existing undo timer
-    if (undoTimer) {
-      clearTimeout(undoTimer);
-    }
-
-    // Set up undo action with 5-second timer
-    setUndoAction(undoInfo);
-    const timer = setTimeout(() => {
-      setUndoAction(null);
-      // Send notification to client after undo window expires
-      notifyClient(orderId, newStatus);
-    }, 5000);
-
-    setUndoTimer(timer);
-  };
-
-  const executeUndo = () => {
-    if (undoAction) {
-      // Revert the status change
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
-          order.id === undoAction.orderId 
-            ? { ...order, status: undoAction.previousStatus } 
-            : order
-        )
-      );
-
-      // Clear undo timer and action
-      if (undoTimer) {
-        clearTimeout(undoTimer);
-      }
-      setUndoAction(null);
-      setUndoTimer(null);
-    }
+    // Show confirmation toast and send notification
+    toast.success(`${order.orderNumber} updated to ${newStatus.toUpperCase()}`);
+    notifyClient(orderId, newStatus);
   };
 
   const notifyClient = (orderId, status) => {
     // Replace with actual notification system - API call
     const order = orders.find(o => o.id === orderId);
-    alert(`Notification sent: Order ${order?.orderNumber} is now ${status.toUpperCase()}`);
+    toast.success(`Notification sent: Order ${order?.orderNumber} is now ${status.toUpperCase()}`);
   };
 
-  const getStatusColor = (status) => {
-    const colors = {
-      pending: '#ff9800',
-      preparing: '#2196f3',
-      ready: '#4caf50',
-      completed: '#9e9e9e',
-      cancelled: '#f44336'
-    };
-    return colors[status] || '#9e9e9e';
+  const getStatusFlow = () => {
+    return ['pending', 'preparing', 'ready', 'completed'];
+  };
+
+  const getCurrentStatusIndex = (status) => {
+    const flow = getStatusFlow();
+    return flow.indexOf(status);
+  };
+
+  const canMoveToPrevious = (status) => {
+    const currentIndex = getCurrentStatusIndex(status);
+    return currentIndex > 0 && status !== 'cancelled';
+  };
+
+  const canMoveToNext = (status) => {
+    const flow = getStatusFlow();
+    const currentIndex = getCurrentStatusIndex(status);
+    return currentIndex < flow.length - 1 && currentIndex !== -1 && status !== 'cancelled';
+  };
+
+  const getPreviousStatus = (status) => {
+    const flow = getStatusFlow();
+    const currentIndex = getCurrentStatusIndex(status);
+    return currentIndex > 0 ? flow[currentIndex - 1] : null;
+  };
+
+  const getNextStatus = (status) => {
+    const flow = getStatusFlow();
+    const currentIndex = getCurrentStatusIndex(status);
+    return currentIndex < flow.length - 1 && currentIndex !== -1 ? flow[currentIndex + 1] : null;
   };
 
   const getStatusOptions = (currentStatus) => {
-    const statusFlow = {
-      pending: ['preparing', 'cancelled'],
-      preparing: ['ready', 'cancelled'],
-      ready: ['completed'],
-      completed: [],
-      cancelled: []
-    };
-    return statusFlow[currentStatus] || [];
+    // Keep cancel option available for pending and preparing orders
+    const cancelOptions = ['pending', 'preparing'].includes(currentStatus) ? ['cancelled'] : [];
+    return cancelOptions;
   };
 
   const formatTime = (date) => {
@@ -232,42 +208,6 @@ const OrdersPage = () => {
           <h1>Orders Management</h1>
           <p>Manage active orders and update status in real-time</p>
         </div>
-
-        {/* Undo Toast Notification */}
-        {undoAction && (
-          <div className="undo-toast" style={{
-            position: 'fixed',
-            top: '20px',
-            right: '20px',
-            backgroundColor: '#333',
-            color: 'white',
-            padding: '12px 16px',
-            borderRadius: '8px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px'
-          }}>
-            <span>
-              Changed {undoAction.orderNumber} from {undoAction.previousStatus} to {undoAction.newStatus}
-            </span>
-            <button 
-              onClick={executeUndo}
-              style={{
-                backgroundColor: '#4caf50',
-                color: 'white',
-                border: 'none',
-                padding: '4px 8px',
-                borderRadius: '4px',
-                cursor: 'pointer',
-                fontSize: '12px'
-              }}
-            >
-              UNDO
-            </button>
-          </div>
-        )}
 
         <div className="orders-controls">
           <div className="search-bar">
@@ -310,10 +250,7 @@ const OrdersPage = () => {
                     <h3>{order.orderNumber}</h3>
                     <span className="order-time">{formatTime(order.orderTime)}</span>
                   </div>
-                  <div 
-                    className="status-badge"
-                    style={{ backgroundColor: getStatusColor(order.status) }}
-                  >
+                  <div className={`status-badge status-${order.status}`}>
                     {order.status.toUpperCase()}
                   </div>
                 </div>
@@ -333,14 +270,43 @@ const OrdersPage = () => {
                 </div>
 
                 <div className="order-actions">
+                  <div className="status-navigation">
+                    <div className="nav-controls">
+                      <button
+                        className="nav-button prev"
+                        disabled={!canMoveToPrevious(order.status)}
+                        onClick={() => updateOrderStatus(order.id, getPreviousStatus(order.status))}
+                        title={`Move back to ${getPreviousStatus(order.status) || 'previous status'}`}
+                      >
+                        &#8249; {getPreviousStatus(order.status) ? getPreviousStatus(order.status).charAt(0).toUpperCase() + getPreviousStatus(order.status).slice(1) : 'Previous'}
+                      </button>
+                      
+                      <div className="current-status">
+                        <span className="status-label">Status</span>
+                        <span className={`status-display status-${order.status}`}>
+                          {order.status.toUpperCase()}
+                        </span>
+                      </div>
+                      
+                      <button
+                        className="nav-button next"
+                        disabled={!canMoveToNext(order.status)}
+                        onClick={() => updateOrderStatus(order.id, getNextStatus(order.status))}
+                        title={`Move forward to ${getNextStatus(order.status) || 'next status'}`}
+                      >
+                        {getNextStatus(order.status) ? getNextStatus(order.status).charAt(0).toUpperCase() + getNextStatus(order.status).slice(1) : 'Next'} &#8250;
+                      </button>
+                    </div>
+                  </div>
+
                   {getStatusOptions(order.status).length > 0 && (
                     <div className="status-actions">
-                      <label>Update Status:</label>
+                      <label>Other Actions:</label>
                       <div className="action-buttons">
                         {getStatusOptions(order.status).map(statusOption => (
                           <button
                             key={statusOption}
-                            className={`status-button ${statusOption}`}
+                            className={`status-button status-${statusOption}`}
                             onClick={() => updateOrderStatus(order.id, statusOption)}
                           >
                             Mark as {statusOption.charAt(0).toUpperCase() + statusOption.slice(1)}

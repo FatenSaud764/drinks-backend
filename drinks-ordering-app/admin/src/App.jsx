@@ -8,6 +8,9 @@ import InventoryPage from './pages/InventoryPage';
 import 'shared/styles/Global.css';
 import 'shared/styles/Theme.css';
 import { ThemeProvider } from 'shared/contexts/ThemeContext';
+// Toastify for Toast Alerts
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -74,6 +77,9 @@ function App() {
                 onClick={closeSidebar}
               />
             )}
+
+            { /* Toast notifications */ }
+            <ToastContainer position="top-right" autoClose={5000} />
 
             <Routes>
               <Route path="/" element={<OrdersPage />} />
