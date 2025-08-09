@@ -39,10 +39,17 @@ install-backend:
 	cd $(BACKEND_DIR) && ${PYTHON} -m venv env && \
 	${VENV_ACTIVATE} && \
 	pip install -r requirements.txt && \
-	psql -U postgres -tAc "SELECT 1 FROM pg_roles WHERE rolname='baruser'" | grep -q 1 || \
-	psql -U postgres -c "CREATE USER baruser WITH PASSWORD 'barpass';" && \
-	psql -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname='barapp_db'" | grep -q 1 || \
-	psql -U postgres -c "CREATE DATABASE barapp_db OWNER baruser;" && \
+	if [ "$$(uname)" = "Linux" ]; then \
+		sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='baruser'" | grep -q 1 || \
+		sudo -u postgres psql -c "CREATE USER baruser WITH PASSWORD 'barpass';"; \
+		sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='barapp_db'" | grep -q 1 || \
+		sudo -u postgres psql -c "CREATE DATABASE barapp_db OWNER baruser;"; \
+	else \
+		psql -U postgres -h localhost -tAc "SELECT 1 FROM pg_roles WHERE rolname='baruser'" | grep -q 1 || \
+		psql -U postgres -h localhost -c "CREATE USER baruser WITH PASSWORD 'barpass';"; \
+		psql -U postgres -h localhost -tAc "SELECT 1 FROM pg_database WHERE datname='barapp_db'" | grep -q 1 || \
+		psql -U postgres -h localhost -c "CREATE DATABASE barapp_db OWNER baruser;"; \
+	fi && \
 	${PYTHON} manage.py makemigrations && \
 	${PYTHON} manage.py migrate
 
