@@ -26,11 +26,6 @@ frontend:
 backend:
 	cd $(BACKEND_DIR) && ${VENV_ACTIVATE} && ${PYTHON} manage.py runserver
 
-# Initialize the database (create user and database)
-.PHONY: db-init
-db-init:
-	psql -U baruser -d barapp_db -h localhost -f $(BACKEND_DIR)/init_tables.sql
-
 # Install all frontend dependencies
 .PHONY: install-frontend
 install-frontend:
@@ -48,7 +43,6 @@ install-backend:
 	psql -U postgres -c "CREATE USER baruser WITH PASSWORD 'barpass';" && \
 	psql -U postgres -tAc "SELECT 1 FROM pg_database WHERE datname='barapp_db'" | grep -q 1 || \
 	psql -U postgres -c "CREATE DATABASE barapp_db OWNER baruser;" && \
-	cd .. && make db-init && cd ${BACKEND_DIR} \
 	${PYTHON} manage.py makemigrations && \
 	${PYTHON} manage.py migrate
 
