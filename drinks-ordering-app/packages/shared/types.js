@@ -1,9 +1,9 @@
 export const ORDER_STATUS = {
   PENDING: 'pending',
-  REJECTED: 'rejected',
   PREPARING: 'preparing',
   READY: 'ready',
   COMPLETED: 'completed',
+  CANCELLED: 'cancelled',
 };
 
 export const DRINK_CATEGORIES = {
@@ -13,5 +13,8 @@ export const DRINK_CATEGORIES = {
   SPECIALTY: 'specialty'
 };
 
-export const DRINKS = ['Soda', 'Beer', 'Wine', 'Cocktail'];
-
+export const USER_ROLES = {
+  CUSTOMER: 'customer',
+  ADMIN: 'admin',
+  BARTENDER: 'bartender',
+};
