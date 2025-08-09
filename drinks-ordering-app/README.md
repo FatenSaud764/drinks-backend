@@ -31,9 +31,11 @@ Starts both development servers (bar-end and client-end) simultaneously.
    ```
 
 3. **Run only the Client**
+
    ```bash
    make client
    ```
+
 4. **Run only the Bar**
 
    ```bash
@@ -49,4 +51,13 @@ Starts both development servers (bar-end and client-end) simultaneously.
 6. **Clean Build Files**
    ```bash
    make clean
+   ```
+
+## Available Django management commands
+
+Ensure virtual environment is activated.
+
+1. **Create Dummy Data**
+   ```bash
+   python manage.py create_dummy_data
    ```
