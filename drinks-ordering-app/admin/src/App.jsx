@@ -1,12 +1,15 @@
 import { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// Main dashboard components
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
+// Pages
 import OrdersPage from './pages/OrdersPage';
 import HistoryPage from './pages/HistoryPage';
 import InventoryPage from './pages/InventoryPage';
+// Styles
 import 'shared/styles/Global.css';
-import 'shared/styles/Theme.css';
+// Themes
 import { ThemeProvider } from 'shared/contexts/ThemeContext';
 // Toastify for Toast Alerts
 import { ToastContainer } from 'react-toastify';

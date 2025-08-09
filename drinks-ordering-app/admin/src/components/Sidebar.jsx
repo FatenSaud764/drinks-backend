@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import '../styles/Sidebar.css';
+// Icons
 import GlassIcon from '@mui/icons-material/LocalBarOutlined';
 import HistoryIcon from '@mui/icons-material/HistoryToggleOffOutlined';
 import InventoryIcon from '@mui/icons-material/Inventory2Outlined';

@@ -1,6 +1,7 @@
 /**
- * @file ThemeToggle.jsx - Toggles between light and dark mode using MUI icons.
- * @author Kirsty
+ * @author Kirsten Sanders
+ * @description This component handles the theme toggle for light/dark mode
+ *
 */
 import { useTheme } from 'shared/contexts/ThemeContext';
 

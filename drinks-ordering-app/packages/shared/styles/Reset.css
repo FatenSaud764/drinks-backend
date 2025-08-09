@@ -1,4 +1,8 @@
-/* Global reset and base styles */
+/**
+ * @author Kirsten Sanders
+ * @description Global reset and base styles
+*/
+
 * {
   margin: 0;
   padding: 0;
@@ -69,8 +73,6 @@ body.sidebar-mobile-open {
     margin-top: 50px; /* Smaller header on very small screens */
   }
 }
-
-/* Updated styles to work with your React app */
 
 /* App layout adjustments */
 .app-layout {

@@ -1,23 +1,24 @@
+/**
+ * @author Kirsten Sanders
+ * @description Order Status styles
+*/
+
 /* Status Color Variables */
 :root {
-  /* Status Colors */
   --status-pending: #ff9800;
   --status-pending-hover: #f57c00;
+
   --status-preparing: #2196f3;
   --status-preparing-hover: #1976d2;
+
   --status-ready: #4caf50;
   --status-ready-hover: #388e3c;
+
   --status-completed: #9e9e9e;
   --status-completed-hover: #757575;
+
   --status-cancelled: #f44336;
   --status-cancelled-hover: #d32f2f;
-  
-  /* Status Light Variants for backgrounds */
-  --status-pending-light: rgba(255, 152, 0, 0.1);
-  --status-preparing-light: rgba(33, 150, 243, 0.1);
-  --status-ready-light: rgba(76, 175, 80, 0.1);
-  --status-completed-light: rgba(158, 158, 158, 0.1);
-  --status-cancelled-light: rgba(244, 67, 54, 0.1);
 }
 
 /* Status-based classes for dynamic styling */
@@ -59,30 +60,4 @@
 
 .status-cancelled:hover {
   background-color: var(--status-cancelled-hover) !important;
-}
-
-/* Light background variants */
-.status-bg-pending {
-  background-color: var(--status-pending-light);
-  border-color: var(--status-pending);
-}
-
-.status-bg-preparing {
-  background-color: var(--status-preparing-light);
-  border-color: var(--status-preparing);
-}
-
-.status-bg-ready {
-  background-color: var(--status-ready-light);
-  border-color: var(--status-ready);
-}
-
-.status-bg-completed {
-  background-color: var(--status-completed-light);
-  border-color: var(--status-completed);
-}
-
-.status-bg-cancelled {
-  background-color: var(--status-cancelled-light);
-  border-color: var(--status-cancelled);
 }

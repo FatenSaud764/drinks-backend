@@ -1,12 +1,14 @@
-/* Main Global CSS - Import all modular styles */
+/**
+ * @author Kirsten Sanders
+ * @description Main Global CSS - Import all modular styles
+*/
 
-/* Core styles - order matters */
-/* @import './Variables.css'; */
-@import './Reset.css';
+/* Core styles - order matters !*/
 @import './Theme.css';
+@import './Reset.css';
 
 /* Component styles */
 @import './OrderStatus.css';
 
-/* Responsive styles - KEEP THIS LAST OMG */
+/* Responsive styles - KEEP THIS FOR LAST IF YOU EVENTUALLY MAKE IT */
 /* @import './Responsive.css'; */
