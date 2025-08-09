@@ -75,14 +75,12 @@ function App() {
               />
             )}
 
-            <main className="main-content">
-              <Routes>
-                <Route path="/" element={<OrdersPage />} />
-                <Route path="/orders" element={<OrdersPage />} />
-                <Route path="/history" element={<HistoryPage />} />
-                <Route path="/inventory" element={<InventoryPage />} />
-              </Routes>
-            </main>
+            <Routes>
+              <Route path="/" element={<OrdersPage />} />
+              <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/history" element={<HistoryPage />} />
+              <Route path="/inventory" element={<InventoryPage />} />
+            </Routes>
           </div>
         </div>
       </Router>

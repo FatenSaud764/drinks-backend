@@ -6,8 +6,10 @@ const OrdersPage = () => {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [undoAction, setUndoAction] = useState(null);
+  const [undoTimer, setUndoTimer] = useState(null);
 
-  // Fake data until API calls can be used
+  // Enhanced mock data with more orders for better grid demonstration
   useEffect(() => {
     const mockOrders = [
       {
@@ -50,6 +52,48 @@ const OrdersPage = () => {
         totalAmount: 18.90,
         status: 'completed',
         orderTime: new Date('2024-08-08T08:45:00'),
+      },
+      {
+        id: 5,
+        orderNumber: 'ORD-005',
+        items: [
+          { name: 'Whiskey Sour', quantity: 2, price: 92.00 },
+          { name: 'Aperol Spritz', quantity: 1, price: 68.00 }
+        ],
+        totalAmount: 252.00,
+        status: 'preparing',
+        orderTime: new Date('2024-08-08T11:30:00'),
+      },
+      {
+        id: 6,
+        orderNumber: 'ORD-006',
+        items: [
+          { name: 'Red Wine Glass', quantity: 2, price: 55.00 }
+        ],
+        totalAmount: 110.00,
+        status: 'ready',
+        orderTime: new Date('2024-08-08T12:00:00'),
+      },
+      {
+        id: 7,
+        orderNumber: 'ORD-007',
+        items: [
+          { name: 'Mojito', quantity: 3, price: 72.00 },
+          { name: 'Gin & Tonic', quantity: 2, price: 58.00 }
+        ],
+        totalAmount: 332.00,
+        status: 'pending',
+        orderTime: new Date('2024-08-08T12:30:00'),
+      },
+      {
+        id: 8,
+        orderNumber: 'ORD-008',
+        items: [
+          { name: 'Beer Flight', quantity: 1, price: 120.00 }
+        ],
+        totalAmount: 120.00,
+        status: 'preparing',
+        orderTime: new Date('2024-08-08T13:00:00'),
       }
     ];
     setOrders(mockOrders);
@@ -67,7 +111,7 @@ const OrdersPage = () => {
     if (searchTerm) {
       filtered = filtered.filter(order => 
         order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customerName.toLowerCase().includes(searchTerm.toLowerCase())
+        (order.customerName && order.customerName.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
@@ -75,20 +119,64 @@ const OrdersPage = () => {
   }, [orders, statusFilter, searchTerm]);
 
   const updateOrderStatus = (orderId, newStatus) => {
+    const order = orders.find(o => o.id === orderId);
+    const previousStatus = order.status;
+
+    // Store undo information
+    const undoInfo = {
+      orderId,
+      previousStatus,
+      newStatus,
+      orderNumber: order.orderNumber
+    };
+
+    // Update the order immediately
     setOrders(prevOrders =>
       prevOrders.map(order =>
         order.id === orderId ? { ...order, status: newStatus } : order
       )
     );
-    
-    // Send notification to client when status updates
-    notifyClient(orderId, newStatus);
+
+    // Clear any existing undo timer
+    if (undoTimer) {
+      clearTimeout(undoTimer);
+    }
+
+    // Set up undo action with 5-second timer
+    setUndoAction(undoInfo);
+    const timer = setTimeout(() => {
+      setUndoAction(null);
+      // Send notification to client after undo window expires
+      notifyClient(orderId, newStatus);
+    }, 5000);
+
+    setUndoTimer(timer);
+  };
+
+  const executeUndo = () => {
+    if (undoAction) {
+      // Revert the status change
+      setOrders(prevOrders =>
+        prevOrders.map(order =>
+          order.id === undoAction.orderId 
+            ? { ...order, status: undoAction.previousStatus } 
+            : order
+        )
+      );
+
+      // Clear undo timer and action
+      if (undoTimer) {
+        clearTimeout(undoTimer);
+      }
+      setUndoAction(null);
+      setUndoTimer(null);
+    }
   };
 
   const notifyClient = (orderId, status) => {
     // Replace with actual notification system - API call
     const order = orders.find(o => o.id === orderId);
-    alert(`Notification sent to ${order?.customerName}: Order ${status}`);
+    alert(`Notification sent: Order ${order?.orderNumber} is now ${status.toUpperCase()}`);
   };
 
   const getStatusColor = (status) => {
@@ -124,104 +212,155 @@ const OrdersPage = () => {
     return `R${amount.toFixed(2)}`;
   };
 
+  const getStatusCounts = () => {
+    return {
+      all: orders.length,
+      pending: orders.filter(order => order.status === 'pending').length,
+      preparing: orders.filter(order => order.status === 'preparing').length,
+      ready: orders.filter(order => order.status === 'ready').length,
+      completed: orders.filter(order => order.status === 'completed').length,
+      cancelled: orders.filter(order => order.status === 'cancelled').length
+    };
+  };
+
+  const statusCounts = getStatusCounts();
+
   return (
     <div className="page">
-      <div className="page-header">
-        <h1>Orders</h1>
-        <p>Manage active orders and update status</p>
-      </div>
-
-      <div className="orders-controls">
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search by order number..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
+      <div className="page-container">
+        <div className="page-header">
+          <h1>Orders Management</h1>
+          <p>Manage active orders and update status in real-time</p>
         </div>
-        
-        <div className="filter-tabs">
-          {['all', 'pending', 'preparing', 'ready', 'completed'].map(status => (
-            <button
-              key={status}
-              className={`filter-tab ${statusFilter === status ? 'active' : ''}`}
-              onClick={() => setStatusFilter(status)}
+
+        {/* Undo Toast Notification */}
+        {undoAction && (
+          <div className="undo-toast" style={{
+            position: 'fixed',
+            top: '20px',
+            right: '20px',
+            backgroundColor: '#333',
+            color: 'white',
+            padding: '12px 16px',
+            borderRadius: '8px',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px'
+          }}>
+            <span>
+              Changed {undoAction.orderNumber} from {undoAction.previousStatus} to {undoAction.newStatus}
+            </span>
+            <button 
+              onClick={executeUndo}
+              style={{
+                backgroundColor: '#4caf50',
+                color: 'white',
+                border: 'none',
+                padding: '4px 8px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontSize: '12px'
+              }}
             >
-              {status.charAt(0).toUpperCase() + status.slice(1)}
-              <span className="count">
-                {status === 'all' 
-                  ? orders.length 
-                  : orders.filter(order => order.status === status).length}
-              </span>
+              UNDO
             </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="orders-grid">
-        {filteredOrders.length === 0 ? (
-          <div className="no-orders">
-            <p>No orders found matching your criteria.</p>
           </div>
-        ) : (
-          filteredOrders.map(order => (
-            <div key={order.id} className="order-card">
-              <div className="order-header">
-                <div className="order-number">
-                  <h3>{order.orderNumber}</h3>
-                  <span className="order-time">{formatTime(order.orderTime)}</span>
-                </div>
-                <div 
-                  className="status-badge"
-                  style={{ backgroundColor: getStatusColor(order.status) }}
-                >
-                  {order.status.toUpperCase()}
-                </div>
-              </div>
-
-              <div className="order-items">
-                <h4>Items:</h4>
-                {order.items.map((item, index) => (
-                  <div key={index} className="item-row">
-                    <span>{item.quantity}x {item.name}</span>
-                    <span>{formatCurrency(item.price * item.quantity)}</span>
-                  </div>
-                ))}
-                <div className="total-row">
-                  <span><strong>Total: {formatCurrency(order.totalAmount)}</strong></span>
-                </div>
-              </div>
-
-              <div className="order-actions">
-                {getStatusOptions(order.status).length > 0 && (
-                  <div className="status-actions">
-                    <label>Update Status:</label>
-                    <div className="action-buttons">
-                      {getStatusOptions(order.status).map(statusOption => (
-                        <button
-                          key={statusOption}
-                          className={`status-button ${statusOption}`}
-                          onClick={() => updateOrderStatus(order.id, statusOption)}
-                        >
-                          Mark as {statusOption.charAt(0).toUpperCase() + statusOption.slice(1)}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-                
-                <button 
-                  className="notify-button"
-                  onClick={() => notifyClient(order.id, order.status)}
-                >
-                  Send Notification
-                </button>
-              </div>
-            </div>
-          ))
         )}
+
+        <div className="orders-controls">
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search by order number or customer name..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          
+          <div className="filter-tabs">
+            {['all', 'pending', 'preparing', 'ready', 'completed'].map(status => (
+              <button
+                key={status}
+                className={`filter-tab ${statusFilter === status ? 'active' : ''}`}
+                onClick={() => setStatusFilter(status)}
+              >
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+                <span className="count">
+                  {statusCounts[status]}
+                </span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="orders-grid">
+          {filteredOrders.length === 0 ? (
+            <div className="no-orders">
+              <h3>No orders found</h3>
+              <p>No orders match your current search criteria.</p>
+            </div>
+          ) : (
+            filteredOrders.map(order => (
+              <div key={order.id} className="order-card">
+                <div className="order-header">
+                  <div className="order-number">
+                    <h3>{order.orderNumber}</h3>
+                    <span className="order-time">{formatTime(order.orderTime)}</span>
+                  </div>
+                  <div 
+                    className="status-badge"
+                    style={{ backgroundColor: getStatusColor(order.status) }}
+                  >
+                    {order.status.toUpperCase()}
+                  </div>
+                </div>
+
+                <div className="order-items">
+                  <h4>Items:</h4>
+                  {order.items.map((item, index) => (
+                    <div key={index} className="item-row">
+                      <span>{item.quantity}x {item.name}</span>
+                      <span>{formatCurrency(item.price * item.quantity)}</span>
+                    </div>
+                  ))}
+                  <div className="total-row">
+                    <span><strong>Total:</strong></span>
+                    <span className="total-amount"><strong>{formatCurrency(order.totalAmount)}</strong></span>
+                  </div>
+                </div>
+
+                <div className="order-actions">
+                  {getStatusOptions(order.status).length > 0 && (
+                    <div className="status-actions">
+                      <label>Update Status:</label>
+                      <div className="action-buttons">
+                        {getStatusOptions(order.status).map(statusOption => (
+                          <button
+                            key={statusOption}
+                            className={`status-button ${statusOption}`}
+                            onClick={() => updateOrderStatus(order.id, statusOption)}
+                          >
+                            Mark as {statusOption.charAt(0).toUpperCase() + statusOption.slice(1)}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <button 
+                    className="notify-button"
+                    onClick={() => notifyClient(order.id, order.status)}
+                  >
+                    Send Notification
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
       </div>
     </div>
   );

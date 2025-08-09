@@ -41,13 +41,13 @@
   --bg-primary: #1e293b;
   --bg-secondary: #334155;
   --bg-card: #0f172a;
-  --bg-muted: rgba(255, 255, 255, 0.3);
+  --bg-muted: rgba(255, 255, 255, 0.182);
   
   /* High contrast text for readability */
   --text-primary: #ffffff;
   --text-secondary: #e2e8f0;
-  --text-muted: #cbd5e1;
-  --text-meta: #cbd5e1;
+  --text-muted: #abb2ba;
+  --text-meta: #abb2ba;
   
   /* Vibrant orange and blue accents */
   --accent-color: #3b82f6;
