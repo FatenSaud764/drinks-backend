@@ -33,19 +33,17 @@ install-frontend:
 	cd $(CLIENT_DIR) && npm install
 	cd $(SHARED_DIR) && npm install
 
-# Create database & user
-.PHONY: setup-db
-setup-db:
-	if [ "$$(uname)" = "Linux" ]; then \
-		sudo -u postgres psql -f create_db.sql; \
-	else \
-		psql -U postgres -h localhost -f create_db.sql; \
-	fi
+.PHONY: start-db
+start-db:
+	docker-compose up -d postgres
+
+.PHONY: stop-db
+stop-db:
+	docker-compose down
 
 # Install backend dependencies
 .PHONY: install-backend
-install-backend:
-	make setup-db && \
+install-backend: start-db
 	cd $(BACKEND_DIR) && ${PYTHON} -m venv env && \
 	${VENV_ACTIVATE} && \
 	pip install -r requirements.txt && \

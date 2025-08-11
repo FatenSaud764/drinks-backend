@@ -10,7 +10,7 @@ This project contains two Vite React apps (`admin` and `client`), a backend and 
 - npm (v11 or later)
 - Make (GNU Make)
 - Python 3.10+
-- PostgreSQL
+- Docker
 
 ---
 
