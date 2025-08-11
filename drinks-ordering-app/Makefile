@@ -33,26 +33,24 @@ install-frontend:
 	cd $(CLIENT_DIR) && npm install
 	cd $(SHARED_DIR) && npm install
 
+# Create database & user
+.PHONY: setup-db
+setup-db:
+	if [ "$$(uname)" = "Linux" ]; then \
+		sudo -u postgres psql -f create_db.sql; \
+	else \
+		psql -U postgres -h localhost -f create_db.sql; \
+	fi
+
 # Install backend dependencies
 .PHONY: install-backend
 install-backend:
+	make setup-db && \
 	cd $(BACKEND_DIR) && ${PYTHON} -m venv env && \
 	${VENV_ACTIVATE} && \
 	pip install -r requirements.txt && \
-	if [ "$$(uname)" = "Linux" ]; then \
-		sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='baruser'" | grep -q 1 || \
-		sudo -u postgres psql -c "CREATE USER baruser WITH PASSWORD 'barpass';"; \
-		sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='barapp_db'" | grep -q 1 || \
-		sudo -u postgres psql -c "CREATE DATABASE barapp_db OWNER baruser;"; \
-	else \
-		psql -U postgres -h localhost -tAc "SELECT 1 FROM pg_roles WHERE rolname='baruser'" | grep -q 1 || \
-		psql -U postgres -h localhost -c "CREATE USER baruser WITH PASSWORD 'barpass';"; \
-		psql -U postgres -h localhost -tAc "SELECT 1 FROM pg_database WHERE datname='barapp_db'" | grep -q 1 || \
-		psql -U postgres -h localhost -c "CREATE DATABASE barapp_db OWNER baruser;"; \
-	fi && \
 	${PYTHON} manage.py makemigrations && \
 	${PYTHON} manage.py migrate
-
 
 # Clean all node_modules and lock files
 .PHONY: clean
