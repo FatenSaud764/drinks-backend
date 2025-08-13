@@ -229,6 +229,12 @@ const OrdersPage = () => {
     };
   };
 
+  const notifyCustomer = (orderId) => {
+    // Notify customer to collect their completed order
+    const order = historyOrders.find(o => o.id === orderId);
+    toast.success(`Reminder sent: ${order?.orderNumber} is ready for collection`);
+  };
+
   const statusCounts = getStatusCounts();
 
   return (
@@ -344,6 +350,16 @@ const OrdersPage = () => {
                         ))}
                       </div>
                     </div>
+                  )}
+
+                  {order.status === 'ready' && (
+                    <button 
+                      className="notify-button"
+                      onClick={() => notifyCustomer(order.id)}
+                      title="Remind customer to collect their completed order"
+                    >
+                      Remind Customer
+                    </button>
                   )}
                 </div>
               </div>
