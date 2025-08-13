@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/Pages.css';
-// Toast alerts for undo and notification system
 import { toast } from 'react-toastify';
 
 const OrdersPage = () => {
@@ -22,6 +21,7 @@ const OrdersPage = () => {
         totalAmount: 190,
         status: 'pending',
         orderTime: new Date('2024-08-08T09:30:00'),
+        lastUpdated: new Date('2024-08-08T09:30:00'),
       },
       {
         id: 2,
@@ -32,6 +32,7 @@ const OrdersPage = () => {
         totalAmount: 38.50,
         status: 'preparing',
         orderTime: new Date('2024-08-08T10:15:00'),
+        lastUpdated: new Date('2024-08-08T10:45:00'),
       },
       {
         id: 3,
@@ -42,16 +43,7 @@ const OrdersPage = () => {
         totalAmount: 256.50,
         status: 'ready',
         orderTime: new Date('2024-08-08T11:00:00'),
-      },
-      {
-        id: 4,
-        orderNumber: 'ORD-004',
-        items: [
-          { name: 'Coke', quantity: 1, price: 18.90 }
-        ],
-        totalAmount: 18.90,
-        status: 'completed',
-        orderTime: new Date('2024-08-08T08:45:00'),
+        lastUpdated: new Date('2024-08-08T11:30:00'),
       },
       {
         id: 5,
@@ -63,6 +55,7 @@ const OrdersPage = () => {
         totalAmount: 252.00,
         status: 'preparing',
         orderTime: new Date('2024-08-08T11:30:00'),
+        lastUpdated: new Date('2024-08-08T11:45:00'),
       },
       {
         id: 6,
@@ -73,6 +66,7 @@ const OrdersPage = () => {
         totalAmount: 110.00,
         status: 'ready',
         orderTime: new Date('2024-08-08T12:00:00'),
+        lastUpdated: new Date('2024-08-08T12:15:00'),
       },
       {
         id: 7,
@@ -84,6 +78,7 @@ const OrdersPage = () => {
         totalAmount: 332.00,
         status: 'pending',
         orderTime: new Date('2024-08-08T12:30:00'),
+        lastUpdated: new Date('2024-08-08T12:30:00'),
       },
       {
         id: 8,
@@ -94,15 +89,18 @@ const OrdersPage = () => {
         totalAmount: 120.00,
         status: 'preparing',
         orderTime: new Date('2024-08-08T13:00:00'),
+        lastUpdated: new Date('2024-08-08T13:10:00'),
       }
     ];
     setOrders(mockOrders);
     setFilteredOrders(mockOrders);
   }, []);
 
-  // Filter orders based on status and search term
+  // Filter orders based on status and search term - exclude completed and cancelled
   useEffect(() => {
-    let filtered = orders;
+    let filtered = orders.filter(order => 
+      !['completed', 'cancelled'].includes(order.status)
+    );
 
     if (statusFilter !== 'all') {
       filtered = filtered.filter(order => order.status === statusFilter);
@@ -122,15 +120,44 @@ const OrdersPage = () => {
     const order = orders.find(o => o.id === orderId);
 
     // Update the order immediately
+    const updatedOrder = { 
+      ...order, 
+      status: newStatus, 
+      lastUpdated: new Date(),
+      ...(newStatus === 'completed' && { completedAt: new Date() }),
+      ...(newStatus === 'cancelled' && { cancelledAt: new Date() })
+    };
+
     setOrders(prevOrders =>
-      prevOrders.map(order =>
-        order.id === orderId ? { ...order, status: newStatus } : order
+      prevOrders.map(o =>
+        o.id === orderId ? updatedOrder : o
       )
     );
+
+    // If moving to completed or cancelled, send to history
+    if (['completed', 'cancelled'].includes(newStatus)) {
+      moveToHistory(updatedOrder);
+    }
 
     // Show confirmation toast and send notification
     toast.success(`${order.orderNumber} updated to ${newStatus.toUpperCase()}`);
     notifyClient(orderId, newStatus);
+  };
+
+  const moveToHistory = (order) => {
+    // This function will handle moving orders to history
+    // In a real app, this would be an API call to update the order status in the backend
+    // The history page would then fetch these orders from the backend
+    
+    console.log('Moving order to history:', order);
+    
+    // For now, we'll store in localStorage to simulate backend persistence
+    // In production, replace this with an API call
+    const existingHistory = JSON.parse(localStorage.getItem('orderHistory') || '[]');
+    const updatedHistory = [order, ...existingHistory];
+    localStorage.setItem('orderHistory', JSON.stringify(updatedHistory));
+    
+    toast.info(`${order.orderNumber} moved to order history`);
   };
 
   const notifyClient = (orderId, status) => {
@@ -189,13 +216,16 @@ const OrdersPage = () => {
   };
 
   const getStatusCounts = () => {
+    // Only count active orders (not completed or cancelled)
+    const activeOrders = orders.filter(order => 
+      !['completed', 'cancelled'].includes(order.status)
+    );
+    
     return {
-      all: orders.length,
-      pending: orders.filter(order => order.status === 'pending').length,
-      preparing: orders.filter(order => order.status === 'preparing').length,
-      ready: orders.filter(order => order.status === 'ready').length,
-      completed: orders.filter(order => order.status === 'completed').length,
-      cancelled: orders.filter(order => order.status === 'cancelled').length
+      all: activeOrders.length,
+      pending: activeOrders.filter(order => order.status === 'pending').length,
+      preparing: activeOrders.filter(order => order.status === 'preparing').length,
+      ready: activeOrders.filter(order => order.status === 'ready').length,
     };
   };
 
@@ -205,7 +235,7 @@ const OrdersPage = () => {
     <div className="page">
       <div className="page-container">
         <div className="page-header">
-          <h1>Orders Management</h1>
+          <h1>Active Orders</h1>
           <p>Manage active orders and update status in real-time</p>
         </div>
 
@@ -221,7 +251,7 @@ const OrdersPage = () => {
           </div>
           
           <div className="filter-tabs">
-            {['all', 'pending', 'preparing', 'ready', 'completed'].map(status => (
+            {['all', 'pending', 'preparing', 'ready'].map(status => (
               <button
                 key={status}
                 className={`filter-tab ${statusFilter === status ? 'active' : ''}`}
@@ -239,8 +269,8 @@ const OrdersPage = () => {
         <div className="orders-grid">
           {filteredOrders.length === 0 ? (
             <div className="no-orders">
-              <h3>No orders found</h3>
-              <p>No orders match your current search criteria.</p>
+              <h3>No active orders found</h3>
+              <p>No active orders match your current search criteria.</p>
             </div>
           ) : (
             filteredOrders.map(order => (
@@ -315,13 +345,6 @@ const OrdersPage = () => {
                       </div>
                     </div>
                   )}
-                  
-                  <button 
-                    className="notify-button"
-                    onClick={() => notifyClient(order.id, order.status)}
-                  >
-                    Send Notification
-                  </button>
                 </div>
               </div>
             ))
