@@ -10,8 +10,8 @@ const HistoryPage = () => {
   const [dateFilter, setDateFilter] = useState('all');
 
   useEffect(() => {
-    // In a real app, this would be an API call to fetch historical orders
-    // For now, we'll get from localStorage and add some mock historical data
+    // This would be an API call to fetch historical orders
+    // For now, I just get from localStorage
     const mockHistoryOrders = [
       {
         id: 4,
