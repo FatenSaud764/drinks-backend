@@ -53,7 +53,7 @@ const OrderCard = ({
       {!isHistory ? (
         <ActiveOrderActions order={order} onUpdateStatus={onUpdateStatus} />
       ) : (
-        <HistoryOrderActions order={order} />
+        <HistoryOrderActions order={order} onUpdateStatus={onUpdateStatus} />
       )}
     </div>
   );
@@ -120,7 +120,7 @@ const ActiveOrderActions = ({ order, onUpdateStatus }) => {
   );
 };
 
-const HistoryOrderActions = ({ order }) => {
+const HistoryOrderActions = ({ order, onUpdateStatus }) => {
   const formatDate = (date) => {
     return new Date(date).toLocaleDateString('en-US', {
       month: 'short',
@@ -140,11 +140,7 @@ const HistoryOrderActions = ({ order }) => {
         {order.status === 'cancelled' && (
           <button 
             className="restore-button"
-            onClick={() => {
-              // This would be handled by the parent component
-              console.log('Restore order:', order.id);
-            }}
-            title="Restore this cancelled order to active orders"
+            onClick={() => onUpdateStatus(order.id)}
           >
             Restore Order
           </button>
