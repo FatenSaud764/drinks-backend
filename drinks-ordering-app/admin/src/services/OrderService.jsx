@@ -1,90 +1,114 @@
 import { toast } from 'react-toastify';
 import { ORDER_STATUSES, notifyClient } from '../utils/OrderUtils';
 
-// Mock data - eventually replace with API calls
+// Base mock data
+const BASE_MOCK_ORDERS = [
+  {
+    id: 1,
+    orderNumber: 'ORD-001',
+    items: [
+      { name: 'Pina Colada', quantity: 2, price: 75.00 },
+      { name: 'Black Label', quantity: 1, price: 40.00 }
+    ],
+    totalAmount: 190,
+    status: ORDER_STATUSES.PENDING,
+    orderTime: new Date('2024-08-08T09:30:00'),
+    lastUpdated: new Date('2024-08-08T09:30:00'),
+  },
+  {
+    id: 2,
+    orderNumber: 'ORD-002',
+    items: [
+      { name: 'Castle Lager', quantity: 1, price: 38.50 },
+    ],
+    totalAmount: 38.50,
+    status: ORDER_STATUSES.PREPARING,
+    orderTime: new Date('2024-08-08T10:15:00'),
+    lastUpdated: new Date('2024-08-08T10:45:00'),
+  },
+  {
+    id: 3,
+    orderNumber: 'ORD-003',
+    items: [
+      { name: 'Espresso Martini', quantity: 3, price: 85.50 },
+    ],
+    totalAmount: 256.50,
+    status: ORDER_STATUSES.READY,
+    orderTime: new Date('2024-08-08T11:00:00'),
+    lastUpdated: new Date('2024-08-08T11:30:00'),
+  },
+  {
+    id: 5,
+    orderNumber: 'ORD-005',
+    items: [
+      { name: 'Whiskey Sour', quantity: 2, price: 92.00 },
+      { name: 'Aperol Spritz', quantity: 1, price: 68.00 }
+    ],
+    totalAmount: 252.00,
+    status: ORDER_STATUSES.PREPARING,
+    orderTime: new Date('2024-08-08T11:30:00'),
+    lastUpdated: new Date('2024-08-08T11:45:00'),
+  },
+  {
+    id: 6,
+    orderNumber: 'ORD-006',
+    items: [
+      { name: 'Red Wine Glass', quantity: 2, price: 55.00 }
+    ],
+    totalAmount: 110.00,
+    status: ORDER_STATUSES.READY,
+    orderTime: new Date('2024-08-08T12:00:00'),
+    lastUpdated: new Date('2024-08-08T12:15:00'),
+  },
+  {
+    id: 7,
+    orderNumber: 'ORD-007',
+    items: [
+      { name: 'Mojito', quantity: 3, price: 72.00 },
+      { name: 'Gin & Tonic', quantity: 2, price: 58.00 }
+    ],
+    totalAmount: 332.00,
+    status: ORDER_STATUSES.PENDING,
+    orderTime: new Date('2024-08-08T12:30:00'),
+    lastUpdated: new Date('2024-08-08T12:30:00'),
+  },
+  {
+    id: 8,
+    orderNumber: 'ORD-008',
+    items: [
+      { name: 'Beer Flight', quantity: 1, price: 120.00 }
+    ],
+    totalAmount: 120.00,
+    status: ORDER_STATUSES.PREPARING,
+    orderTime: new Date('2024-08-08T13:00:00'),
+    lastUpdated: new Date('2024-08-08T13:10:00'),
+  }
+];
+
+// Get active orders, excluding those moved to history
 export const getMockActiveOrders = () => {
-  return [
-    {
-      id: 1,
-      orderNumber: 'ORD-001',
-      items: [
-        { name: 'Pina Colada', quantity: 2, price: 75.00 },
-        { name: 'Black Label', quantity: 1, price: 40.00 }
-      ],
-      totalAmount: 190,
-      status: ORDER_STATUSES.PENDING,
-      orderTime: new Date('2024-08-08T09:30:00'),
-      lastUpdated: new Date('2024-08-08T09:30:00'),
-    },
-    {
-      id: 2,
-      orderNumber: 'ORD-002',
-      items: [
-        { name: 'Castle Lager', quantity: 1, price: 38.50 },
-      ],
-      totalAmount: 38.50,
-      status: ORDER_STATUSES.PREPARING,
-      orderTime: new Date('2024-08-08T10:15:00'),
-      lastUpdated: new Date('2024-08-08T10:45:00'),
-    },
-    {
-      id: 3,
-      orderNumber: 'ORD-003',
-      items: [
-        { name: 'Espresso Martini', quantity: 3, price: 85.50 },
-      ],
-      totalAmount: 256.50,
-      status: ORDER_STATUSES.READY,
-      orderTime: new Date('2024-08-08T11:00:00'),
-      lastUpdated: new Date('2024-08-08T11:30:00'),
-    },
-    {
-      id: 5,
-      orderNumber: 'ORD-005',
-      items: [
-        { name: 'Whiskey Sour', quantity: 2, price: 92.00 },
-        { name: 'Aperol Spritz', quantity: 1, price: 68.00 }
-      ],
-      totalAmount: 252.00,
-      status: ORDER_STATUSES.PREPARING,
-      orderTime: new Date('2024-08-08T11:30:00'),
-      lastUpdated: new Date('2024-08-08T11:45:00'),
-    },
-    {
-      id: 6,
-      orderNumber: 'ORD-006',
-      items: [
-        { name: 'Red Wine Glass', quantity: 2, price: 55.00 }
-      ],
-      totalAmount: 110.00,
-      status: ORDER_STATUSES.READY,
-      orderTime: new Date('2024-08-08T12:00:00'),
-      lastUpdated: new Date('2024-08-08T12:15:00'),
-    },
-    {
-      id: 7,
-      orderNumber: 'ORD-007',
-      items: [
-        { name: 'Mojito', quantity: 3, price: 72.00 },
-        { name: 'Gin & Tonic', quantity: 2, price: 58.00 }
-      ],
-      totalAmount: 332.00,
-      status: ORDER_STATUSES.PENDING,
-      orderTime: new Date('2024-08-08T12:30:00'),
-      lastUpdated: new Date('2024-08-08T12:30:00'),
-    },
-    {
-      id: 8,
-      orderNumber: 'ORD-008',
-      items: [
-        { name: 'Beer Flight', quantity: 1, price: 120.00 }
-      ],
-      totalAmount: 120.00,
-      status: ORDER_STATUSES.PREPARING,
-      orderTime: new Date('2024-08-08T13:00:00'),
-      lastUpdated: new Date('2024-08-08T13:10:00'),
-    }
-  ];
+  // Get stored active orders or use base mock data
+  const storedActiveOrders = JSON.parse(localStorage.getItem('activeOrders') || 'null');
+  
+  if (storedActiveOrders) {
+    return storedActiveOrders;
+  }
+  
+  // First time load - filter out any orders that are already in history
+  const historyOrders = JSON.parse(localStorage.getItem('orderHistory') || '[]');
+  const historyIds = historyOrders.map(order => order.id);
+  
+  const activeOrders = BASE_MOCK_ORDERS.filter(order => !historyIds.includes(order.id));
+  
+  // Store active orders
+  localStorage.setItem('activeOrders', JSON.stringify(activeOrders));
+  
+  return activeOrders;
+};
+
+// Save active orders to localStorage
+export const saveActiveOrders = (orders) => {
+  localStorage.setItem('activeOrders', JSON.stringify(orders));
 };
 
 export const getMockHistoryOrders = () => {
@@ -133,7 +157,7 @@ export const getMockHistoryOrders = () => {
 export const updateOrderStatus = (orders, setOrders, orderId, newStatus) => {
   const order = orders.find(o => o.id === orderId);
 
-  // Update the order immediately
+  // Create the updated order
   const updatedOrder = { 
     ...order, 
     status: newStatus, 
@@ -142,15 +166,24 @@ export const updateOrderStatus = (orders, setOrders, orderId, newStatus) => {
     ...(newStatus === ORDER_STATUSES.CANCELLED && { cancelledAt: new Date() })
   };
 
-  setOrders(prevOrders =>
-    prevOrders.map(o =>
-      o.id === orderId ? updatedOrder : o
-    )
-  );
-
-  // If moving to completed or cancelled, send to history
+  // If moving to completed or cancelled, remove from active orders and send to history
   if ([ORDER_STATUSES.COMPLETED, ORDER_STATUSES.CANCELLED].includes(newStatus)) {
+    // Remove from active orders
+    const updatedOrders = orders.filter(o => o.id !== orderId);
+    setOrders(updatedOrders);
+    
+    // Save updated active orders to localStorage
+    saveActiveOrders(updatedOrders);
+    
+    // Move to history
     moveToHistory(updatedOrder);
+  } else {
+    // For other status updates, just update the order in place
+    const updatedOrders = orders.map(o => o.id === orderId ? updatedOrder : o);
+    setOrders(updatedOrders);
+    
+    // Save updated active orders to localStorage
+    saveActiveOrders(updatedOrders);
   }
 
   // Show confirmation toast and send notification
@@ -208,9 +241,19 @@ export const restoreOrder = (historyOrders, setHistoryOrders, orderId) => {
       lastUpdated: new Date()
     };
     
-    // Remove from history
+    // Remove from history (both localStorage and state)
     const updatedHistory = historyOrders.filter(o => o.id !== orderId);
     setHistoryOrders(updatedHistory);
+    
+    // Update localStorage history
+    const storedHistory = JSON.parse(localStorage.getItem('orderHistory') || '[]');
+    const updatedStoredHistory = storedHistory.filter(o => o.id !== orderId);
+    localStorage.setItem('orderHistory', JSON.stringify(updatedStoredHistory));
+    
+    // Add back to active orders
+    const currentActiveOrders = JSON.parse(localStorage.getItem('activeOrders') || '[]');
+    const updatedActiveOrders = [restoredOrder, ...currentActiveOrders];
+    localStorage.setItem('activeOrders', JSON.stringify(updatedActiveOrders));
     
     // In a real app, this would be an API call to move the order back to active
     toast.success(`${order.orderNumber} restored to active orders`);
