@@ -1,0 +1,157 @@
+import React from 'react';
+import {
+  formatTime,
+  formatCurrency,
+  canMoveToPrevious,
+  canMoveToNext,
+  getPreviousStatus,
+  getNextStatus,
+  getStatusOptions,
+  notifyCustomer
+} from '../utils/OrderUtils';
+
+const OrderCard = ({ 
+  order, 
+  onUpdateStatus, 
+  isHistory = false 
+}) => {
+  return (
+    <div className={`order-card ${isHistory ? 'history-card' : ''}`}>
+      <div className="order-header">
+        <div className="order-number">
+          <h3>{order.orderNumber}</h3>
+          {isHistory ? (
+            <div className="order-timestamps">
+              <span className="order-time">Ordered: {formatTime(order.orderTime)}</span>
+              <span className="updated-time">
+                {order.status === 'completed' ? 'Completed' : 'Cancelled'}: {formatTime(order.lastUpdated)}
+              </span>
+            </div>
+          ) : (
+            <span className="order-time">{formatTime(order.orderTime)}</span>
+          )}
+        </div>
+        <div className={`status-badge status-${order.status}`}>
+          {order.status.toUpperCase()}
+        </div>
+      </div>
+
+      <div className="order-items">
+        <h4>Items:</h4>
+        {order.items.map((item, index) => (
+          <div key={index} className="item-row">
+            <span>{item.quantity}x {item.name}</span>
+            <span>{formatCurrency(item.price * item.quantity)}</span>
+          </div>
+        ))}
+        <div className="total-row">
+          <span><strong>Total:</strong></span>
+          <span className="total-amount"><strong>{formatCurrency(order.totalAmount)}</strong></span>
+        </div>
+      </div>
+
+      {!isHistory ? (
+        <ActiveOrderActions order={order} onUpdateStatus={onUpdateStatus} />
+      ) : (
+        <HistoryOrderActions order={order} />
+      )}
+    </div>
+  );
+};
+
+const ActiveOrderActions = ({ order, onUpdateStatus }) => {
+  return (
+    <div className="order-actions">
+      <div className="status-navigation">
+        <div className="nav-controls">
+          <button
+            className="nav-button prev"
+            disabled={!canMoveToPrevious(order.status)}
+            onClick={() => onUpdateStatus(order.id, getPreviousStatus(order.status))}
+            title={`Move back to ${getPreviousStatus(order.status) || 'previous status'}`}
+          >
+            &#8249; {getPreviousStatus(order.status) ? getPreviousStatus(order.status).charAt(0).toUpperCase() + getPreviousStatus(order.status).slice(1) : 'Previous'}
+          </button>
+          
+          <div className="current-status">
+            <span className="status-label">Status</span>
+            <span className={`status-display status-${order.status}`}>
+              {order.status.toUpperCase()}
+            </span>
+          </div>
+          
+          <button
+            className="nav-button next"
+            disabled={!canMoveToNext(order.status)}
+            onClick={() => onUpdateStatus(order.id, getNextStatus(order.status))}
+            title={`Move forward to ${getNextStatus(order.status) || 'next status'}`}
+          >
+            {getNextStatus(order.status) ? getNextStatus(order.status).charAt(0).toUpperCase() + getNextStatus(order.status).slice(1) : 'Next'} &#8250;
+          </button>
+        </div>
+      </div>
+
+      {getStatusOptions(order.status).length > 0 && (
+        <div className="status-actions">
+          <div className="action-buttons">
+            {getStatusOptions(order.status).map(statusOption => (
+              <button
+                key={statusOption}
+                className={`status-button status-${statusOption}`}
+                onClick={() => onUpdateStatus(order.id, statusOption)}
+              >
+                Mark as {statusOption.charAt(0).toUpperCase() + statusOption.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {order.status === 'ready' && (
+        <button 
+          className="notify-button"
+          onClick={() => notifyCustomer(order)}
+          title="Remind customer to collect their completed order"
+        >
+          Remind Customer
+        </button>
+      )}
+    </div>
+  );
+};
+
+const HistoryOrderActions = ({ order }) => {
+  const formatDate = (date) => {
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  return (
+    <div className="history-actions">
+      <div className="order-date">
+        <span className="date-label">Date:</span>
+        <span className="date-value">{formatDate(order.lastUpdated)}</span>
+      </div>
+      
+      <div className="action-buttons-group">
+        {order.status === 'cancelled' && (
+          <button 
+            className="restore-button"
+            onClick={() => {
+              // This would be handled by the parent component
+              console.log('Restore order:', order.id);
+            }}
+            title="Restore this cancelled order to active orders"
+          >
+            Restore Order
+          </button>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default OrderCard;
