@@ -125,7 +125,7 @@
   grid-column: 1 / -1;
   text-align: center;
   padding: 4rem 2rem;
-  background: white;
+  background: var(--bg-card);
   border-radius: 16px;
   box-shadow: 0 10px 25px var(--shadow);
   color: var(--text-secondary);
@@ -135,13 +135,13 @@
   font-size: 1.5rem;
   font-weight: 600;
   margin: 0 0 0.5rem 0;
-  color: #2d3748;
+  color: var(--text-primary);
 }
 
 .no-orders p {
   margin: 0;
   font-size: 1rem;
-  color: #718096;
+  color: var(--text-muted);
 }
 
 /* Order Cards */
