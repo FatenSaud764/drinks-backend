@@ -337,7 +337,6 @@ const OrdersPage = () => {
 
                   {getStatusOptions(order.status).length > 0 && (
                     <div className="status-actions">
-                      <label>Other Actions:</label>
                       <div className="action-buttons">
                         {getStatusOptions(order.status).map(statusOption => (
                           <button
