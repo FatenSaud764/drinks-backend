@@ -1,4 +1,3 @@
-// services/orderService.js
 import { toast } from 'react-toastify';
 import { ORDER_STATUSES, notifyClient } from '../utils/OrderUtils';
 
