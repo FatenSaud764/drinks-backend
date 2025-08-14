@@ -597,6 +597,35 @@
   gap: 0.5rem;
 }
 
+/* Page Actions */
+.page-actions {
+  margin-top: 1rem;
+}
+
+/* Complete by PIN Button */
+.btn-complete-by-pin {
+  background: var(--success-color);
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 2px 8px var(--shadow);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+}
+
+.btn-complete-by-pin:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--success-color);
+}
+
+.btn-complete-by-pin .icon {
+  font-size: 16px;
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .filter-section {
