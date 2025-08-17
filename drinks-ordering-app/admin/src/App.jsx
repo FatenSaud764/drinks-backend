@@ -8,9 +8,9 @@ import OrdersPage from './pages/OrdersPage';
 import HistoryPage from './pages/HistoryPage';
 import InventoryPage from './pages/InventoryPage';
 // Styles
-import 'shared/styles/Global.css';
+import './styles/Global.css';
 // Themes
-import { ThemeProvider } from 'shared/contexts/ThemeContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 // Toastify for Toast Alerts
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

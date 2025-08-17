@@ -3,7 +3,7 @@
  * @description This component handles the theme toggle for light/dark mode
  *
 */
-import { useTheme } from 'shared/contexts/ThemeContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 // MUI Icons
 import DarkModeIcon from '@mui/icons-material/DarkMode';

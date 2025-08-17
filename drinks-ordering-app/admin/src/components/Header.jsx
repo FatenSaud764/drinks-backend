@@ -1,4 +1,4 @@
-import ThemeToggle from 'shared/components/ThemeToggle';
+import ThemeToggle from './ThemeToggle';
 import '../styles/Header.css';
 
 const Header = ({ toggleSidebar, isSidebarOpen }) => {
