@@ -1,0 +1,143 @@
+.sidebar {
+  width: 300px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-colour);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  position: fixed;
+  top: 60px;
+  left: 0;
+  height: calc(100vh - 60px);
+  flex-shrink: 0;
+  z-index: 998;
+}
+
+.sidebar.closed {
+  width: 0;
+  border-right: none;
+}
+
+.sidebar.mobile {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  height: calc(100vh - 60px);
+  z-index: 999;
+  box-shadow: 2px 0 10px var(--shadow);
+  width: 280px;
+}
+
+.sidebar.mobile.closed {
+  transform: translateX(-100%);
+  width: 280px;
+}
+
+.sidebar-content {
+  width: 280px;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+}
+
+/* Navigation */
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem 0;
+  overflow: hidden;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-item {
+  margin: 0.5rem 1rem;
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.nav-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-accent);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.nav-item:hover::before {
+  left: 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  border-radius: 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.nav-link:hover {
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-hover);
+}
+
+.nav-link.active {
+  background-color: var(--accent-primary, #3b82f6);
+  color: white;
+  border-left-color: var(--accent-secondary, #1d4ed8);
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+}
+
+.nav-link.active:hover {
+  background-color: var(--accent-secondary, #1d4ed8);
+  transform: none;
+}
+
+.nav-icon {
+  font-size: 1.1rem;
+  margin-right: 0.75rem;
+  width: 20px;
+  text-align: center;
+}
+
+.nav-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+/* Mobile specific styles */
+@media (max-width: 768px) {
+  .sidebar {
+    top: 50px;
+    height: calc(100vh - 50px);
+  }
+  
+  .sidebar.mobile {
+    top: 50px;
+    height: calc(100vh - 50px);
+    transition: transform 0.3s ease;
+  }
+  
+  .sidebar.mobile.open {
+    transform: translateX(0);
+  }
+
+  .nav-link {
+    padding: 0.875rem 1rem;
+  }
+}

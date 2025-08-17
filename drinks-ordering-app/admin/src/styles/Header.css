@@ -1,0 +1,128 @@
+/* Header.css - Header component styles */
+
+.header {
+  height: 60px;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--border-colour);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px var(--shadow);
+}
+
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: none;
+  border: 1px solid var(--shadow);
+  padding: 8px 12px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-right: 1rem;
+  transition: all 0.2s ease;
+  color: var(--text-primary);
+}
+
+.sidebar-toggle:hover {
+  background-color: var(--hover);
+  border-color: var(--border-colour);
+}
+
+.sidebar-toggle:active {
+  transform: translateY(1px);
+}
+
+/* Animated hamburger icon */
+.hamburger {
+  display: flex;
+  flex-direction: column;
+  width: 20px;
+  height: 16px;
+  position: relative;
+}
+
+.hamburger span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background-color: var(--text-primary);
+  border-radius: 1px;
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+.hamburger span:nth-child(1) {
+  margin-bottom: 3px;
+}
+
+.hamburger span:nth-child(2) {
+  margin-bottom: 3px;
+}
+
+/* Hamburger animation when open */
+.hamburger.open span:nth-child(1) {
+  transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger.open span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburger.open span:nth-child(3) {
+  transform: rotate(-45deg) translate(7px, -6px);
+}
+
+.toggle-text {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.header-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .header {
+    padding: 0 0.75rem;
+  }
+  
+  .header-title {
+    font-size: 1.25rem;
+  }
+  
+  .toggle-text {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    height: 50px;
+  }
+  
+  .header-title {
+    font-size: 1.1rem;
+  }
+  
+  .sidebar-toggle {
+    padding: 6px 10px;
+    margin-right: 0.75rem;
+  }
+}

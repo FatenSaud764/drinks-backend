@@ -1,0 +1,63 @@
+/**
+ * @author Kirsten Sanders
+ * @description Order Status styles
+*/
+
+/* Status Color Variables */
+:root {
+  --status-pending: #ff9800;
+  --status-pending-hover: #f57c00;
+
+  --status-preparing: #2196f3;
+  --status-preparing-hover: #1976d2;
+
+  --status-ready: #4caf50;
+  --status-ready-hover: #388e3c;
+
+  --status-completed: #9e9e9e;
+  --status-completed-hover: #757575;
+
+  --status-cancelled: #f44336;
+  --status-cancelled-hover: #d32f2f;
+}
+
+/* Status-based classes for dynamic styling */
+.status-pending {
+  background-color: var(--status-pending) !important;
+}
+
+.status-pending:hover {
+  background-color: var(--status-pending-hover) !important;
+}
+
+.status-preparing {
+  background-color: var(--status-preparing) !important;
+}
+
+.status-preparing:hover {
+  background-color: var(--status-preparing-hover) !important;
+}
+
+.status-ready {
+  background-color: var(--status-ready) !important;
+}
+
+.status-ready:hover {
+  background-color: var(--status-ready-hover) !important;
+}
+
+.status-completed {
+  background-color: var(--status-completed) !important;
+}
+
+.status-completed:hover {
+  background-color: var(--status-completed-hover) !important;
+}
+
+.status-cancelled {
+  background-color: var(--status-cancelled) !important;
+}
+
+.status-cancelled:hover {
+  background-color: var(--status-cancelled-hover) !important;
+}
