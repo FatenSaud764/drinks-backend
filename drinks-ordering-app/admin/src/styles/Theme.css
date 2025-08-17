@@ -5,26 +5,26 @@
 
 /* Root theme (light-mode) */
 :root {
-  /* Light mode */
+  /* Light mode - toned down blues */
   --bg-primary: #ffffff;
-  --bg-secondary: #89b6ff;
-  --bg-card: #b7ceff;
-  --bg-muted: rgba(255, 255, 255, 0.3);
+  --bg-secondary: #c1d5ea;
+  --bg-card: rgb(193, 213, 234, 0.75);
+  --bg-muted: rgba(248, 250, 252, 0.8);
 
   /* Clean text hierarchy */
   --text-primary: #0f172a;
   --text-secondary: #334155;
   --text-muted: #64748b;
-  --text-meta: #64748b;;
+  --text-meta: #94a3b8;
   
-  /* Subtle blue accents */
-  --border-color: rgba(59, 130, 246, 0.15);
-  --accent-color: #2563eb;
+  /* Much more subtle blue accents */
+  --border-color: rgba(148, 163, 184, 0.2);
+  --accent-color: #475569;
   --hover: #f97316;
   --focus: #f97316;
   --hover-secondary: #ea580c;
-  --accent-hover: #1d4ed8;
-  --accent-secondary: #0ea5e9;
+  --accent-hover: #334155;
+  --accent-secondary: #64748b;
   
   /* Basic success/danger/warning colors */
   --success-color: #059669;
@@ -35,10 +35,10 @@
   --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   
-  /* Subtle gradients */
+  /* Subtle gradients - removed blue tones */
   --gradient-accent: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  --gradient-background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
-  --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(248,250,252,0.95));
+  --gradient-background: linear-gradient(135deg, #ffffff 0%, #f9fafb 50%, #f3f4f6 100%);
+  --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(249,250,251,0.95));
 }
 
 [data-theme="dark"] {
