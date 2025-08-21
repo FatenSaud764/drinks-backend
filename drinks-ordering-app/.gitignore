@@ -1,6 +1,10 @@
 backend/env/
 **/package-lock.json
 
+# Python
+__pycache__/
+*.pyc
+
 # Logs
 logs
 *.log
