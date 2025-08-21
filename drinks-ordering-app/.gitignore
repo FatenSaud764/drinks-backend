@@ -1,9 +1,11 @@
-backend/env/
-**/package-lock.json
-
 # Python
-__pycache__/
 *.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+*.db
 
 # Logs
 logs
@@ -14,10 +16,31 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+# Node.js
+node_modules/
+**/package-lock.json
 dist
 dist-ssr
 *.local
+
+# Virtual Environment
+backend/env/
+env/
+venv/
+ENV/
+.venv/
+.env/
+myenv/
+.myenv/
+myenvironment/
+.myenvironment/
+/home/faten/Samus-RW344/drinks-ordering-app/backend/myenvironment
+
+
+# Django-specific
+*.sqlite3
+staticfiles/
+local_settings.py
 
 # Editor directories and files
 .vscode/*
@@ -29,3 +52,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# macOS / Windows junk
+.DS_Store
+Thumbs.db
