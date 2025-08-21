@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 ('description', models.TextField(blank=True)),
                 ('price', models.DecimalField(decimal_places=2, max_digits=6)),
                 ('available', models.BooleanField(default=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
+                ('created_at', models.DateTimeField(auto_now_add=True))
             ],
         ),
         migrations.CreateModel(

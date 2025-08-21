@@ -7,30 +7,42 @@ import {
   getPreviousStatus,
   getNextStatus,
   getStatusOptions,
-  notifyCustomer
+  notifyClientReminder
 } from '../utils/OrderUtils';
+import { useInventory } from '../hooks/useInventory'; // Add this import
 
 const OrderCard = ({ 
   order, 
   onUpdateStatus, 
   isHistory = false 
 }) => {
+  // Use the inventory hook to get drink data
+  const { drinks } = useInventory();
+
+  // Helper function to get drink details by ID
+  const getDrinkById = (drinkId) => {
+    return drinks.find(drink => drink.id === drinkId);
+  };
+
   return (
     <div className={`order-card ${isHistory ? 'history-card' : ''}`}>
       <div className="order-header">
         <div className="order-number">
           <h3>{order.orderNumber}</h3>
-          {isHistory ? (
-            <div className="order-timestamps">
-              <span className="order-time">Ordered: {formatTime(order.orderTime)}</span>
-              <span className="updated-time">
-                {order.status === 'completed' ? 'Completed' : 'Cancelled'}: {formatTime(order.lastUpdated)}
-              </span>
-            </div>
-          ) : (
-            <span className="order-time">{formatTime(order.orderTime)}</span>
-          )}
+          <div className="order-timestamps">
+            {isHistory ? (
+              <>
+                <span className="order-time">Ordered: {formatTime(order.orderTime)}</span>
+                <span className="updated-time">
+                  {order.status === 'completed' ? 'Completed' : 'Cancelled'}: {formatTime(order.lastUpdated)}
+                </span>
+              </>
+            ) : (
+              <span className="order-time">{formatTime(order.orderTime)}</span>
+            )}
+          </div>
         </div>
+
         <div className={`status-badge status-${order.status}`}>
           {order.status.toUpperCase()}
         </div>
@@ -38,12 +50,20 @@ const OrderCard = ({
 
       <div className="order-items">
         <h4>Items:</h4>
-        {order.items.map((item, index) => (
-          <div key={index} className="item-row">
-            <span>{item.quantity}x {item.name}</span>
-            <span>{formatCurrency(item.price * item.quantity)}</span>
-          </div>
-        ))}
+        <div className="items-list">
+          {order.items.map((item, index) => {
+            const drink = getDrinkById(item.drink_id);
+            const itemName = drink?.name || 'Unknown Item';
+            const itemPrice = drink?.price || 0;
+            
+            return (
+              <div key={index} className="item-row">
+                <span>{item.quantity}x {itemName}</span>
+                <span>{formatCurrency(itemPrice * item.quantity)}</span>
+              </div>
+            );
+          })}
+        </div>
         <div className="total-row">
           <span><strong>Total:</strong></span>
           <span className="total-amount"><strong>{formatCurrency(order.totalAmount)}</strong></span>
@@ -110,7 +130,7 @@ const ActiveOrderActions = ({ order, onUpdateStatus }) => {
       {order.status === 'ready' && (
         <button 
           className="notify-button"
-          onClick={() => notifyCustomer(order)}
+          onClick={() => notifyClientReminder(order.id)}
           title="Remind customer to collect their completed order"
         >
           Remind Customer
@@ -140,7 +160,7 @@ const HistoryOrderActions = ({ order, onUpdateStatus }) => {
         {order.status === 'cancelled' && (
           <button 
             className="restore-button"
-            onClick={() => onUpdateStatus(order.id)}
+            onClick={() => {onUpdateStatus(order.id);}}
           >
             Restore Order
           </button>

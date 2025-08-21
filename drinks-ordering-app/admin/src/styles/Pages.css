@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description Page Structures - Inventory page will override some
+*/
+
 .page {
   flex: 1;
   min-height: 100vh;
@@ -27,6 +32,14 @@
   font-size: 1.25rem;
 }
 
+.loading-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 1rem;
+  height: 100%;
+}
+
 /* Orders Controls */
 .orders-controls {
   background: var(--bg-card);
@@ -34,29 +47,43 @@
   padding: 1rem;
   margin-bottom: 2rem;
   box-shadow: var(--shadow-hover);
-  border: 1px solid var(--border-color);
+  border: 1px dashed var(--border-color);
 }
 
-.search-bar {
+.search-container {
   display: flex;
   justify-content: center;
   margin-bottom: 1rem;
-}
-
-.search-input {
   width: 100%;
-  padding: 1rem 1.5rem;
+  padding: 1rem 0.5rem;
   border: 2px solid var(--border-color);
   border-radius: 12px;
   transition: all 0.3s ease;
   background: var(--bg-primary);
 }
 
-.search-input:focus {
+.search-input {
+  width: 100%;
+  border: none;
   outline: none;
+  background: transparent;
+  color: var(--text-primary);
+  font: inherit;
+}
+
+/* Apply focus styles to the container */
+.search-container:focus-within {
   border-color: var(--focus);
-  background: var(--bg-primary);
   box-shadow: 0 0 0 3px var(--shadow);
+}
+
+/* Placeholder text will be this colour */
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+.search-input option:first-child {
+  color: var(--text-muted);
 }
 
 .filter-section {
@@ -125,9 +152,7 @@
   grid-column: 1 / -1;
   text-align: center;
   padding: 4rem 2rem;
-  background: var(--bg-card);
   border-radius: 16px;
-  box-shadow: 0 10px 25px var(--shadow);
   color: var(--text-secondary);
 }
 
@@ -146,11 +171,11 @@
 
 /* Order Cards */
 .order-card {
-  background: var(--bg-card);
+  background: var(--gradient-card);
   border-radius: 16px;
   padding: 0;
   box-shadow: var(--shadow);
-  border: 1px solid var(--border-color);
+  border: 2px solid var(--border-color-secondary);
   transition: all 0.3s ease;
   overflow: hidden;
   position: relative;
@@ -194,7 +219,7 @@
 }
 
 .order-timestamps .order-time {
-  font-size: 0.75rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
 }
 
@@ -219,6 +244,8 @@
   padding: 0 1.5rem;
   margin-bottom: 1.5rem;
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .order-items h4 {
@@ -228,31 +255,35 @@
   font-weight: 600;
 }
 
+/* Container for all the individual items */
+.items-list {
+  flex: 1; /* This will push total-row to bottom */
+}
+
 .item-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 0.5rem 0;
-  color: var(--text-secondary);
-  font-size: 0.875rem;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px dashed var(--border-color-secondary);
 }
 
 .item-row:last-child {
-  border-bottom: none;
+  border-bottom: none; /* Remove border from last item */
 }
 
 .total-row {
   display: flex;
   justify-content: space-between;
-  padding: 1rem 0 0.5rem 0;
-  margin-top: 1rem;
-  border-top: 2px solid var(--border-color);
-  font-size: 1.125rem;
-  font-weight: 700;
+  align-items: center;
+  padding: 1rem 0 0 0;
+  margin-top: auto; /* This ensures it sticks to bottom */
+  border-top: 2px solid var(--border-color-secondary);
+  font-size: 1.1rem;
 }
 
 .total-row .total-amount {
-  color: var(--accent-color);
+  color: var(--accent-secondary);
 }
 
 .order-actions {
@@ -260,30 +291,30 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  border-top: 1px solid var(--border-color);
 }
 
-/* Fixed Navigation Controls */
+/* Navigation Controls */
 .nav-controls {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 0.5rem;
   padding: 1rem;
-  background: var(--bg-muted);
+  background: var(--bg-primary);
   border-radius: 12px;
-  border: 1px solid var(--border-color);
+  border: 1px dashed var(--border-color);
   width: 100%;
   box-sizing: border-box;
 }
 
+/* Move between statusses */
 .nav-button {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0.5rem 0.75rem;
   background: var(--bg-primary);
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.75rem;
@@ -378,7 +409,7 @@
 
 .notify-button {
   padding: 0.75rem 1.5rem;
-  background: var(--gradient-accent);
+  background: var(--accent-color);
   color: white;
   border: none;
   border-radius: 8px;
@@ -390,7 +421,7 @@
 }
 
 .notify-button:hover {
-  background: var(--hover-secondary);
+  background: var(--accent-hover);
   transform: translateY(-1px);
   box-shadow: var(--shadow-hover);
 }
@@ -531,7 +562,7 @@
 }
 
 .date-select:focus {
-  border-color: var(--primary-color);
+  border: 2px solid var(--focus);
 }
 
 .clear-history-button {
@@ -595,6 +626,25 @@
 .action-buttons-group {
   display: flex;
   gap: 0.5rem;
+}
+
+.refresh-button {
+  margin-top: 1rem;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.5rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease-in-out;
+  font-size: 1rem;
+}
+
+.refresh-button:hover {
+  background-color: var(--accent-hover);
 }
 
 /* Page Actions */

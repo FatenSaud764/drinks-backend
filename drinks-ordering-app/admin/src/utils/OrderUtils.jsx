@@ -42,11 +42,27 @@ export const getNextStatus = (status) => {
 };
 
 export const getStatusOptions = (currentStatus) => {
-  // Keep cancel option available for pending and preparing orders
-  const cancelOptions = [ORDER_STATUSES.PENDING, ORDER_STATUSES.PREPARING].includes(currentStatus) 
-    ? [ORDER_STATUSES.CANCELLED] 
-    : [];
-  return cancelOptions;
+  switch (currentStatus) {
+    case ORDER_STATUSES.PENDING:
+      // Pending orders can be cancelled
+      return [ORDER_STATUSES.CANCELLED];
+    
+    case ORDER_STATUSES.PREPARING:
+      // Preparing orders can move to ready
+      return [ORDER_STATUSES.READY];
+    
+    case ORDER_STATUSES.READY:
+      // Ready orders are completed via PIN modal, no direct button
+      return [];
+    
+    case ORDER_STATUSES.COMPLETED:
+    case ORDER_STATUSES.CANCELLED:
+      // Terminal states - no actions available
+      return [];
+    
+    default:
+      return [];
+  }
 };
 
 // Formatting utilities
@@ -75,12 +91,24 @@ export const filterOrdersByStatus = (orders, statusFilter) => {
   return orders.filter(order => order.status === statusFilter);
 };
 
+// Will probably need to adjust infuture depending on what the order heading will be
 export const filterOrdersBySearch = (orders, searchTerm) => {
   if (!searchTerm) return orders;
-  return orders.filter(order => 
-    order.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (order.customerName && order.customerName.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const searchLower = searchTerm.toLowerCase();
+  
+  return orders.filter(order => {
+    // Check order number (handle both string and number IDs)
+    const orderNumber = order.orderNumber || `#${order.id}`;
+    const orderNumberMatch = orderNumber.toString().toLowerCase().includes(searchLower);
+    
+    // Check customer name safely
+    const customerName = order.customerName || order.customer_name || '';
+    const customerNameMatch = customerName && typeof customerName === 'string' 
+      ? customerName.toLowerCase().includes(searchLower)
+      : false;
+    
+    return orderNumberMatch || customerNameMatch;
+  });
 };
 
 export const filterOrdersByDate = (orders, dateFilter) => {
@@ -132,12 +160,12 @@ export const getHistoryOrderStatusCounts = (orders) => {
 };
 
 // Notification utilities
-export const notifyClient = (order, status) => {
+export const notifyClient = (orderId, status) => {
   // Replace with actual notification system - API call
-  toast.success(`Notification sent: Order ${order?.orderNumber} is now ${status.toUpperCase()}`);
+  toast.info(`Notification sent: Order ${orderId} is now ${status.toUpperCase()}`);
 };
 
-export const notifyCustomer = (order) => {
+export const notifyClientReminder = (orderId) => {
   // Notify customer to collect their completed order
-  toast.success(`Reminder sent: ${order?.orderNumber} is ready for collection`);
+  toast.info(`Reminder sent: Order ${orderId} is ready for collection`);
 };

@@ -19,9 +19,23 @@ class User(models.Model):
 class Drink(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
+    image = models.ImageField(upload_to='assets/')
     price = models.DecimalField(max_digits=6, decimal_places=2)
+    category = models.CharField(max_length=50, blank=True)
     available = models.BooleanField(default=True)
+    stock = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Added by @kirsten - to handle manual availability toggling if stock drops below threshold (5 units)
+    def save(self, *args, **kwargs):
+        # Automatically set availability based on stock level
+        if self.stock < 5:
+            self.available = False
+        # Only auto-enable if stock is sufficient and not manually disabled
+        elif self.stock >= 5 and not hasattr(self, '_manual_availability'):
+            self.available = True
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

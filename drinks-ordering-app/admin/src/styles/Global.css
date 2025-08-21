@@ -8,6 +8,7 @@
 @import './Reset.css';
 
 /* Component styles */
+@import './Pages.css';
 @import './OrderStatus.css';
 
 /* Responsive styles - KEEP THIS FOR LAST IF YOU EVENTUALLY MAKE IT */

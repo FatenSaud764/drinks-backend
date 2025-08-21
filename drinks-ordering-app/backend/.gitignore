@@ -13,11 +13,15 @@ venv/
 ENV/
 .venv/
 .env/
+myenv/
+.myenv/
+myenvironment/
+.myenvironment/
+/home/faten/Samus-RW344/drinks-ordering-app/backend/myenvironment
 
 # Django-specific
 *.sqlite3
 staticfiles/
-media/
 local_settings.py
 
 # VSCode (if using)

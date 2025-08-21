@@ -15,7 +15,7 @@ const FilterControls = ({
 }) => {
   return (
     <div className="orders-controls">
-      <div className="search-bar">
+      <div className="search-container">
         <input
           type="text"
           placeholder="Search by order number or customer name..."

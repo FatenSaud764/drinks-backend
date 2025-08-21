@@ -5,40 +5,45 @@
 
 /* Root theme (light-mode) */
 :root {
-  /* Light mode */
-  --bg-primary: #ffffff;
-  --bg-secondary: #89b6ff;
-  --bg-card: #b7ceff;
-  --bg-muted: rgba(255, 255, 255, 0.3);
+  /* Light mode - Enhanced backgrounds */
+  --bg-primary: #ffffff; /**/
+  --bg-secondary: #f8fafc; /* Layout that is not main page - header and sidebar */
+  --bg-card: #ffffff; /* Basic card */
+  --bg-muted: #d2d6d9; /* Smaller components and sometimes hover */
 
-  /* Clean text hierarchy */
-  --text-primary: #0f172a;
-  --text-secondary: #334155;
-  --text-muted: #64748b;
-  --text-meta: #64748b;;
+  /* Improved text hierarchy with better contrast */
+  --text-primary: #1e293b; /* Main text and titles */
+  --text-secondary: #475569; /* Subtitles*/
+  --text-muted: #64748b; /* Details */
+  --text-meta: #94a3b8; /* Meta data */
   
-  /* Subtle blue accents */
-  --border-color: rgba(59, 130, 246, 0.15);
-  --accent-color: #2563eb;
+  /* Better border contrast */
+  --border-color: rgb(29, 29, 29); /* Main borders */
+  --border-color-secondary: #f97316; /* Border used for stat and order cards */
+  
+  /* Refined accent colors */
+  --accent-color: #0f766e;
+  --accent-secondary: #d46718;
+
   --hover: #f97316;
-  --focus: #f97316;
-  --hover-secondary: #ea580c;
-  --accent-hover: #1d4ed8;
-  --accent-secondary: #0ea5e9;
+  --hover-secondary: #ccdbfc;
+  --accent-hover: #0d9488;
+
+  --focus: #14b8a6; /* When focussing on a component */
   
-  /* Basic success/danger/warning colors */
+  /* Status colors - for errors, successes and warnings */
   --success-color: #059669;
   --danger-color: #dc2626;
-  --warning-color: #d97706;
+  --warning-color: #ea580c;
   
-  /* Clean shadows */
+  /* Shadows for all components */
   --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-  --shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-hover: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   
-  /* Subtle gradients */
-  --gradient-accent: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
-  --gradient-background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
-  --gradient-card: linear-gradient(145deg, rgba(255,255,255,0.98), rgba(248,250,252,0.95));
+  /* Updated gradients */
+  --gradient-accent: linear-gradient(135deg, #ff8c42 0%, #ff6b1a 50%, #f97316 100%); /* Smaller component gradients */
+  --gradient-background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%); /* Main background */
+  --gradient-card: rgba(255, 255, 255, 0.88);/* Card Specific */
 }
 
 [data-theme="dark"] {
@@ -56,16 +61,17 @@
   
   /* Vibrant orange and blue accents */
   --accent-color: #3b82f6;
-  --hover: #ff8c42;
-  --focus: #f97316;
+  --accent-secondary: #f97316;
 
-  --hover-secondary: #ff6b1a;
+  --hover: #ff8c42;
+  --hover-secondary: #1e293b;
   --accent-hover: #60a5fa;
-  --accent-secondary: #06b6d4;
+
+  --focus: #f97316;
   
   /* Enhanced borders with glow */
   --border-color: rgba(59, 130, 246, 0.3);
-  --glass-border: rgba(255, 140, 66, 0.3);
+  --border-colour-secondary: rgba(255, 140, 66, 0.3);
   
   /* Basic success/danger/warning colors */
   --success-color: #10b981;
@@ -75,21 +81,11 @@
   /* Deep shadows with warmth */
   --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
   --shadow-hover: 0 25px 50px -12px rgba(0, 0, 0, 0.5), 0 10px 16px -4px rgba(0, 0, 0, 0.3);
-  --glass-backdrop: blur(24px) saturate(200%);
   
   /* Rich gradients with depth */
   --gradient-accent: linear-gradient(135deg, #ff8c42 0%, #ff6b1a 50%, #f97316 100%);
   --gradient-background: linear-gradient(135deg, #0c1426 0%, #1e293b 30%, #334155 70%, #475569 100%);
-  --gradient-card: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(51, 65, 85, 0.6) 50%, rgba(71, 85, 105, 0.4) 100%);
-  
-  /* Enhanced glow effects */
-  --glow-primary: 0 0 30px rgba(59, 130, 246, 0.4);
-  --glow-accent: 0 0 30px rgba(255, 140, 66, 0.5);
-  --glow-subtle: 0 0 15px rgba(255, 140, 66, 0.2);
-  
-  /* Interactive states */
-  --hover-glow: 0 0 20px rgba(255, 140, 66, 0.6);
-  --active-glow: 0 0 25px rgba(59, 130, 246, 0.7);
+  --gradient-card: rgba(30, 41, 59, 0.92);
 }
 
 /* Theme toggle button styles */

@@ -254,7 +254,7 @@ const OTPModal = ({
                 <strong>Order:</strong> {(order || selectedOrder)?.orderNumber}
               </Typography>
               <Typography variant="body2">
-                <strong>Total:</strong> R{(order || selectedOrder)?.totalAmount.toFixed(2)}
+                <strong>Total:</strong> R{((order?.totalAmount ?? selectedOrder?.totalAmount) ?? 0).toFixed(2)}
               </Typography>
               <Typography variant="body2">
                 <strong>Items:</strong> {(order || selectedOrder)?.items.map(item => 
