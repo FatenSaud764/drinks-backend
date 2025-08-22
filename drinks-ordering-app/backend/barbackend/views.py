@@ -111,8 +111,6 @@ class OrderViewset(viewsets.ViewSet):
         """
         user = request.user if request.user.is_authenticated else User.objects.first()
         cart = get_object_or_404(Cart, user=user)
-        # if not cart.items.exists():
-        #     return Response({"detail": "Cart is empty"}, status=status.HTTP_400_BAD_REQUEST)
 
         order_data = {
             'user': user.id,

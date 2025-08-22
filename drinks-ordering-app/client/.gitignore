@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+
+/home/faten/Samus-RW344/drinks-ordering-app/backend/env
+/home/faten/Samus-RW344/drinks-ordering-app/myenv

@@ -566,239 +566,199 @@ ALTER TABLE public.django_session OWNER TO baruser;
 -- Data for Name: auth_group; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.auth_group (id, name) FROM stdin;
-\.
 
 
 --
 -- Data for Name: auth_group_permissions; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.auth_group_permissions (id, group_id, permission_id) FROM stdin;
-\.
 
 
 --
 -- Data for Name: auth_permission; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
-1	Can add log entry	1	add_logentry
-2	Can change log entry	1	change_logentry
-3	Can delete log entry	1	delete_logentry
-4	Can view log entry	1	view_logentry
-5	Can add permission	2	add_permission
-6	Can change permission	2	change_permission
-7	Can delete permission	2	delete_permission
-8	Can view permission	2	view_permission
-9	Can add group	3	add_group
-10	Can change group	3	change_group
-11	Can delete group	3	delete_group
-12	Can view group	3	view_group
-13	Can add user	4	add_user
-14	Can change user	4	change_user
-15	Can delete user	4	delete_user
-16	Can view user	4	view_user
-17	Can add content type	5	add_contenttype
-18	Can change content type	5	change_contenttype
-19	Can delete content type	5	delete_contenttype
-20	Can view content type	5	view_contenttype
-21	Can add session	6	add_session
-22	Can change session	6	change_session
-23	Can delete session	6	delete_session
-24	Can view session	6	view_session
-25	Can add drink	7	add_drink
-26	Can change drink	7	change_drink
-27	Can delete drink	7	delete_drink
-28	Can view drink	7	view_drink
-29	Can add order	8	add_order
-30	Can change order	8	change_order
-31	Can delete order	8	delete_order
-32	Can view order	8	view_order
-33	Can add user	9	add_user
-34	Can change user	9	change_user
-35	Can delete user	9	delete_user
-36	Can view user	9	view_user
-37	Can add order item	10	add_orderitem
-38	Can change order item	10	change_orderitem
-39	Can delete order item	10	delete_orderitem
-40	Can view order item	10	view_orderitem
-41	Can add cart	11	add_cart
-42	Can change cart	11	change_cart
-43	Can delete cart	11	delete_cart
-44	Can view cart	11	view_cart
-45	Can add cart item	12	add_cartitem
-46	Can change cart item	12	change_cartitem
-47	Can delete cart item	12	delete_cartitem
-48	Can view cart item	12	view_cartitem
-\.
+INSERT INTO public.auth_permission VALUES (1, 'Can add log entry', 1, 'add_logentry');
+INSERT INTO public.auth_permission VALUES (2, 'Can change log entry', 1, 'change_logentry');
+INSERT INTO public.auth_permission VALUES (3, 'Can delete log entry', 1, 'delete_logentry');
+INSERT INTO public.auth_permission VALUES (4, 'Can view log entry', 1, 'view_logentry');
+INSERT INTO public.auth_permission VALUES (5, 'Can add permission', 2, 'add_permission');
+INSERT INTO public.auth_permission VALUES (6, 'Can change permission', 2, 'change_permission');
+INSERT INTO public.auth_permission VALUES (7, 'Can delete permission', 2, 'delete_permission');
+INSERT INTO public.auth_permission VALUES (8, 'Can view permission', 2, 'view_permission');
+INSERT INTO public.auth_permission VALUES (9, 'Can add group', 3, 'add_group');
+INSERT INTO public.auth_permission VALUES (10, 'Can change group', 3, 'change_group');
+INSERT INTO public.auth_permission VALUES (11, 'Can delete group', 3, 'delete_group');
+INSERT INTO public.auth_permission VALUES (12, 'Can view group', 3, 'view_group');
+INSERT INTO public.auth_permission VALUES (13, 'Can add user', 4, 'add_user');
+INSERT INTO public.auth_permission VALUES (14, 'Can change user', 4, 'change_user');
+INSERT INTO public.auth_permission VALUES (15, 'Can delete user', 4, 'delete_user');
+INSERT INTO public.auth_permission VALUES (16, 'Can view user', 4, 'view_user');
+INSERT INTO public.auth_permission VALUES (17, 'Can add content type', 5, 'add_contenttype');
+INSERT INTO public.auth_permission VALUES (18, 'Can change content type', 5, 'change_contenttype');
+INSERT INTO public.auth_permission VALUES (19, 'Can delete content type', 5, 'delete_contenttype');
+INSERT INTO public.auth_permission VALUES (20, 'Can view content type', 5, 'view_contenttype');
+INSERT INTO public.auth_permission VALUES (21, 'Can add session', 6, 'add_session');
+INSERT INTO public.auth_permission VALUES (22, 'Can change session', 6, 'change_session');
+INSERT INTO public.auth_permission VALUES (23, 'Can delete session', 6, 'delete_session');
+INSERT INTO public.auth_permission VALUES (24, 'Can view session', 6, 'view_session');
+INSERT INTO public.auth_permission VALUES (25, 'Can add drink', 7, 'add_drink');
+INSERT INTO public.auth_permission VALUES (26, 'Can change drink', 7, 'change_drink');
+INSERT INTO public.auth_permission VALUES (27, 'Can delete drink', 7, 'delete_drink');
+INSERT INTO public.auth_permission VALUES (28, 'Can view drink', 7, 'view_drink');
+INSERT INTO public.auth_permission VALUES (29, 'Can add order', 8, 'add_order');
+INSERT INTO public.auth_permission VALUES (30, 'Can change order', 8, 'change_order');
+INSERT INTO public.auth_permission VALUES (31, 'Can delete order', 8, 'delete_order');
+INSERT INTO public.auth_permission VALUES (32, 'Can view order', 8, 'view_order');
+INSERT INTO public.auth_permission VALUES (33, 'Can add user', 9, 'add_user');
+INSERT INTO public.auth_permission VALUES (34, 'Can change user', 9, 'change_user');
+INSERT INTO public.auth_permission VALUES (35, 'Can delete user', 9, 'delete_user');
+INSERT INTO public.auth_permission VALUES (36, 'Can view user', 9, 'view_user');
+INSERT INTO public.auth_permission VALUES (37, 'Can add order item', 10, 'add_orderitem');
+INSERT INTO public.auth_permission VALUES (38, 'Can change order item', 10, 'change_orderitem');
+INSERT INTO public.auth_permission VALUES (39, 'Can delete order item', 10, 'delete_orderitem');
+INSERT INTO public.auth_permission VALUES (40, 'Can view order item', 10, 'view_orderitem');
+INSERT INTO public.auth_permission VALUES (41, 'Can add cart', 11, 'add_cart');
+INSERT INTO public.auth_permission VALUES (42, 'Can change cart', 11, 'change_cart');
+INSERT INTO public.auth_permission VALUES (43, 'Can delete cart', 11, 'delete_cart');
+INSERT INTO public.auth_permission VALUES (44, 'Can view cart', 11, 'view_cart');
+INSERT INTO public.auth_permission VALUES (45, 'Can add cart item', 12, 'add_cartitem');
+INSERT INTO public.auth_permission VALUES (46, 'Can change cart item', 12, 'change_cartitem');
+INSERT INTO public.auth_permission VALUES (47, 'Can delete cart item', 12, 'delete_cartitem');
+INSERT INTO public.auth_permission VALUES (48, 'Can view cart item', 12, 'view_cartitem');
 
 
 --
 -- Data for Name: auth_user; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-\.
 
 
 --
 -- Data for Name: auth_user_groups; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.auth_user_groups (id, user_id, group_id) FROM stdin;
-\.
 
 
 --
 -- Data for Name: auth_user_user_permissions; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.auth_user_user_permissions (id, user_id, permission_id) FROM stdin;
-\.
 
 
 --
 -- Data for Name: barbackend_cart; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.barbackend_cart (id, created_at, user_id, note) FROM stdin;
-\.
 
 
 --
 -- Data for Name: barbackend_cartitem; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.barbackend_cartitem (id, quantity, added_at, cart_id, drink_id) FROM stdin;
-\.
 
 
 --
 -- Data for Name: barbackend_drink; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.barbackend_drink (id, name, description, price, available, created_at, image, stock, updated_at, category) FROM stdin;
-1	Espresso Martini		80.00	t	2025-08-20 16:18:56.409879+00	assets/cocktail.png	10	2025-08-20 16:18:56.409904+00	Alcoholic
-2	Irish Ale		50.00	t	2025-08-20 16:21:51.568935+00	assets/irishale.png	10	2025-08-20 16:21:51.568951+00	Alcoholic
-3	Tequila		50.00	t	2025-08-20 16:23:48.03699+00	assets/tequila.png	10	2025-08-20 16:23:48.037003+00	Alcoholic
-4	Switch		15.00	t	2025-08-22 08:05:25.948784+00	assets/switch.jpeg	9	2025-08-22 08:05:25.948797+00	Non-Alcoholic
-5	Passion Fruit Lemonade		25.00	t	2025-08-22 08:18:05.001091+00	assets/passionfruit.jpg	15	2025-08-22 08:18:05.001103+00	Non-Alcoholic
-6	Manhattan		65.00	f	2025-08-22 08:21:22.402221+00	assets/manhatten_pJnqEBU.png	0	2025-08-22 08:21:22.402231+00	Alcoholic
-7	Peach Vodka		60.00	t	2025-08-22 08:23:35.900439+00	assets/peachvodka.jpg	10	2025-08-22 08:23:35.900448+00	Alcoholic
-8	Passionfruit Martini		50.00	t	2025-08-22 08:25:42.814953+00	assets/passionmartini.png	10	2025-08-22 08:25:42.814962+00	Alcoholic
-9	Gin & Tonic		35.00	t	2025-08-22 08:32:56.958632+00	assets/gintonic.jpg	8	2025-08-22 08:32:56.958643+00	Alcoholic
-10	Still Water		15.00	t	2025-08-22 08:38:56.234995+00	assets/StillWater.jpg	10	2025-08-22 08:38:56.235005+00	Non-Alcoholic
-\.
+INSERT INTO public.barbackend_drink VALUES (1, 'Espresso Martini', '', 80.00, true, '2025-08-20 16:18:56.409879+00', 'assets/cocktail.png', 10, '2025-08-20 16:18:56.409904+00', 'Alcoholic');
+INSERT INTO public.barbackend_drink VALUES (2, 'Irish Ale', '', 50.00, true, '2025-08-20 16:21:51.568935+00', 'assets/irishale.png', 10, '2025-08-20 16:21:51.568951+00', 'Alcoholic');
+INSERT INTO public.barbackend_drink VALUES (3, 'Tequila', '', 50.00, true, '2025-08-20 16:23:48.03699+00', 'assets/tequila.png', 10, '2025-08-20 16:23:48.037003+00', 'Alcoholic');
 
 
 --
 -- Data for Name: barbackend_order; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.barbackend_order (id, status, total_price, created_at, updated_at, user_id, note) FROM stdin;
-1	pending	100.00	2025-08-18 18:33:04.089128+00	2025-08-18 18:33:04.089128+00	1	
-2	preparing	80.00	2025-08-19 18:51:03.363423+00	2025-08-19 18:51:03.363423+00	1	
-3	cancelled	45.00	2025-08-19 18:51:27.053493+00	2025-08-19 18:51:27.053493+00	1	
-4	ready	95.00	2025-08-19 18:51:42.400456+00	2025-08-19 18:51:42.400456+00	1	
-5	ready	35.00	2025-08-19 18:51:51.379722+00	2025-08-19 18:51:51.379722+00	1	
-6	completed	75.00	2025-08-19 18:52:04.666904+00	2025-08-19 18:52:04.666904+00	1	
-7	completed	100.00	2025-08-19 18:52:26.976006+00	2025-08-19 18:52:26.976006+00	1	
-\.
+INSERT INTO public.barbackend_order VALUES (1, 'pending', 100.00, '2025-08-18 18:33:04.089128+00', '2025-08-18 18:33:04.089128+00', 1, '');
+INSERT INTO public.barbackend_order VALUES (2, 'preparing', 80.00, '2025-08-19 18:51:03.363423+00', '2025-08-19 18:51:03.363423+00', 1, '');
+INSERT INTO public.barbackend_order VALUES (3, 'cancelled', 45.00, '2025-08-19 18:51:27.053493+00', '2025-08-19 18:51:27.053493+00', 1, '');
+INSERT INTO public.barbackend_order VALUES (4, 'ready', 95.00, '2025-08-19 18:51:42.400456+00', '2025-08-19 18:51:42.400456+00', 1, '');
+INSERT INTO public.barbackend_order VALUES (5, 'ready', 35.00, '2025-08-19 18:51:51.379722+00', '2025-08-19 18:51:51.379722+00', 1, '');
+INSERT INTO public.barbackend_order VALUES (6, 'completed', 75.00, '2025-08-19 18:52:04.666904+00', '2025-08-19 18:52:04.666904+00', 1, '');
+INSERT INTO public.barbackend_order VALUES (7, 'completed', 100.00, '2025-08-19 18:52:26.976006+00', '2025-08-19 18:52:26.976006+00', 1, '');
 
 
 --
 -- Data for Name: barbackend_orderitem; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.barbackend_orderitem (id, quantity, drink_id, order_id) FROM stdin;
-\.
 
 
 --
 -- Data for Name: barbackend_user; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.barbackend_user (id, username, email, password_hash, role, created_at) FROM stdin;
-1	Samus	Samus@foo.co.za			2025-08-18 18:32:51.911612+00
-\.
+INSERT INTO public.barbackend_user VALUES (1, 'Samus', 'Samus@foo.co.za', '', '', '2025-08-18 18:32:51.911612+00');
 
 
 --
 -- Data for Name: django_admin_log; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
-\.
 
 
 --
 -- Data for Name: django_content_type; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.django_content_type (id, app_label, model) FROM stdin;
-1	admin	logentry
-2	auth	permission
-3	auth	group
-4	auth	user
-5	contenttypes	contenttype
-6	sessions	session
-7	barbackend	drink
-8	barbackend	order
-9	barbackend	user
-10	barbackend	orderitem
-11	barbackend	cart
-12	barbackend	cartitem
-\.
+INSERT INTO public.django_content_type VALUES (1, 'admin', 'logentry');
+INSERT INTO public.django_content_type VALUES (2, 'auth', 'permission');
+INSERT INTO public.django_content_type VALUES (3, 'auth', 'group');
+INSERT INTO public.django_content_type VALUES (4, 'auth', 'user');
+INSERT INTO public.django_content_type VALUES (5, 'contenttypes', 'contenttype');
+INSERT INTO public.django_content_type VALUES (6, 'sessions', 'session');
+INSERT INTO public.django_content_type VALUES (7, 'barbackend', 'drink');
+INSERT INTO public.django_content_type VALUES (8, 'barbackend', 'order');
+INSERT INTO public.django_content_type VALUES (9, 'barbackend', 'user');
+INSERT INTO public.django_content_type VALUES (10, 'barbackend', 'orderitem');
+INSERT INTO public.django_content_type VALUES (11, 'barbackend', 'cart');
+INSERT INTO public.django_content_type VALUES (12, 'barbackend', 'cartitem');
 
 
 --
 -- Data for Name: django_migrations; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2025-08-11 15:40:54.88937+00
-2	auth	0001_initial	2025-08-11 15:40:55.678309+00
-3	admin	0001_initial	2025-08-11 15:40:56.500005+00
-4	admin	0002_logentry_remove_auto_add	2025-08-11 15:40:56.518439+00
-5	admin	0003_logentry_add_action_flag_choices	2025-08-11 15:40:56.549361+00
-6	contenttypes	0002_remove_content_type_name	2025-08-11 15:40:56.568894+00
-7	auth	0002_alter_permission_name_max_length	2025-08-11 15:40:56.586827+00
-8	auth	0003_alter_user_email_max_length	2025-08-11 15:40:56.60928+00
-9	auth	0004_alter_user_username_opts	2025-08-11 15:40:56.629407+00
-10	auth	0005_alter_user_last_login_null	2025-08-11 15:40:56.650026+00
-11	auth	0006_require_contenttypes_0002	2025-08-11 15:40:56.665927+00
-12	auth	0007_alter_validators_add_error_messages	2025-08-11 15:40:56.682749+00
-13	auth	0008_alter_user_username_max_length	2025-08-11 15:40:56.746834+00
-14	auth	0009_alter_user_last_name_max_length	2025-08-11 15:40:56.764072+00
-15	auth	0010_alter_group_name_max_length	2025-08-11 15:40:56.786003+00
-16	auth	0011_update_proxy_permissions	2025-08-11 15:40:56.804609+00
-17	auth	0012_alter_user_first_name_max_length	2025-08-11 15:40:56.827781+00
-18	barbackend	0001_initial	2025-08-11 15:40:58.363915+00
-19	barbackend	0002_alter_order_status	2025-08-11 15:40:58.378159+00
-20	sessions	0001_initial	2025-08-11 15:40:58.61434+00
-21	barbackend	0003_drink_image	2025-08-18 13:25:17.100592+00
-22	barbackend	0003_cart_note	2025-08-18 13:56:31.552807+00
-23	barbackend	0004_order_note	2025-08-18 13:56:31.596092+00
-24	barbackend	0005_merge_0003_drink_image_0004_order_note	2025-08-18 13:56:31.621633+00
-25	barbackend	0006_remove_cart_note_remove_order_note	2025-08-18 18:52:07.101557+00
-26	barbackend	0006_remove_cart_note_remove_order_note_drink_stock_and_more	2025-08-19 06:22:36.724856+00
-27	barbackend	0007_drink_category	2025-08-19 06:22:36.796749+00
-28	barbackend	0008_alter_drink_image	2025-08-19 16:10:48.524514+00
-29	barbackend	0009_alter_drink_image	2025-08-19 19:15:11.572499+00
-30	barbackend	0008_cart_note_order_note	2025-08-20 06:38:06.75994+00
-31	barbackend	0009_merge_20250819_1942	2025-08-20 07:22:20.81962+00
-32	barbackend	0010_alter_drink_image	2025-08-20 07:22:20.84228+00
-33	barbackend	0011_alter_drink_image	2025-08-22 07:44:14.305754+00
-\.
+INSERT INTO public.django_migrations VALUES (1, 'contenttypes', '0001_initial', '2025-08-11 15:40:54.88937+00');
+INSERT INTO public.django_migrations VALUES (2, 'auth', '0001_initial', '2025-08-11 15:40:55.678309+00');
+INSERT INTO public.django_migrations VALUES (3, 'admin', '0001_initial', '2025-08-11 15:40:56.500005+00');
+INSERT INTO public.django_migrations VALUES (4, 'admin', '0002_logentry_remove_auto_add', '2025-08-11 15:40:56.518439+00');
+INSERT INTO public.django_migrations VALUES (5, 'admin', '0003_logentry_add_action_flag_choices', '2025-08-11 15:40:56.549361+00');
+INSERT INTO public.django_migrations VALUES (6, 'contenttypes', '0002_remove_content_type_name', '2025-08-11 15:40:56.568894+00');
+INSERT INTO public.django_migrations VALUES (7, 'auth', '0002_alter_permission_name_max_length', '2025-08-11 15:40:56.586827+00');
+INSERT INTO public.django_migrations VALUES (8, 'auth', '0003_alter_user_email_max_length', '2025-08-11 15:40:56.60928+00');
+INSERT INTO public.django_migrations VALUES (9, 'auth', '0004_alter_user_username_opts', '2025-08-11 15:40:56.629407+00');
+INSERT INTO public.django_migrations VALUES (10, 'auth', '0005_alter_user_last_login_null', '2025-08-11 15:40:56.650026+00');
+INSERT INTO public.django_migrations VALUES (11, 'auth', '0006_require_contenttypes_0002', '2025-08-11 15:40:56.665927+00');
+INSERT INTO public.django_migrations VALUES (12, 'auth', '0007_alter_validators_add_error_messages', '2025-08-11 15:40:56.682749+00');
+INSERT INTO public.django_migrations VALUES (13, 'auth', '0008_alter_user_username_max_length', '2025-08-11 15:40:56.746834+00');
+INSERT INTO public.django_migrations VALUES (14, 'auth', '0009_alter_user_last_name_max_length', '2025-08-11 15:40:56.764072+00');
+INSERT INTO public.django_migrations VALUES (15, 'auth', '0010_alter_group_name_max_length', '2025-08-11 15:40:56.786003+00');
+INSERT INTO public.django_migrations VALUES (16, 'auth', '0011_update_proxy_permissions', '2025-08-11 15:40:56.804609+00');
+INSERT INTO public.django_migrations VALUES (17, 'auth', '0012_alter_user_first_name_max_length', '2025-08-11 15:40:56.827781+00');
+INSERT INTO public.django_migrations VALUES (18, 'barbackend', '0001_initial', '2025-08-11 15:40:58.363915+00');
+INSERT INTO public.django_migrations VALUES (19, 'barbackend', '0002_alter_order_status', '2025-08-11 15:40:58.378159+00');
+INSERT INTO public.django_migrations VALUES (20, 'sessions', '0001_initial', '2025-08-11 15:40:58.61434+00');
+INSERT INTO public.django_migrations VALUES (21, 'barbackend', '0003_drink_image', '2025-08-18 13:25:17.100592+00');
+INSERT INTO public.django_migrations VALUES (22, 'barbackend', '0003_cart_note', '2025-08-18 13:56:31.552807+00');
+INSERT INTO public.django_migrations VALUES (23, 'barbackend', '0004_order_note', '2025-08-18 13:56:31.596092+00');
+INSERT INTO public.django_migrations VALUES (24, 'barbackend', '0005_merge_0003_drink_image_0004_order_note', '2025-08-18 13:56:31.621633+00');
+INSERT INTO public.django_migrations VALUES (25, 'barbackend', '0006_remove_cart_note_remove_order_note', '2025-08-18 18:52:07.101557+00');
+INSERT INTO public.django_migrations VALUES (26, 'barbackend', '0006_remove_cart_note_remove_order_note_drink_stock_and_more', '2025-08-19 06:22:36.724856+00');
+INSERT INTO public.django_migrations VALUES (27, 'barbackend', '0007_drink_category', '2025-08-19 06:22:36.796749+00');
+INSERT INTO public.django_migrations VALUES (28, 'barbackend', '0008_alter_drink_image', '2025-08-19 16:10:48.524514+00');
+INSERT INTO public.django_migrations VALUES (29, 'barbackend', '0009_alter_drink_image', '2025-08-19 19:15:11.572499+00');
+INSERT INTO public.django_migrations VALUES (30, 'barbackend', '0008_cart_note_order_note', '2025-08-20 06:38:06.75994+00');
+INSERT INTO public.django_migrations VALUES (31, 'barbackend', '0009_merge_20250819_1942', '2025-08-20 07:22:20.81962+00');
+INSERT INTO public.django_migrations VALUES (32, 'barbackend', '0010_alter_drink_image', '2025-08-20 07:22:20.84228+00');
 
 
 --
 -- Data for Name: django_session; Type: TABLE DATA; Schema: public; Owner: baruser
 --
 
-COPY public.django_session (session_key, session_data, expire_date) FROM stdin;
-\.
 
 
 --
@@ -861,7 +821,7 @@ SELECT pg_catalog.setval('public.barbackend_cartitem_id_seq', 1, false);
 -- Name: barbackend_drink_id_seq; Type: SEQUENCE SET; Schema: public; Owner: baruser
 --
 
-SELECT pg_catalog.setval('public.barbackend_drink_id_seq', 10, true);
+SELECT pg_catalog.setval('public.barbackend_drink_id_seq', 3, true);
 
 
 --
@@ -903,7 +863,7 @@ SELECT pg_catalog.setval('public.django_content_type_id_seq', 12, true);
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: baruser
 --
 
-SELECT pg_catalog.setval('public.django_migrations_id_seq', 33, true);
+SELECT pg_catalog.setval('public.django_migrations_id_seq', 32, true);
 
 
 --
