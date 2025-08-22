@@ -404,7 +404,14 @@ const InventoryPage = () => {
                   onChange={(e) => handleImageUpload(e, false)}
                 />
                 {newDrink.imagePreview && (
-                  <img src={newDrink.imagePreview} alt="Preview" className="image-preview" />
+                  <img 
+                    src={newDrink.imagePreview.startsWith('blob:') 
+                      ? newDrink.imagePreview 
+                      : `http://localhost:8000${newDrink.imagePreview}`
+                    } 
+                    alt="Preview" 
+                    className="image-preview" 
+                  />
                 )}
               </div>
 
@@ -488,7 +495,14 @@ const InventoryPage = () => {
                 />
                 {editingDrink.imagePreview ? (
                   <div className="image-edit-container">
-                    <img src={editingDrink.imagePreview} alt="Preview" className="image-preview" />
+                    <img 
+                      src={editingDrink.imagePreview.startsWith('blob:') 
+                        ? editingDrink.imagePreview 
+                        : `http://localhost:8000${editingDrink.imagePreview}`
+                      } 
+                      alt="Preview" 
+                      className="image-preview" 
+                    />
                     <button
                       type="button"
                       className="nav-button"
@@ -508,7 +522,14 @@ const InventoryPage = () => {
                   </div>
                 ) : editingDrink.image && typeof editingDrink.image === 'string' && (
                   <div className="image-edit-container">
-                    <img src={editingDrink.image} alt="Current" className="image-preview" />
+                    <img 
+                      src={editingDrink.image.startsWith('blob:') 
+                        ? editingDrink.image 
+                        : `http://localhost:8000${editingDrink.image}`
+                      } 
+                      alt="Current" 
+                      className="image-preview" 
+                    />
                     <button
                       type="button"
                       className="nav-button"
