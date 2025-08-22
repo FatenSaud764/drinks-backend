@@ -86,6 +86,11 @@
   color: var(--text-muted);
 }
 
+.search-input option {
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+}
+
 .filter-section {
   display: flex;
   align-items: center;

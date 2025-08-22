@@ -67,6 +67,7 @@
   outline: 1px solid var(--border-color) !important;
   padding: 1rem 1.25rem;
   border-radius: 8px;
+  color: var(--text-primary);
 }
 
 .add-drink-form .search-input:focus {
