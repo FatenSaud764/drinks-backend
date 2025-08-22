@@ -490,7 +490,7 @@ const InventoryPage = () => {
               
               <div className="image-upload-container">
                 <label htmlFor="edit-image-upload" className="image-upload-label">
-                  {editingDrink.image ? 'Change Image' : 'Upload Image (Optional)'}
+                  {editingDrink.image ? 'Change Image' : 'Upload Image'}
                 </label>
                 <input
                   id="edit-image-upload"
@@ -500,6 +500,11 @@ const InventoryPage = () => {
                   onChange={(e) => handleImageUpload(e, true)}
                   required={!editingDrink.image && !editingDrink.imagePreview}
                 />
+                {!newDrink.image && (
+                  <div className="validation-message" style={{color: 'red', fontSize: '0.875rem', marginTop: '4px'}}>
+                    Please select an image file
+                  </div>
+                )}
                 {editingDrink.imagePreview ? (
                   <div className="image-edit-container">
                     <img 
