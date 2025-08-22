@@ -23,13 +23,13 @@ const [orders, setOrders] = useState([{}]);
 
 console.log('orders', orders);
 
-  const GetData = () => {
+  const GetData = async () => {
     AxiosInstance.get('api/drink/').then((res) => {
       setProducts(res.data);
     })
   }
 
-  const GetOrderData = () => {
+  const GetOrderData = async () => {
     AxiosInstance.get('api/orders/').then((res) => {
       setOrders(res.data);
     })
@@ -43,16 +43,16 @@ console.log('orders', orders);
       behavior: 'smooth' // or 'auto' for instant jump
     });
   }, [selecteddrink])
-
-
-  useEffect( () => {
+  
+  useEffect(() => {
+  // Poll for updates every 10 seconds
+  const interval = setInterval(() => {
     GetData();
-  }, [])
-
-
-  useEffect( () => {
     GetOrderData();
-  }, [])
+  }, 100);
+
+  return () => clearInterval(interval);
+}, []);
 
   useEffect(() => {
         localStorage.setItem('theme', theme);
