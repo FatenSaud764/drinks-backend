@@ -43,14 +43,11 @@ const [orders, setOrders] = useState([{}]);
   }, [selecteddrink])
 
   useEffect(() => {
-  // Poll for updates every 10 seconds
-  const interval = setInterval(() => {
     GetData();
     GetOrderData();
-  }, 100);
+  }, [])
 
-  return () => clearInterval(interval);
-}, []);
+
 
   useEffect(() => {
         localStorage.setItem('theme', theme);
