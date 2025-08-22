@@ -5,8 +5,10 @@
     grid-template-columns: 1fr;
     grid-template-rows: 10vh auto auto;
     row-gap: 2vh;
-    height: 100vh;
+    height: auto;
     width: auto;
+    min-height: 100vh;
+    overflow-y: auto;
 }
 
 .cartwrapper#dark{
