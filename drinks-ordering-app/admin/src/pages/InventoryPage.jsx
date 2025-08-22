@@ -20,11 +20,11 @@ const InventoryPage = () => {
 
   // Available categories - will probably be fetched from an API or something OR just be a datatype somewhere ?
   const DRINK_CATEGORIES = [
-    'Hot Drinks',
-    'Water',
+    // 'Hot Drinks',
+    // 'Water',
     'Alcoholic',
     'Non-Alcoholic',
-    'Other'
+    // 'Other'
   ];
 
   const [showAddForm, setShowAddForm] = useState(false);
