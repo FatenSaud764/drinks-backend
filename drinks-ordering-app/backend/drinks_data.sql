@@ -712,6 +712,22 @@ COPY public.barbackend_order (id, status, total_price, created_at, updated_at, u
 --
 
 COPY public.barbackend_orderitem (id, quantity, drink_id, order_id) FROM stdin;
+1	2	1	1
+2	1	7	1
+3	1	2	2
+4	2	8	2
+5	2	4	2
+6	3	9	3
+7	1	1	4
+8	2	5	4
+9	2	7	4
+10	2	10	5
+11	3	4	5
+12	1	9	6
+13	2	1	6
+14	1	3	7
+15	3	8	7
+16	2	2	7
 \.
 
 
