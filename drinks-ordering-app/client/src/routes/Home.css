@@ -1,0 +1,113 @@
+.wrapper{
+    position: relative;
+    background: linear-gradient(180deg, #2563EB, #16296b);
+    width:100vw;
+    height: 100vh;
+}
+
+#dark{
+    background: #1F2937 !important;
+}
+
+.togglebutton{
+    position: absolute;
+    left: 80%;
+    top: 5%;
+    transform: translate(-50%, -50%);
+    border: none;
+}
+
+.content{
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    width: 35vh;
+    height: 40vh;
+}
+
+.login{
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 71%;
+    width: 20vw;
+    height: 4vh;
+    background: #F59E0B;
+    color: white;
+    box-shadow: none !important;
+    border: none;
+    border-radius: 10vh;
+    cursor: pointer;
+}
+
+.signup{
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 94%;
+    width: 20vw;
+    height: 4vh;
+    background: none;
+    color: white;
+    box-shadow: none !important;
+    border: none;
+    border-radius: 10vh;
+    font-family: 'Nunito';
+    font-size: 1.5vh;
+}
+
+.content h1{
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 10%;
+    color: #F59E0B;
+    font-size: 6vh;
+    
+}
+
+.content h4{
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 25%;
+    color: white;
+    font-size: 2vh;
+    font-family: 'Nunito';
+}
+
+.content h5{
+    justify-content: center;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 88%;
+    color: white;
+    font-size: 1.5vh;
+    font-family: 'Nunito';
+}
+
+.username{
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 41%;
+    height: 3vh;
+    width: 42vw;
+    padding-left: 1vw;
+    border: none;
+    font-family: 'Nunito';
+}
+
+.password{
+    position: absolute;
+    transform: translate(-50%, -50%);
+    left: 50%;
+    top: 56%;
+    height: 3vh;
+    width: 42vw;
+    padding-left: 1vw;
+    border: none;
+    font-family: 'Nunito';
+}

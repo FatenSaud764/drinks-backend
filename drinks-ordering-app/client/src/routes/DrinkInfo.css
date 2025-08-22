@@ -1,0 +1,72 @@
+.drinkinfowrapper{
+    justify-content: center;
+    justify-items: center;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 10vh 50vh auto;
+    row-gap: 2vh;
+    height: 100vh;
+    width: auto;
+}
+
+.drinkinfowrapper#dark{
+    background: #1F2937 !important;
+}
+
+.drinkname{
+    margin-top: 45vh;
+    font-size: 30px !important;
+    font-family: 'DM Serif Text';
+}
+
+.drinkprice{
+    font-size: 20px !important;
+    font-family: 'DM Serif Text';
+}
+
+#dark .drinkname{
+    color: white !important;
+}
+
+#dark .drinkprice{
+    color: white !important;
+}
+
+.addtocart{
+    margin-top: 10vh;
+    width: 15vh;
+    height: 6vh;
+    background: #F59E0B;
+    color: white;
+    border-radius: 20px;
+    box-shadow: none;
+    border: none;
+    font-family: 'Nunito';
+    cursor: pointer;
+}
+
+.addtocart:hover{
+    background:#e29b1f;
+}
+
+.drinkimage{
+    margin-top: 15vh;
+    height: 39vh;
+    width: 35vh;
+    border-radius: 50px;
+    background: white;
+    border: 3px solid #F59E0B;
+    object-fit: cover;
+}
+
+.nav{
+    position: fixed;
+    height: 8vh;
+    width: 100vw;
+    background: #2563EB;
+    z-index: 999;
+}
+
+#dark .nav{
+    background:#F59E0B !important;
+}

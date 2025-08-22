@@ -1,0 +1,55 @@
+.searchwrap{
+    display: flex;
+    align-items: center;
+    margin-top: 11vh;
+    height: 4vh;
+    width: 90vw;
+    background: none;
+    margin-left: 0vh;
+}
+
+.search{
+    border: 2px solid #F59E0B;
+    border-radius: 30vh;
+    padding-left: 4vw;
+    width: 40vw;
+    height:4vh;
+    cursor: pointer;
+    font-family: 'Lalita One';
+
+}
+
+.search:focus{
+    outline: none;
+}
+
+.submitsearch{
+    margin-left: 1.3vh;
+    border-radius: 100%;
+    width: 4.1vh;
+    height: 4.1vh;
+    border: none;
+    background: #F59E0B;
+    position: relative;
+}
+
+.searchicon{
+    color: white !important;
+    margin-top: 0.2vh;
+    height: 2vh;
+    width: 2vh;
+}
+
+.filter{
+    width: 19vw;
+    height: 4vh;
+    text-align: center;
+    font-size: 10px;
+    margin-left: 6vh;
+    background: #F59E0B;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-family: 'Lilita One' !important;
+    cursor: pointer;
+}
