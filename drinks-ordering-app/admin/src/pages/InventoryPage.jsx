@@ -394,7 +394,7 @@ const InventoryPage = () => {
               
               <div className="image-upload-container">
                 <label htmlFor="add-image-upload" className="image-upload-label">
-                  {newDrink.image ? 'Change Image' : 'Upload Image (Optional)'}
+                  {newDrink.image ? 'Change Image' : 'Upload Image'}
                 </label>
                 <input
                   id="add-image-upload"
@@ -402,7 +402,13 @@ const InventoryPage = () => {
                   accept="image/*"
                   className="image-upload-input"
                   onChange={(e) => handleImageUpload(e, false)}
+                  required
                 />
+                {!newDrink.image && (
+                  <div className="validation-message" style={{color: 'red', fontSize: '0.875rem', marginTop: '4px'}}>
+                    Please select an image file
+                  </div>
+                )}
                 {newDrink.imagePreview && (
                   <img 
                     src={newDrink.imagePreview.startsWith('blob:') 
@@ -492,6 +498,7 @@ const InventoryPage = () => {
                   accept="image/*"
                   className="image-upload-input"
                   onChange={(e) => handleImageUpload(e, true)}
+                  required={!editingDrink.image && !editingDrink.imagePreview}
                 />
                 {editingDrink.imagePreview ? (
                   <div className="image-edit-container">
@@ -530,13 +537,6 @@ const InventoryPage = () => {
                       alt="Current" 
                       className="image-preview" 
                     />
-                    <button
-                      type="button"
-                      className="nav-button"
-                      onClick={() => setEditingDrink(prev => ({ ...prev, image: null }))}
-                    >
-                      Remove Image
-                    </button>
                   </div>
                 )}
               </div>
