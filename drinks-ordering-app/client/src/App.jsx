@@ -21,8 +21,6 @@ const App = () => {
 
 const [orders, setOrders] = useState([{}]);
 
-console.log('orders', orders);
-
   const GetData = async () => {
     AxiosInstance.get('api/drink/').then((res) => {
       setProducts(res.data);
@@ -43,7 +41,7 @@ console.log('orders', orders);
       behavior: 'smooth' // or 'auto' for instant jump
     });
   }, [selecteddrink])
-  
+
   useEffect(() => {
   // Poll for updates every 10 seconds
   const interval = setInterval(() => {

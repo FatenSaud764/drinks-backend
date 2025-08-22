@@ -16,15 +16,15 @@ const Products = () => {
   const {selecteddrink, setSelectedDrink} = useContext(SelectedProduct);
   const {alcoholicfilter, setAlcoholicFilter} = useContext(AlcoholicFilter);
 
-  const sortedProducts = [... products].sort((a, b) => {return a.available<b.available})
+  const sortedProducts = [...products].sort((a, b) => {
+  return (a.available === b.available) ? 0 : a.available ? -1 : 1;
+});
   const sortedProducts2 = [... sortedProducts].sort((a,b) => {if(a.available && b.available) {return a.name.localeCompare(b.name)}})
 
   const filtered = sortedProducts2.filter((product) => {if(search!='') {
     return (product.name.toLowerCase().includes(search.toLowerCase()) && product.category.toLowerCase()===alcoholicfilter);}
     else{return product.category.toLowerCase()===alcoholicfilter}
 });
-
-  console.log('filter', alcoholicfilter);
 
   return (
     <div className='prodwrapper' id={theme}>

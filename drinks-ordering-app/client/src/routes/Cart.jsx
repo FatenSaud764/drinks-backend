@@ -56,7 +56,6 @@ const Cart = () => {
   };
 
   const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.stock, 0);
-  console.log('items', cartItems);
 
   return (
       <div className="cartwrapper" id={theme}>

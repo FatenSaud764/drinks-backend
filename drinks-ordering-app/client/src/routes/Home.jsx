@@ -12,8 +12,6 @@ const Home = () => {
 
   const {orders, setOrders} = useContext(Orders)
 
-  console.log('orders', orders)
-
   const checklogin = () => {
     if(username.current.value==='Samus' && password.current.value==='123') {
       navigate('/products');
@@ -23,7 +21,7 @@ const Home = () => {
     }
   }
 
-  console.log('theme', theme);
+
 
   return (
     <>

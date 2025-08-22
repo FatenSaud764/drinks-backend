@@ -7,9 +7,6 @@ const DrinkInfo = () => {
     const {selecteddrink, setSelectedDrink} = useContext(SelectedProduct);
     const {theme, setTheme} = useContext(LightDark);
 
-    console.log('image', selecteddrink.image)
-    console.log('drink', selecteddrink);
-
   return (
     <div className='drinkinfowrapper' id={theme}>
         <NavBar />
