@@ -1,11 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { MaterialReactTable } from 'material-react-table';
 import { useInventory } from '../hooks/useInventory';
 import '../styles/Pages.css';
 import '../styles/InventoryPage.css';
 
-const LOW_STOCK_THRESHOLD = 10; // Define low stock threshold
-const UNAVAILABLE_THRESHOLD = 5; // Define threshold for unavailable drinks
+const LOW_STOCK_THRESHOLD = 10;
+const UNAVAILABLE_THRESHOLD = 5;
 
 const InventoryPage = () => {
   const { 
@@ -18,13 +18,13 @@ const InventoryPage = () => {
     updateDrink
   } = useInventory();
 
-  // Available categories - will probably be fetched from an API or something OR just be a datatype somewhere ?
+  // Refs for scrolling to forms
+  const addFormRef = useRef(null);
+  const editFormRef = useRef(null);
+
   const DRINK_CATEGORIES = [
-    // 'Hot Drinks',
-    // 'Water',
     'Alcoholic',
     'Non-Alcoholic',
-    // 'Other'
   ];
 
   const [showAddForm, setShowAddForm] = useState(false);
@@ -38,21 +38,43 @@ const InventoryPage = () => {
     image: null
   });
 
+  // Auto-scroll to forms when they become visible
+  useEffect(() => {
+    if (showAddForm && addFormRef.current) {
+      setTimeout(() => {
+        addFormRef.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }, 100); // Small delay to ensure form is rendered
+    }
+  }, [showAddForm]);
+
+  useEffect(() => {
+    if (editingDrink && editFormRef.current) {
+      setTimeout(() => {
+        editFormRef.current.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }, 100);
+    }
+  }, [editingDrink]);
+
   const handleImageUpload = (e, isEdit = false) => {
     const file = e.target.files[0];
     if (file) {
-      // Store the actual File object, not the base64 data URL
       if (isEdit && editingDrink) {
         setEditingDrink(prev => ({ 
           ...prev, 
           image: file,
-          imagePreview: URL.createObjectURL(file) // For preview purposes
+          imagePreview: URL.createObjectURL(file)
         }));
       } else {
         setNewDrink(prev => ({ 
           ...prev, 
           image: file,
-          imagePreview: URL.createObjectURL(file) // For preview purposes
+          imagePreview: URL.createObjectURL(file)
         }));
       }
     }
@@ -61,47 +83,44 @@ const InventoryPage = () => {
   const columns = useMemo(
     () => [
       {
-  accessorKey: 'image',
-  header: 'Image',
-  size: 80,
-  Cell: ({ row }) => {
-    let imageUrl = null;
-    
-    // Handle different image formats
-    if (row.original.image) {
-      if (typeof row.original.image === 'string') {
-        // It's already a URL string
-        imageUrl = row.original.image;
-      } else if (row.original.image instanceof File) {
-        // It's a File object, create object URL
-        imageUrl = URL.createObjectURL(row.original.image);
-      }
-    }
-    
-    return (
-      <div className="image-cell">
-        {imageUrl ? (
-          <img 
-            src= {`http://localhost:8000${imageUrl}`} // ?? Without this, the image won't load properly
-            alt={row.original.name}
-            className="drink-image"
-            onError={(e) => {
-              console.log('Image failed to load:', imageUrl);
-              e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'block';
-            }}
-          />
-        ) : null}
-        <div 
-          className="no-image-placeholder" 
-          style={{ display: imageUrl ? 'none' : 'block' }}
-        >
-          No Image
-        </div>
-      </div>
-    );
-  },
-},
+        accessorKey: 'image',
+        header: 'Image',
+        size: 80,
+        Cell: ({ row }) => {
+          let imageUrl = null;
+          
+          if (row.original.image) {
+            if (typeof row.original.image === 'string') {
+              imageUrl = row.original.image;
+            } else if (row.original.image instanceof File) {
+              imageUrl = URL.createObjectURL(row.original.image);
+            }
+          }
+          
+          return (
+            <div className="image-cell">
+              {imageUrl ? (
+                <img 
+                  src={`http://localhost:8000${imageUrl}`}
+                  alt={row.original.name}
+                  className="drink-image"
+                  onError={(e) => {
+                    console.log('Image failed to load:', imageUrl);
+                    e.target.style.display = 'none';
+                    e.target.nextSibling.style.display = 'block';
+                  }}
+                />
+              ) : null}
+              <div 
+                className="no-image-placeholder" 
+                style={{ display: imageUrl ? 'none' : 'block' }}
+              >
+                No Image
+              </div>
+            </div>
+          );
+        },
+      },
       {
         accessorKey: 'name',
         header: 'Name',
@@ -131,7 +150,7 @@ const InventoryPage = () => {
         Cell: ({ cell }) => {
           const stock = cell.getValue() || 0;
           return (
-            <span className={`stock-cell ${stock < UNAVAILABLE_THRESHOLD  ? 'unavailable' : stock < LOW_STOCK_THRESHOLD ? 'low-stock' : ''}`}>
+            <span className={`stock-cell ${stock < UNAVAILABLE_THRESHOLD ? 'unavailable' : stock < LOW_STOCK_THRESHOLD ? 'low-stock' : ''}`}>
               {stock} units
             </span>
           );
@@ -200,7 +219,6 @@ const InventoryPage = () => {
       imagePreview: null 
     });
 
-    // Clean up preview URLs to prevent memory leaks
     if (newDrink.imagePreview) {
       URL.revokeObjectURL(newDrink.imagePreview);
     }
@@ -214,7 +232,7 @@ const InventoryPage = () => {
       await createDrink({
         name: newDrink.name.trim(),
         description: newDrink.description.trim(),
-        image: newDrink.image, // This will now be a File object or null
+        image: newDrink.image,
         price: parseFloat(newDrink.price),
         category: newDrink.category.trim(),
         available: stockValue >= 5,
@@ -236,7 +254,7 @@ const InventoryPage = () => {
       await updateDrink(editingDrink.id, {
         name: editingDrink.name.trim(),
         description: editingDrink.description.trim(),
-        image: editingDrink.image, // This will now be a File object or the existing image path
+        image: editingDrink.image,
         price: parseFloat(editingDrink.price),
         category: editingDrink.category.trim(),
         available: stockValue >= 5,
@@ -331,7 +349,7 @@ const InventoryPage = () => {
 
         {/* Add Form */}
         {showAddForm && (
-          <div className="orders-controls">
+          <div className="orders-controls" ref={addFormRef}>
             <h3 className="form-title">Add New Drink</h3>
             <form onSubmit={handleAddDrink} className="add-drink-form">
               <div className="form-grid">
@@ -414,7 +432,7 @@ const InventoryPage = () => {
 
         {/* Edit Form */}
         {editingDrink && (
-          <div className="orders-controls">
+          <div className="orders-controls" ref={editFormRef}>
             <h3 className="form-title">Edit Drink</h3>
             <form onSubmit={handleEditSubmit} className="add-drink-form">
               <div className="form-grid">
