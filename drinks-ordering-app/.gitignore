@@ -56,3 +56,12 @@ local_settings.py
 # macOS / Windows junk
 .DS_Store
 Thumbs.db
+
+# Re-allow images in this repo
+!*.jpg
+!*.jpeg
+!*.jpe
+!*.jif
+!*.jfif
+!*.jfi
+!*.png
