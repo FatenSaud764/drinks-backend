@@ -60,16 +60,6 @@ const HistoryPage = () => {
     }
   };
 
-  // Clear error when component mounts or when user dismisses error
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        clearError();
-      }, 5000); // Auto-clear error after 5 seconds
-      return () => clearTimeout(timer);
-    }
-  }, [error, clearError]);
-
   const statusCounts = getHistoryOrderStatusCounts(historyOrders.filter(order => 
     [ORDER_STATUSES.COMPLETED, ORDER_STATUSES.CANCELLED].includes(order.status)
   ));
@@ -99,8 +89,22 @@ const HistoryPage = () => {
         {/* Error Display */}
         {error && (
           <div className="error-banner">
-            <p>Error: {error}</p>
-            <button onClick={clearError} className="btn-clear-error">×</button>
+            <div className="error-content">
+              <p>Error: {error}</p>
+              <div className="error-actions">
+                <button 
+                  onClick={() => {
+                    clearError();
+                    refetch();
+                  }} 
+                  className="btn-refresh-error"
+                  disabled={loading}
+                >
+                  Retry
+                </button>
+                <button onClick={clearError} className="btn-clear-error">×</button>
+              </div>
+            </div>
           </div>
         )}
 

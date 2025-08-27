@@ -3,6 +3,7 @@ import { MaterialReactTable } from 'material-react-table';
 import { useInventory } from '../hooks/useInventory';
 import '../styles/Pages.css';
 import '../styles/InventoryPage.css';
+import '../styles/Form.css';
 
 const LOW_STOCK_THRESHOLD = 10;
 const UNAVAILABLE_THRESHOLD = 5;
@@ -15,7 +16,8 @@ const InventoryPage = () => {
     createDrink, 
     toggleAvailability, 
     deleteDrink,
-    updateDrink
+    updateDrink,
+    clearError
   } = useInventory();
 
   // Refs for scrolling to forms
@@ -294,8 +296,18 @@ const InventoryPage = () => {
     }
   };
 
-  if (loading) return <div className="page"><div className="page-container">Loading inventory...</div></div>;
-  if (error) return <div className="page"><div className="page-container">Error loading inventory: {error}</div></div>;
+  // Show loading state only for initial load
+  if (loading && drinks.length === 0) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <div className="loading-state">
+            <h3>Loading inventory...</h3>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="page">
@@ -304,6 +316,28 @@ const InventoryPage = () => {
           <h1>Inventory Management</h1>
           <p>Track and manage your inventory levels</p>
         </div>
+
+        {/* Error Display */}
+        {error && (
+          <div className="error-banner">
+            <div className="error-content">
+              <p>Error: {error}</p>
+              <div className="error-actions">
+                <button 
+                  onClick={() => {
+                    clearError();
+                    refetch();
+                  }}
+                  className="btn-refresh-error"
+                  disabled={loading}
+                >
+                  Retry
+                </button>
+                <button onClick={clearError} className="btn-clear-error">×</button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Summary Stats */}
         <div className="inventory-stats">
@@ -347,87 +381,113 @@ const InventoryPage = () => {
           )}
         </div>
 
+        {/* Loading indicator for updates */}
+        {loading && drinks.length > 0 && (
+          <div className="loading-indicator">
+            <p>Updating inventory...</p>
+          </div>
+        )}
+
         {/* Add Form */}
         {showAddForm && (
           <div className="orders-controls" ref={addFormRef}>
             <h3 className="form-title">Add New Drink</h3>
             <form onSubmit={handleAddDrink} className="add-drink-form">
               <div className="form-grid">
-                <input
-                  type="text"
-                  placeholder="Drink name"
-                  className="search-input"
-                  value={newDrink.name}
-                  onChange={(e) => setNewDrink(prev => ({ ...prev, name: e.target.value }))}
-                  required
-                />
-                <input
-                  type="number"
-                  step="0.01"
-                  placeholder="Price"
-                  className="search-input"
-                  value={newDrink.price}
-                  onChange={(e) => setNewDrink(prev => ({ ...prev, price: e.target.value }))}
-                  required
-                />
-                <select
-                  className="search-input"
-                  value={newDrink.category}
-                  onChange={(e) => setNewDrink(prev => ({ ...prev, category: e.target.value }))}
-                  required
-                >
-                  <option value="">Select Category</option>
-                  {DRINK_CATEGORIES.map(category => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                </select>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="Stock quantity"
-                  className="search-input"
-                  value={newDrink.stock}
-                  onChange={(e) => setNewDrink(prev => ({ ...prev, stock: e.target.value }))}
-                  required
+                <div className="form-field">
+                  <label htmlFor="add-drink-name" className="form-label">Name of Drink</label>
+                  <input
+                    id="add-drink-name"
+                    type="text"
+                    placeholder="Enter drink name"
+                    className="search-input"
+                    value={newDrink.name}
+                    onChange={(e) => setNewDrink(prev => ({ ...prev, name: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div className="form-field">
+                  <label htmlFor="add-drink-price" className="form-label">Price of Drink (R)</label>
+                  <input
+                    id="add-drink-price"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    className="search-input"
+                    value={newDrink.price}
+                    onChange={(e) => setNewDrink(prev => ({ ...prev, price: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div className="form-field">
+                  <label htmlFor="add-drink-category" className="form-label">Category</label>
+                  <select
+                    id="add-drink-category"
+                    className="search-input"
+                    value={newDrink.category}
+                    onChange={(e) => setNewDrink(prev => ({ ...prev, category: e.target.value }))}
+                    required
+                  >
+                    <option value="">Select Category</option>
+                    {DRINK_CATEGORIES.map(category => (
+                      <option key={category} value={category}>{category}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-field">
+                  <label htmlFor="add-drink-stock" className="form-label">Stock Quantity (Units)</label>
+                  <input
+                    id="add-drink-stock"
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    className="search-input"
+                    value={newDrink.stock}
+                    onChange={(e) => setNewDrink(prev => ({ ...prev, stock: e.target.value }))}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="form-field">
+                <label className="form-label required">Drink Image</label>
+                <div className="image-upload-container">
+                  <label htmlFor="add-image-upload" className="image-upload-label">
+                    {newDrink.image ? 'Change Image' : 'Upload Image'}
+                  </label>
+                  <input
+                    id="add-image-upload"
+                    type="file"
+                    accept="image/*"
+                    className="image-upload-input"
+                    onChange={(e) => handleImageUpload(e, false)}
+                    required
+                  />
+                  {newDrink.imagePreview && (
+                    <img 
+                      src={newDrink.imagePreview.startsWith('blob:') 
+                        ? newDrink.imagePreview 
+                        : `http://localhost:8000${newDrink.imagePreview}`
+                      } 
+                      alt="Preview" 
+                      className="image-preview" 
+                    />
+                  )}
+                </div>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="add-drink-description" className="form-label">Description (Optional)</label>
+                <textarea
+                  id="add-drink-description"
+                  placeholder="Enter drink description"
+                  className="search-input form-textarea"
+                  value={newDrink.description}
+                  onChange={(e) => setNewDrink(prev => ({ ...prev, description: e.target.value }))}
+                  rows="3"
                 />
               </div>
               
-              <div className="image-upload-container">
-                <label htmlFor="add-image-upload" className="image-upload-label">
-                  {newDrink.image ? 'Change Image' : 'Upload Image'}
-                </label>
-                <input
-                  id="add-image-upload"
-                  type="file"
-                  accept="image/*"
-                  className="image-upload-input"
-                  onChange={(e) => handleImageUpload(e, false)}
-                  required
-                />
-                {!newDrink.image && (
-                  <div className="validation-message" style={{color: 'red', fontSize: '0.875rem', marginTop: '4px'}}>
-                    Please select an image file
-                  </div>
-                )}
-                {newDrink.imagePreview && (
-                  <img 
-                    src={newDrink.imagePreview.startsWith('blob:') 
-                      ? newDrink.imagePreview 
-                      : `http://localhost:8000${newDrink.imagePreview}`
-                    } 
-                    alt="Preview" 
-                    className="image-preview" 
-                  />
-                )}
-              </div>
-
-              <textarea
-                placeholder="Description (optional)"
-                className="search-input form-textarea"
-                value={newDrink.description}
-                onChange={(e) => setNewDrink(prev => ({ ...prev, description: e.target.value }))}
-                rows="3"
-              />
               <div className="form-actions">
                 <button type="button" className="nav-button" onClick={() => {
                   clearForm();
@@ -449,110 +509,136 @@ const InventoryPage = () => {
             <h3 className="form-title">Edit Drink</h3>
             <form onSubmit={handleEditSubmit} className="add-drink-form">
               <div className="form-grid">
-                <input
-                  type="text"
-                  placeholder="Drink name"
-                  className="search-input"
-                  value={editingDrink.name}
-                  onChange={(e) => setEditingDrink(prev => ({ ...prev, name: e.target.value }))}
-                  required
-                />
-                <input
-                  type="number"
-                  step="0.01"
-                  placeholder="Price"
-                  className="search-input"
-                  value={editingDrink.price}
-                  onChange={(e) => setEditingDrink(prev => ({ ...prev, price: e.target.value }))}
-                  required
-                />
-                <select
-                  className="search-input"
-                  value={editingDrink.category}
-                  onChange={(e) => setEditingDrink(prev => ({ ...prev, category: e.target.value }))}
-                  required
-                >
-                  <option value="">Select Category</option>
-                  {DRINK_CATEGORIES.map(category => (
-                    <option key={category} value={category}>{category}</option>
-                  ))}
-                </select>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="Stock quantity"
-                  className="search-input"
-                  value={editingDrink.stock}
-                  onChange={(e) => setEditingDrink(prev => ({ ...prev, stock: e.target.value }))}
-                  required
+                <div className="form-field">
+                  <label htmlFor="edit-drink-name" className="form-label">Name of Drink *</label>
+                  <input
+                    id="edit-drink-name"
+                    type="text"
+                    placeholder="Enter drink name"
+                    className="search-input"
+                    value={editingDrink.name}
+                    onChange={(e) => setEditingDrink(prev => ({ ...prev, name: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div className="form-field">
+                  <label htmlFor="edit-drink-price" className="form-label">Price of Drink (R) *</label>
+                  <input
+                    id="edit-drink-price"
+                    type="number"
+                    step="0.01"
+                    placeholder="0.00"
+                    className="search-input"
+                    value={editingDrink.price}
+                    onChange={(e) => setEditingDrink(prev => ({ ...prev, price: e.target.value }))}
+                    required
+                  />
+                </div>
+                <div className="form-field">
+                  <label htmlFor="add-drink-category" className="form-label">Category</label>
+                  <div className="search-container">
+                    <select
+                      id="add-drink-category"
+                      className="search-input"
+                      value={newDrink.category}
+                      onChange={(e) => setNewDrink(prev => ({ ...prev, category: e.target.value }))}
+                      required
+                    >
+                      <option value="">Select Category</option>
+                      {DRINK_CATEGORIES.map(category => (
+                        <option key={category} value={category}>{category}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+                <div className="form-field">
+                  <label htmlFor="edit-drink-stock" className="form-label">Stock Quantity (Units) *</label>
+                  <input
+                    id="edit-drink-stock"
+                    type="number"
+                    min="0"
+                    placeholder="0"
+                    className="search-input"
+                    value={editingDrink.stock}
+                    onChange={(e) => setEditingDrink(prev => ({ ...prev, stock: e.target.value }))}
+                    required
+                  />
+                </div>
+              </div>
+              
+              <div className="form-field">
+                <label className="form-label">Drink Image *</label>
+                <div className="image-upload-container">
+                  <label htmlFor="edit-image-upload" className="image-upload-label">
+                    {editingDrink.image ? 'Change Image' : 'Upload Image'}
+                  </label>
+                  <input
+                    id="edit-image-upload"
+                    type="file"
+                    accept="image/*"
+                    className="image-upload-input"
+                    onChange={(e) => handleImageUpload(e, true)}
+                    required={!editingDrink.image && !editingDrink.imagePreview}
+                  />
+                  {!newDrink.image && (
+                    <div className="validation-message" style={{color: 'red', fontSize: '0.875rem', marginTop: '4px'}}>
+                      Please select an image file
+                    </div>
+                  )}
+                  {editingDrink.imagePreview ? (
+                    <div className="image-edit-container">
+                      <img 
+                        src={editingDrink.imagePreview.startsWith('blob:') 
+                          ? editingDrink.imagePreview 
+                          : `http://localhost:8000${editingDrink.imagePreview}`
+                        } 
+                        alt="Preview" 
+                        className="image-preview" 
+                      />
+                      <button
+                        type="button"
+                        className="nav-button"
+                        onClick={() => {
+                          if (editingDrink.imagePreview) {
+                            URL.revokeObjectURL(editingDrink.imagePreview);
+                          }
+                          setEditingDrink(prev => ({ 
+                            ...prev, 
+                            image: null, 
+                            imagePreview: null
+                          }));
+                        }}
+                      >
+                        Remove Image
+                      </button>
+                    </div>
+                  ) : editingDrink.image && typeof editingDrink.image === 'string' && (
+                    <div className="image-edit-container">
+                      <img 
+                        src={editingDrink.image.startsWith('blob:') 
+                          ? editingDrink.image 
+                          : `http://localhost:8000${editingDrink.image}`
+                        } 
+                        alt="Current" 
+                        className="image-preview" 
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="form-field">
+                <label htmlFor="edit-drink-description" className="form-label">Description (Optional)</label>
+                <textarea
+                  id="edit-drink-description"
+                  placeholder="Enter drink description"
+                  className="search-input form-textarea"
+                  value={editingDrink.description}
+                  onChange={(e) => setEditingDrink(prev => ({ ...prev, description: e.target.value }))}
+                  rows="3"
                 />
               </div>
               
-              <div className="image-upload-container">
-                <label htmlFor="edit-image-upload" className="image-upload-label">
-                  {editingDrink.image ? 'Change Image' : 'Upload Image'}
-                </label>
-                <input
-                  id="edit-image-upload"
-                  type="file"
-                  accept="image/*"
-                  className="image-upload-input"
-                  onChange={(e) => handleImageUpload(e, true)}
-                  required={!editingDrink.image && !editingDrink.imagePreview}
-                />
-                {!newDrink.image && (
-                  <div className="validation-message" style={{color: 'red', fontSize: '0.875rem', marginTop: '4px'}}>
-                    Please select an image file
-                  </div>
-                )}
-                {editingDrink.imagePreview ? (
-                  <div className="image-edit-container">
-                    <img 
-                      src={editingDrink.imagePreview.startsWith('blob:') 
-                        ? editingDrink.imagePreview 
-                        : `http://localhost:8000${editingDrink.imagePreview}`
-                      } 
-                      alt="Preview" 
-                      className="image-preview" 
-                    />
-                    <button
-                      type="button"
-                      className="nav-button"
-                      onClick={() => {
-                        if (editingDrink.imagePreview) {
-                          URL.revokeObjectURL(editingDrink.imagePreview);
-                        }
-                        setEditingDrink(prev => ({ 
-                          ...prev, 
-                          image: null, 
-                          imagePreview: null
-                        }));
-                      }}
-                    >
-                      Remove Image
-                    </button>
-                  </div>
-                ) : editingDrink.image && typeof editingDrink.image === 'string' && (
-                  <div className="image-edit-container">
-                    <img 
-                      src={editingDrink.image.startsWith('blob:') 
-                        ? editingDrink.image 
-                        : `http://localhost:8000${editingDrink.image}`
-                      } 
-                      alt="Current" 
-                      className="image-preview" 
-                    />
-                  </div>
-                )}
-              </div>
-
-              <textarea
-                placeholder="Description (optional)"
-                className="search-input form-textarea"
-                value={editingDrink.description}
-                onChange={(e) => setEditingDrink(prev => ({ ...prev, description: e.target.value }))}
-                rows="3"
-              />
               <div className="form-actions">
                 <button type="button" className="nav-button" onClick={() => setEditingDrink(null)}>
                   Cancel
