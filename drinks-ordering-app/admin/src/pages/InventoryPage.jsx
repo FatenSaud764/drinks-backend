@@ -1,9 +1,9 @@
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { MaterialReactTable } from 'material-react-table';
 import { useInventory } from '../hooks/useInventory';
 import '../styles/Pages.css';
 import '../styles/InventoryPage.css';
-import '../styles/Form.css';
+import '../styles/Modal.css';
 
 const LOW_STOCK_THRESHOLD = 10;
 const UNAVAILABLE_THRESHOLD = 5;
@@ -20,66 +20,73 @@ const InventoryPage = () => {
     clearError
   } = useInventory();
 
-  // Refs for scrolling to forms
-  const addFormRef = useRef(null);
-  const editFormRef = useRef(null);
-
   const DRINK_CATEGORIES = [
     'Alcoholic',
     'Non-Alcoholic',
   ];
 
-  const [showAddForm, setShowAddForm] = useState(false);
-  const [editingDrink, setEditingDrink] = useState(null);
-  const [newDrink, setNewDrink] = useState({
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
+  const [validationErrors, setValidationErrors] = useState({});
+  const [formData, setFormData] = useState({
+    id: null,
     name: '',
     price: '',
     category: '',
     stock: '',
     description: '',
-    image: null
+    image: null,
+    imagePreview: null
   });
 
-  // Auto-scroll to forms when they become visible
-  useEffect(() => {
-    if (showAddForm && addFormRef.current) {
-      setTimeout(() => {
-        addFormRef.current.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
-        });
-      }, 100); // Small delay to ensure form is rendered
-    }
-  }, [showAddForm]);
-
-  useEffect(() => {
-    if (editingDrink && editFormRef.current) {
-      setTimeout(() => {
-        editFormRef.current.scrollIntoView({ 
-          behavior: 'smooth', 
-          block: 'center' 
-        });
-      }, 100);
-    }
-  }, [editingDrink]);
-
-  const handleImageUpload = (e, isEdit = false) => {
+  const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (isEdit && editingDrink) {
-        setEditingDrink(prev => ({ 
-          ...prev, 
-          image: file,
-          imagePreview: URL.createObjectURL(file)
-        }));
-      } else {
-        setNewDrink(prev => ({ 
-          ...prev, 
-          image: file,
-          imagePreview: URL.createObjectURL(file)
-        }));
+      // Clear any image validation errors
+      setValidationErrors(prev => ({
+        ...prev,
+        image: null
+      }));
+
+      setFormData(prev => ({ 
+        ...prev, 
+        image: file,
+        imagePreview: URL.createObjectURL(file)
+      }));
+    }
+  };
+
+  const validateForm = (data) => {
+    const errors = {};
+
+    if (!data.name?.trim()) {
+      errors.name = 'Drink name is required';
+    }
+
+    if (!data.price || parseFloat(data.price) <= 0) {
+      errors.price = 'Valid price is required';
+    }
+
+    if (!data.category?.trim()) {
+      errors.category = 'Category is required';
+    }
+
+    if (!data.stock || parseInt(data.stock) < 0) {
+      errors.stock = 'Valid stock quantity is required';
+    }
+
+    // Image validation
+    if (modalMode === 'add') {
+      if (!data.image) {
+        errors.image = 'An image is required for the drink';
+      }
+    } else if (modalMode === 'edit') {
+      if (!data.image && !data.imagePreview) {
+        errors.image = 'An image is required for the drink';
       }
     }
+
+    return errors;
   };
 
   const columns = useMemo(
@@ -211,61 +218,76 @@ const InventoryPage = () => {
   );
 
   const clearForm = () => {
-    setNewDrink({ 
-      name: '', 
-      price: '', 
-      category: '', 
-      stock: '', 
-      description: '', 
+    if (formData.imagePreview && formData.imagePreview.startsWith('blob:')) {
+      URL.revokeObjectURL(formData.imagePreview);
+    }
+    
+    setFormData({
+      id: null,
+      name: '',
+      price: '',
+      category: '',
+      stock: '',
+      description: '',
       image: null,
-      imagePreview: null 
+      imagePreview: null
     });
-
-    if (newDrink.imagePreview) {
-      URL.revokeObjectURL(newDrink.imagePreview);
-    }
+    setValidationErrors({});
   };
 
-  const handleAddDrink = async (e) => {
-    e.preventDefault();
-    
-    try {
-      const stockValue = parseInt(newDrink.stock);
-      await createDrink({
-        name: newDrink.name.trim(),
-        description: newDrink.description.trim(),
-        image: newDrink.image,
-        price: parseFloat(newDrink.price),
-        category: newDrink.category.trim(),
-        available: stockValue >= 5,
-        stock: stockValue,
-      });
-      clearForm();
-      setShowAddForm(false);
-    } catch (err) {
-      console.error('Failed to create drink:', err);
-      alert(`Failed to create drink: ${err.message}`);
-    }
+  const openAddModal = () => {
+    clearForm();
+    setModalMode('add');
+    setModalOpen(true);
   };
 
-  const handleEditSubmit = async (e) => {
+  const handleEditDrink = (drink) => {
+    setFormData({ 
+      ...drink,
+      imagePreview: drink.image // Use existing image as preview
+    });
+    setModalMode('edit');
+    setModalOpen(true);
+    setValidationErrors({});
+  };
+
+  const closeModal = () => {
+    setModalOpen(false);
+    clearForm();
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate form
+    const errors = validateForm(formData);
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
     try {
-      const stockValue = parseInt(editingDrink.stock);
-      await updateDrink(editingDrink.id, {
-        name: editingDrink.name.trim(),
-        description: editingDrink.description.trim(),
-        image: editingDrink.image,
-        price: parseFloat(editingDrink.price),
-        category: editingDrink.category.trim(),
+      const stockValue = parseInt(formData.stock);
+      const drinkData = {
+        name: formData.name.trim(),
+        description: formData.description.trim(),
+        image: formData.image,
+        price: parseFloat(formData.price),
+        category: formData.category.trim(),
         available: stockValue >= 5,
         stock: stockValue,
-      });
-      setEditingDrink(null);
+      };
+
+      if (modalMode === 'add') {
+        await createDrink(drinkData);
+      } else {
+        await updateDrink(formData.id, drinkData);
+      }
+      
+      closeModal();
     } catch (err) {
-      console.error('Failed to update drink:', err);
-      alert(`Failed to update drink: ${err.message}`);
+      console.error(`Failed to ${modalMode} drink:`, err);
+      alert(`Failed to ${modalMode} drink: ${err.message}`);
     }
   };
 
@@ -279,11 +301,6 @@ const InventoryPage = () => {
     }
   };
 
-  const handleEditDrink = (drink) => {
-    setEditingDrink({ ...drink });
-    setShowAddForm(false);
-  };
-
   const handleDeleteDrink = async (drinkId) => {
     if (window.confirm('Are you sure you want to delete this drink?')) {
       try {
@@ -293,6 +310,14 @@ const InventoryPage = () => {
         console.error('Failed to delete drink:', err);
         alert(`Failed to delete drink: ${err.message}`);
       }
+    }
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear validation error when user starts typing
+    if (validationErrors[field]) {
+      setValidationErrors(prev => ({ ...prev, [field]: null }));
     }
   };
 
@@ -359,295 +384,17 @@ const InventoryPage = () => {
           </div>
         </div>
 
-        {/* Add/Edit Buttons */}
+        {/* Add Button */}
         <div className="orders-controls">
-          <button
-            className="notify-button"
-            onClick={() => {
-              clearForm();
-              setShowAddForm(!showAddForm);
-              setEditingDrink(null);
-            }}
-          >
-            {showAddForm ? 'Cancel' : 'Add New Drink'}
+          <button className="notify-button" onClick={openAddModal}>
+            Add New Drink
           </button>
-          {editingDrink && (
-            <button
-              className="nav-button"
-              onClick={() => setEditingDrink(null)}
-            >
-              Cancel Edit
-            </button>
-          )}
         </div>
 
         {/* Loading indicator for updates */}
         {loading && drinks.length > 0 && (
           <div className="loading-indicator">
             <p>Updating inventory...</p>
-          </div>
-        )}
-
-        {/* Add Form */}
-        {showAddForm && (
-          <div className="orders-controls" ref={addFormRef}>
-            <h3 className="form-title">Add New Drink</h3>
-            <form onSubmit={handleAddDrink} className="add-drink-form">
-              <div className="form-grid">
-                <div className="form-field">
-                  <label htmlFor="add-drink-name" className="form-label">Name of Drink</label>
-                  <input
-                    id="add-drink-name"
-                    type="text"
-                    placeholder="Enter drink name"
-                    className="search-input"
-                    value={newDrink.name}
-                    onChange={(e) => setNewDrink(prev => ({ ...prev, name: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="add-drink-price" className="form-label">Price of Drink (R)</label>
-                  <input
-                    id="add-drink-price"
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    className="search-input"
-                    value={newDrink.price}
-                    onChange={(e) => setNewDrink(prev => ({ ...prev, price: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="add-drink-category" className="form-label">Category</label>
-                  <select
-                    id="add-drink-category"
-                    className="search-input"
-                    value={newDrink.category}
-                    onChange={(e) => setNewDrink(prev => ({ ...prev, category: e.target.value }))}
-                    required
-                  >
-                    <option value="">Select Category</option>
-                    {DRINK_CATEGORIES.map(category => (
-                      <option key={category} value={category}>{category}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-field">
-                  <label htmlFor="add-drink-stock" className="form-label">Stock Quantity (Units)</label>
-                  <input
-                    id="add-drink-stock"
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    className="search-input"
-                    value={newDrink.stock}
-                    onChange={(e) => setNewDrink(prev => ({ ...prev, stock: e.target.value }))}
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="form-field">
-                <label className="form-label required">Drink Image</label>
-                <div className="image-upload-container">
-                  <label htmlFor="add-image-upload" className="image-upload-label">
-                    {newDrink.image ? 'Change Image' : 'Upload Image'}
-                  </label>
-                  <input
-                    id="add-image-upload"
-                    type="file"
-                    accept="image/*"
-                    className="image-upload-input"
-                    onChange={(e) => handleImageUpload(e, false)}
-                    required
-                  />
-                  {newDrink.imagePreview && (
-                    <img 
-                      src={newDrink.imagePreview.startsWith('blob:') 
-                        ? newDrink.imagePreview 
-                        : `http://localhost:8000${newDrink.imagePreview}`
-                      } 
-                      alt="Preview" 
-                      className="image-preview" 
-                    />
-                  )}
-                </div>
-              </div>
-
-              <div className="form-field">
-                <label htmlFor="add-drink-description" className="form-label">Description (Optional)</label>
-                <textarea
-                  id="add-drink-description"
-                  placeholder="Enter drink description"
-                  className="search-input form-textarea"
-                  value={newDrink.description}
-                  onChange={(e) => setNewDrink(prev => ({ ...prev, description: e.target.value }))}
-                  rows="3"
-                />
-              </div>
-              
-              <div className="form-actions">
-                <button type="button" className="nav-button" onClick={() => {
-                  clearForm();
-                  setShowAddForm(false);
-                }}>
-                  Cancel
-                </button>
-                <button type="submit" className="notify-button">
-                  Add Drink
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
-
-        {/* Edit Form */}
-        {editingDrink && (
-          <div className="orders-controls" ref={editFormRef}>
-            <h3 className="form-title">Edit Drink</h3>
-            <form onSubmit={handleEditSubmit} className="add-drink-form">
-              <div className="form-grid">
-                <div className="form-field">
-                  <label htmlFor="edit-drink-name" className="form-label">Name of Drink *</label>
-                  <input
-                    id="edit-drink-name"
-                    type="text"
-                    placeholder="Enter drink name"
-                    className="search-input"
-                    value={editingDrink.name}
-                    onChange={(e) => setEditingDrink(prev => ({ ...prev, name: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="edit-drink-price" className="form-label">Price of Drink (R) *</label>
-                  <input
-                    id="edit-drink-price"
-                    type="number"
-                    step="0.01"
-                    placeholder="0.00"
-                    className="search-input"
-                    value={editingDrink.price}
-                    onChange={(e) => setEditingDrink(prev => ({ ...prev, price: e.target.value }))}
-                    required
-                  />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="add-drink-category" className="form-label">Category</label>
-                  <div className="search-container">
-                    <select
-                      id="add-drink-category"
-                      className="search-input"
-                      value={newDrink.category}
-                      onChange={(e) => setNewDrink(prev => ({ ...prev, category: e.target.value }))}
-                      required
-                    >
-                      <option value="">Select Category</option>
-                      {DRINK_CATEGORIES.map(category => (
-                        <option key={category} value={category}>{category}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-                <div className="form-field">
-                  <label htmlFor="edit-drink-stock" className="form-label">Stock Quantity (Units) *</label>
-                  <input
-                    id="edit-drink-stock"
-                    type="number"
-                    min="0"
-                    placeholder="0"
-                    className="search-input"
-                    value={editingDrink.stock}
-                    onChange={(e) => setEditingDrink(prev => ({ ...prev, stock: e.target.value }))}
-                    required
-                  />
-                </div>
-              </div>
-              
-              <div className="form-field">
-                <label className="form-label">Drink Image *</label>
-                <div className="image-upload-container">
-                  <label htmlFor="edit-image-upload" className="image-upload-label">
-                    {editingDrink.image ? 'Change Image' : 'Upload Image'}
-                  </label>
-                  <input
-                    id="edit-image-upload"
-                    type="file"
-                    accept="image/*"
-                    className="image-upload-input"
-                    onChange={(e) => handleImageUpload(e, true)}
-                    required={!editingDrink.image && !editingDrink.imagePreview}
-                  />
-                  {!newDrink.image && (
-                    <div className="validation-message" style={{color: 'red', fontSize: '0.875rem', marginTop: '4px'}}>
-                      Please select an image file
-                    </div>
-                  )}
-                  {editingDrink.imagePreview ? (
-                    <div className="image-edit-container">
-                      <img 
-                        src={editingDrink.imagePreview.startsWith('blob:') 
-                          ? editingDrink.imagePreview 
-                          : `http://localhost:8000${editingDrink.imagePreview}`
-                        } 
-                        alt="Preview" 
-                        className="image-preview" 
-                      />
-                      <button
-                        type="button"
-                        className="nav-button"
-                        onClick={() => {
-                          if (editingDrink.imagePreview) {
-                            URL.revokeObjectURL(editingDrink.imagePreview);
-                          }
-                          setEditingDrink(prev => ({ 
-                            ...prev, 
-                            image: null, 
-                            imagePreview: null
-                          }));
-                        }}
-                      >
-                        Remove Image
-                      </button>
-                    </div>
-                  ) : editingDrink.image && typeof editingDrink.image === 'string' && (
-                    <div className="image-edit-container">
-                      <img 
-                        src={editingDrink.image.startsWith('blob:') 
-                          ? editingDrink.image 
-                          : `http://localhost:8000${editingDrink.image}`
-                        } 
-                        alt="Current" 
-                        className="image-preview" 
-                      />
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              <div className="form-field">
-                <label htmlFor="edit-drink-description" className="form-label">Description (Optional)</label>
-                <textarea
-                  id="edit-drink-description"
-                  placeholder="Enter drink description"
-                  className="search-input form-textarea"
-                  value={editingDrink.description}
-                  onChange={(e) => setEditingDrink(prev => ({ ...prev, description: e.target.value }))}
-                  rows="3"
-                />
-              </div>
-              
-              <div className="form-actions">
-                <button type="button" className="nav-button" onClick={() => setEditingDrink(null)}>
-                  Cancel
-                </button>
-                <button type="submit" className="notify-button">
-                  Update Drink
-                </button>
-              </div>
-            </form>
           </div>
         )}
 
@@ -692,6 +439,167 @@ const InventoryPage = () => {
             }}
           />
         </div>
+
+        {/* Add/Edit Modal */}
+        {modalOpen && (
+          <div className="modal-overlay" onClick={closeModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3 className="modal-title">
+                  {modalMode === 'add' ? 'Add New Drink' : 'Edit Drink'}
+                </h3>
+                <button className="modal-close" onClick={closeModal}>×</button>
+              </div>
+
+              <form onSubmit={handleSubmit} className="modal-form">
+                <div className="modal-body">
+                  <div className="form-grid">
+                    <div className="form-field">
+                      <label htmlFor="drink-name" className="form-label">Drink Name</label>
+                      <input
+                        id="drink-name"
+                        type="text"
+                        placeholder="Enter drink name"
+                        className={`search-input ${validationErrors.name ? 'error' : ''}`}
+                        value={formData.name}
+                        onChange={(e) => handleInputChange('name', e.target.value)}
+                        required
+                      />
+                      {validationErrors.name && (
+                        <div className="error-message">{validationErrors.name}</div>
+                      )}
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="drink-price" className="form-label">Price (R)</label>
+                      <input
+                        id="drink-price"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="0.00"
+                        className={`search-input ${validationErrors.price ? 'error' : ''}`}
+                        value={formData.price}
+                        onChange={(e) => handleInputChange('price', e.target.value)}
+                        required
+                      />
+                      {validationErrors.price && (
+                        <div className="error-message">{validationErrors.price}</div>
+                      )}
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="drink-category" className="form-label">Category</label>
+                      <select
+                        id="drink-category"
+                        className={`search-input ${validationErrors.category ? 'error' : ''}`}
+                        value={formData.category}
+                        onChange={(e) => handleInputChange('category', e.target.value)}
+                        required
+                      >
+                        <option value="">Select Category</option>
+                        {DRINK_CATEGORIES.map(category => (
+                          <option key={category} value={category}>{category}</option>
+                        ))}
+                      </select>
+                      {validationErrors.category && (
+                        <div className="error-message">{validationErrors.category}</div>
+                      )}
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="drink-stock" className="form-label">Stock Quantity</label>
+                      <input
+                        id="drink-stock"
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        className={`search-input ${validationErrors.stock ? 'error' : ''}`}
+                        value={formData.stock}
+                        onChange={(e) => handleInputChange('stock', e.target.value)}
+                        required
+                      />
+                      {validationErrors.stock && (
+                        <div className="error-message">{validationErrors.stock}</div>
+                      )}
+                    </div>
+                  </div>
+                  
+                  <div className="form-field">
+                    <label className="form-label">Drink Image</label>
+                    <div className="image-upload-container">
+                      <label htmlFor="image-upload" className={`image-upload-label ${validationErrors.image ? 'error' : ''}`}>
+                        {formData.image ? 'Change Image' : 'Upload Image'}
+                      </label>
+                      <input
+                        id="image-upload"
+                        type="file"
+                        accept="image/*"
+                        className="image-upload-input"
+                        onChange={handleImageUpload}
+                      />
+                      {validationErrors.image && (
+                        <div className="error-message">{validationErrors.image}</div>
+                      )}
+                      {(formData.imagePreview || formData.image) && (
+                        <div className="image-edit-container">
+                          <img 
+                            src={
+                              formData.imagePreview && formData.imagePreview.startsWith('blob:') 
+                                ? formData.imagePreview 
+                                : formData.imagePreview 
+                                  ? `http://localhost:8000${formData.imagePreview}`
+                                  : `http://localhost:8000${formData.image}`
+                            } 
+                            alt="Preview" 
+                            className="image-preview"
+                          />
+                          <button
+                            type="button"
+                            className="nav-button"
+                            onClick={() => {
+                              if (formData.imagePreview && formData.imagePreview.startsWith('blob:')) {
+                                URL.revokeObjectURL(formData.imagePreview);
+                              }
+                              setFormData(prev => ({ 
+                                ...prev, 
+                                image: null, 
+                                imagePreview: null
+                              }));
+                            }}
+                          >
+                            Remove Image
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="form-field">
+                    <label htmlFor="drink-description" className="form-label">Description</label>
+                    <textarea
+                      id="drink-description"
+                      placeholder="Enter drink description"
+                      className="search-input form-textarea"
+                      value={formData.description}
+                      onChange={(e) => handleInputChange('description', e.target.value)}
+                      rows="3"
+                    />
+                  </div>
+                </div>
+                
+                <div className="modal-footer">
+                  <button type="button" className="nav-button" onClick={closeModal}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="notify-button">
+                    {modalMode === 'add' ? 'Add Drink' : 'Update Drink'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

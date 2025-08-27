@@ -333,7 +333,7 @@
 }
 
 .nav-button:hover:not(:disabled) {
-  background: var(--gradient-accent);
+  background: var(--accent-hover);
   color: white;
   border-color: var(--accent-color);
   transform: translateY(-1px);
