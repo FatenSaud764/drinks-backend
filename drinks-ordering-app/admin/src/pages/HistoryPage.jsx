@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import '../styles/Pages.css';
 import OrderCard from '../components/OrderCard';
 import FilterControls from '../components/FilterControls';
-import { useSnackbar } from '../contexts/SnackbarContext';
-import { toast } from 'react-toastify'; // Keep for client-side notifications
 import {
   ORDER_STATUSES,
   filterOrdersByStatus,
@@ -12,6 +10,9 @@ import {
   getHistoryOrderStatusCounts
 } from '../utils/OrderUtils';
 import { useOrderHistory } from '../hooks/useOrders';
+// Notifications
+import { useSnackbar } from '../contexts/SnackbarContext'; // Snackbar notifications
+import { toast } from 'react-toastify'; // Keep for client-side notifications
 
 const HistoryPage = () => {
   const {

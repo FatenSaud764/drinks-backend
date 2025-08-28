@@ -13,9 +13,9 @@ import {
 } from '../utils/OrderUtils';
 import { useActiveOrders } from '../hooks/useOrders';
 import { validateCompletionPIN, validateOrderPIN } from '../services/OrderService';
-import { useSnackbar } from '../contexts/SnackbarContext';
 // Notifications
 import { toast } from 'react-toastify'; // For client-side notifications
+import { useSnackbar } from '../contexts/SnackbarContext';
 
 const OrdersPage = () => {
   const {

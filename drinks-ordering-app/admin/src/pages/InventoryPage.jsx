@@ -1,10 +1,11 @@
 import { useState, useMemo } from 'react';
 import { MaterialReactTable } from 'material-react-table';
 import { useInventory } from '../hooks/useInventory';
-import { useSnackbar } from '../contexts/SnackbarContext';
 import '../styles/Pages.css';
 import '../styles/InventoryPage.css';
 import '../styles/Modal.css';
+// Notifications
+import { useSnackbar } from '../contexts/SnackbarContext';
 
 const LOW_STOCK_THRESHOLD = 10;
 const UNAVAILABLE_THRESHOLD = 5;
