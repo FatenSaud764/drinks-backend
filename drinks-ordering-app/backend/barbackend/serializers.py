@@ -56,10 +56,19 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 class CartSerializer(serializers.ModelSerializer):
     items = CartItemSerializer(many=True)
+    total_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Cart
-        fields = ['id', 'note', 'items', 'created_at']
+        fields = ['id', 'note', 'items', 'total_price', 'created_at']
+
+    def get_total_price(self, obj: Cart):
+        # Calculate using current drink prices to reflect updates
+        from decimal import Decimal
+        total = Decimal('0.00')
+        for item in obj.items.select_related('drink').all():
+            total += item.drink.price * item.quantity
+        return str(total)
 
     def create(self, validated_data):
         items_data = validated_data.pop('items', [])

@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'barbackend',
+    'barbackend.apps.BarbackendConfig',
     'rest_framework',
     'corsheaders'
 ]
