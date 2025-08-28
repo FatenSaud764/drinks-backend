@@ -8,6 +8,10 @@ import { useNavigate } from 'react-router-dom';
 import SearchBar from '../components/SearchBar.jsx';
 import { Search } from '../contexts/contexts';
 import nostock from 'shared/assets/soldout.png'
+import Fuse from 'fuse.js'
+import { useMemo } from 'react';
+
+
 const Products = () => {
   const {products, setProducts} = useContext(ProductList);
   const {theme, setTheme} = useContext(LightDark);
@@ -15,16 +19,24 @@ const Products = () => {
   const {search, setSearch} = useContext(Search);
   const {selecteddrink, setSelectedDrink} = useContext(SelectedProduct);
   const {alcoholicfilter, setAlcoholicFilter} = useContext(AlcoholicFilter);
+  const keys = ['name'];
 
-  const sortedProducts = [...products].sort((a, b) => {
+
+  const fuse = useMemo(() => {
+  return new Fuse(products, {
+    keys: keys,
+    threshold: 0.4
+  });
+}, [products, keys]);
+
+  console.log('search' , search);
+
+  const filtered = search === '' ? products : fuse.search(search).map(result => result.item);
+
+  const sortedProducts = [...filtered].sort((a, b) => {
   return (a.available === b.available) ? 0 : a.available ? -1 : 1;
 });
   const sortedProducts2 = [... sortedProducts].sort((a,b) => {if(a.available && b.available) {return a.name.localeCompare(b.name)}})
-
-  const filtered = sortedProducts2.filter((product) => {if(search!='') {
-    return (product.name.toLowerCase().includes(search.toLowerCase()) && product.category.toLowerCase()===alcoholicfilter);}
-    else{return product.category.toLowerCase()===alcoholicfilter}
-});
 
   return (
     <div className='prodwrapper' id={theme}>
@@ -37,7 +49,7 @@ const Products = () => {
       </div>
       <div><SearchBar /></div>
       <div className='prodlist'>
-      {filtered.map((product) => {
+      {sortedProducts2.map((product) => {
         return(
             <div key={product.id} className='productdisplay'>
             <button className='productbutton' onClick={() => {if(product.available){setSelectedDrink(product); navigate('/drinkinfo');}}}><img src={product.available ? `http://127.0.0.1:8000${product.image}` : nostock} className='drinkcard'/></button>

@@ -15,7 +15,7 @@ const SearchBar = () => {
     <>
         <form onSubmit={(e) => {setSearch(searchterms.current.value); e.preventDefault();}}>
             <div className='searchwrap'>
-                <input type='text' className='search' ref={searchterms} placeholder='Search' onChange={(e) => {submit.current.click(); e.preventDefault();}}/>
+                <input type='search' className='search' ref={searchterms} placeholder='Search' onChange={(e) => {submit.current.click(); e.preventDefault();}}/>
                 <input type='submit' ref={submit} style={{display:'none'}}/>
                 <button className='submitsearch' onClick={(e) => {submit.current.click(); e.preventDefault();}}><BsSearch className='searchicon' /></button>
                 <button className='filter' onClick={() => {if(alcoholicfilter=="alcoholic") {setAlcoholicFilter("non-alcoholic")} else{setAlcoholicFilter("alcoholic")}}}>{alcoholicfilter.toUpperCase()}</button>
