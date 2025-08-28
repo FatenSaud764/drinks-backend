@@ -9,9 +9,10 @@ import HistoryPage from './pages/HistoryPage';
 import InventoryPage from './pages/InventoryPage';
 // Styles
 import './styles/Global.css';
-// Themes
+// Contexts
 import { ThemeProvider } from './contexts/ThemeContext';
-// Toastify for Toast Alerts
+import { SnackbarProvider } from './contexts/SnackbarContext';
+// Toastify for Toast Alerts (client-side only)
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -59,40 +60,42 @@ function App() {
 
   return (
     <ThemeProvider>
-      <Router>
-        <div className="app">
-          <Header 
-            toggleSidebar={toggleSidebar} 
-            isSidebarOpen={isSidebarOpen}
-          />
-          
-          <div className={`app-layout ${isSidebarOpen && !isMobile ? 'with-sidebar' : ''}`}>
-            <Sidebar 
-              isOpen={isSidebarOpen}
-              isMobile={isMobile}
-              onClose={closeSidebar}
+      <SnackbarProvider> {/* Snackbar Notification Provider */}
+        <Router>
+          <div className="app">
+            <Header 
+              toggleSidebar={toggleSidebar} 
+              isSidebarOpen={isSidebarOpen}
             />
-
-            {/* Mobile Overlay */}
-            {isMobile && isSidebarOpen && (
-              <div 
-                className="sidebar-overlay active"
-                onClick={closeSidebar}
+            
+            <div className={`app-layout ${isSidebarOpen && !isMobile ? 'with-sidebar' : ''}`}>
+              <Sidebar 
+                isOpen={isSidebarOpen}
+                isMobile={isMobile}
+                onClose={closeSidebar}
               />
-            )}
 
-            { /* Toast notifications */ }
-            <ToastContainer position="top-right" autoClose={5000} />
+              {/* Mobile Overlay */}
+              {isMobile && isSidebarOpen && (
+                <div 
+                  className="sidebar-overlay active"
+                  onClick={closeSidebar}
+                />
+              )}
 
-            <Routes>
-              <Route path="/" element={<OrdersPage />} />
-              <Route path="/orders" element={<OrdersPage />} />
-              <Route path="/history" element={<HistoryPage />} />
-              <Route path="/inventory" element={<InventoryPage />} />
-            </Routes>
+              {/* Toast notifications for client-side */}
+              <ToastContainer position="top-right" autoClose={5000} />
+
+              <Routes>
+                <Route path="/" element={<OrdersPage />} />
+                <Route path="/orders" element={<OrdersPage />} />
+                <Route path="/history" element={<HistoryPage />} />
+                <Route path="/inventory" element={<InventoryPage />} />
+              </Routes>
+            </div>
           </div>
-        </div>
-      </Router>
+        </Router>
+      </SnackbarProvider>
     </ThemeProvider>
   );
 }

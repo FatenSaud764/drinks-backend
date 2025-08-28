@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import '../styles/Pages.css';
 import OrderCard from '../components/OrderCard';
 import FilterControls from '../components/FilterControls';
-import { toast } from 'react-toastify';
+import { useSnackbar } from '../contexts/SnackbarContext';
+import { toast } from 'react-toastify'; // Keep for client-side notifications
 import {
   ORDER_STATUSES,
   filterOrdersByStatus,
@@ -21,6 +22,8 @@ const HistoryPage = () => {
     restoreOrder,
     clearError
   } = useOrderHistory();
+
+  const { showSnackbar } = useSnackbar();
 
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -47,16 +50,16 @@ const HistoryPage = () => {
       
       // Only allow restoring cancelled orders
       if (!order || order.status !== ORDER_STATUSES.CANCELLED) {
-        toast.error('Only cancelled orders can be restored');
+        showSnackbar('Only cancelled orders can be restored', 'error');
         return;
       }
 
       if (window.confirm(`Are you sure you want to restore order ${order.orderNumber || `#${order.id}`} back to active orders?`)) {
         await restoreOrder(parseInt(orderId));
-        toast.success(`Order ${order.orderNumber || `#${order.id}`} restored to active orders`);
+        showSnackbar(`Order ${order.orderNumber || `#${order.id}`} restored to active orders`, 'success');
       }
     } catch (err) {
-      toast.error(`Failed to restore order: ${err.message}`);
+      showSnackbar(`Failed to restore order: ${err.message}`, 'error');
     }
   };
 

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { MaterialReactTable } from 'material-react-table';
 import { useInventory } from '../hooks/useInventory';
+import { useSnackbar } from '../contexts/SnackbarContext';
 import '../styles/Pages.css';
 import '../styles/InventoryPage.css';
 import '../styles/Modal.css';
@@ -19,6 +20,8 @@ const InventoryPage = () => {
     updateDrink,
     clearError
   } = useInventory();
+
+  const { showSnackbar } = useSnackbar();
 
   const DRINK_CATEGORIES = [
     'Alcoholic',
@@ -280,35 +283,41 @@ const InventoryPage = () => {
 
       if (modalMode === 'add') {
         await createDrink(drinkData);
+        showSnackbar(`Drink "${drinkData.name}" added successfully!`, 'success');
       } else {
         await updateDrink(formData.id, drinkData);
+        showSnackbar(`"${drinkData.name}" updated successfully!`, 'success');
       }
       
       closeModal();
     } catch (err) {
       console.error(`Failed to ${modalMode} drink:`, err);
-      alert(`Failed to ${modalMode} drink: ${err.message}`);
+      showSnackbar(`Failed to ${modalMode} drink: ${err.message}`, 'error');
     }
   };
 
   const handleToggleAvailability = async (drinkId, currentAvailability) => {
     try {
+      const drink = drinks.find(d => d.id === drinkId);
       await toggleAvailability(drinkId, !currentAvailability);
-      console.log('Availability toggled successfully');
+      const status = currentAvailability ? 'disabled' : 'enabled';
     } catch (err) {
       console.error('Failed to toggle availability:', err);
-      alert(`Failed to toggle availability: ${err.message}`);
+      showSnackbar(`Failed to toggle availability: ${err.message}`, 'error');
     }
   };
 
   const handleDeleteDrink = async (drinkId) => {
-    if (window.confirm('Are you sure you want to delete this drink?')) {
+    const drink = drinks.find(d => d.id === drinkId);
+    const drinkName = drink ? drink.name : `drink ID ${drinkId}`;
+    
+    if (window.confirm(`Are you sure you want to delete "${drinkName}"?`)) {
       try {
         await deleteDrink(drinkId);
-        console.log('Drink deleted successfully');
+        showSnackbar(`"${drinkName}" deleted successfully!`, 'success');
       } catch (err) {
         console.error('Failed to delete drink:', err);
-        alert(`Failed to delete drink: ${err.message}`);
+        showSnackbar(`Failed to delete drink: ${err.message}`, 'error');
       }
     }
   };
