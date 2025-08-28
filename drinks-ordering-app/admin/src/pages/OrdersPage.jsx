@@ -4,7 +4,6 @@ import OrderCard from '../components/OrderCard';
 import FilterControls from '../components/FilterControls';
 import OTPModal from '../components/OTPModal';
 import { Lock as LockIcon } from '@mui/icons-material';
-import { toast } from 'react-toastify';
 import {
   ORDER_STATUSES,
   filterOrdersByStatus,
@@ -14,6 +13,9 @@ import {
 } from '../utils/OrderUtils';
 import { useActiveOrders } from '../hooks/useOrders';
 import { validateCompletionPIN, validateOrderPIN } from '../services/OrderService';
+// Notifications
+import { toast } from 'react-toastify'; // For client-side notifications
+import { useSnackbar } from '../contexts/SnackbarContext';
 
 const OrdersPage = () => {
   const {
@@ -24,6 +26,8 @@ const OrdersPage = () => {
     updateOrderStatus,
     clearError
   } = useActiveOrders();
+
+  const { showSnackbar } = useSnackbar();
 
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -59,12 +63,12 @@ const OrdersPage = () => {
         }
       }
       
-      // For all other status updates, proceed normally
+      // For all other status updates, proceed normally with global Snackbar
       await updateOrderStatus(parseInt(orderId), newStatus);
-      toast.success(`Order updated to ${newStatus.toUpperCase()}`);
+      showSnackbar(`Order #${orderId} updated to ${newStatus.toUpperCase()}`, 'success');
       notifyClient(orderId, newStatus);
     } catch (err) {
-      toast.error(`Failed to update order: ${err.message}`);
+      showSnackbar(`Failed to update order: ${err.message}`, 'error');
     }
   };
 
@@ -75,14 +79,20 @@ const OrdersPage = () => {
         if (pinModalMode === 'complete' && pendingCompletionOrder) {
           // Complete the specific order that was pending
           await updateOrderStatus(pendingCompletionOrder.id, ORDER_STATUSES.COMPLETED);
-          toast.success(`Order ${pendingCompletionOrder.orderNumber || `#${pendingCompletionOrder.id}`} completed successfully!`);
+          showSnackbar(
+            `Order ${pendingCompletionOrder.orderNumber || `#${pendingCompletionOrder.id}`} completed successfully!`, 
+            'success'
+          );
         } else if (pinModalMode === 'find' && order) {
           // Complete the order found by PIN
           await updateOrderStatus(order.id, ORDER_STATUSES.COMPLETED);
-          toast.success(`Order ${order.orderNumber || `#${order.id}`} completed successfully!`);
+          showSnackbar(
+            `Order ${order.orderNumber || `#${order.id}`} completed successfully!`, 
+            'success'
+          );
         }
       } catch (err) {
-        toast.error(`Failed to complete order: ${err.message}`);
+        showSnackbar(`Failed to complete order: ${err.message}`, 'error');
       }
     }
     
@@ -103,16 +113,6 @@ const OrdersPage = () => {
   const getReadyOrders = () => {
     return orders.filter(order => order.status === ORDER_STATUSES.READY);
   };
-
-  // Clear error when component mounts or when user dismisses error
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        clearError();
-      }, 5000); // Auto-clear error after 5 seconds
-      return () => clearTimeout(timer);
-    }
-  }, [error, clearError]);
 
   const statusCounts = getActiveOrderStatusCounts(orders);
   const statusOptions = ['all', 'pending', 'preparing', 'ready'];
@@ -155,8 +155,22 @@ const OrdersPage = () => {
         {/* Error Display */}
         {error && (
           <div className="error-banner">
-            <p>Error: {error}</p>
-            <button onClick={clearError} className="btn-clear-error">×</button>
+            <div className="error-content">
+              <p>Error: {error}</p>
+              <div className="error-actions">
+                <button 
+                  onClick={() => {
+                    clearError();
+                    refetch();
+                  }} 
+                  className="btn-refresh-error"
+                  disabled={loading}
+                >
+                  Retry
+                </button>
+                <button onClick={clearError} className="btn-clear-error">×</button>
+              </div>
+            </div>
           </div>
         )}
 

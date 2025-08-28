@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import '../styles/Pages.css';
 import OrderCard from '../components/OrderCard';
 import FilterControls from '../components/FilterControls';
-import { toast } from 'react-toastify';
 import {
   ORDER_STATUSES,
   filterOrdersByStatus,
@@ -11,6 +10,9 @@ import {
   getHistoryOrderStatusCounts
 } from '../utils/OrderUtils';
 import { useOrderHistory } from '../hooks/useOrders';
+// Notifications
+import { useSnackbar } from '../contexts/SnackbarContext'; // Snackbar notifications
+import { toast } from 'react-toastify'; // Keep for client-side notifications
 
 const HistoryPage = () => {
   const {
@@ -21,6 +23,8 @@ const HistoryPage = () => {
     restoreOrder,
     clearError
   } = useOrderHistory();
+
+  const { showSnackbar } = useSnackbar();
 
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [statusFilter, setStatusFilter] = useState('all');
@@ -47,28 +51,18 @@ const HistoryPage = () => {
       
       // Only allow restoring cancelled orders
       if (!order || order.status !== ORDER_STATUSES.CANCELLED) {
-        toast.error('Only cancelled orders can be restored');
+        showSnackbar('Only cancelled orders can be restored', 'error');
         return;
       }
 
       if (window.confirm(`Are you sure you want to restore order ${order.orderNumber || `#${order.id}`} back to active orders?`)) {
         await restoreOrder(parseInt(orderId));
-        toast.success(`Order ${order.orderNumber || `#${order.id}`} restored to active orders`);
+        showSnackbar(`Order ${order.orderNumber || `#${order.id}`} restored to active orders`, 'success');
       }
     } catch (err) {
-      toast.error(`Failed to restore order: ${err.message}`);
+      showSnackbar(`Failed to restore order: ${err.message}`, 'error');
     }
   };
-
-  // Clear error when component mounts or when user dismisses error
-  useEffect(() => {
-    if (error) {
-      const timer = setTimeout(() => {
-        clearError();
-      }, 5000); // Auto-clear error after 5 seconds
-      return () => clearTimeout(timer);
-    }
-  }, [error, clearError]);
 
   const statusCounts = getHistoryOrderStatusCounts(historyOrders.filter(order => 
     [ORDER_STATUSES.COMPLETED, ORDER_STATUSES.CANCELLED].includes(order.status)
@@ -99,8 +93,22 @@ const HistoryPage = () => {
         {/* Error Display */}
         {error && (
           <div className="error-banner">
-            <p>Error: {error}</p>
-            <button onClick={clearError} className="btn-clear-error">×</button>
+            <div className="error-content">
+              <p>Error: {error}</p>
+              <div className="error-actions">
+                <button 
+                  onClick={() => {
+                    clearError();
+                    refetch();
+                  }} 
+                  className="btn-refresh-error"
+                  disabled={loading}
+                >
+                  Retry
+                </button>
+                <button onClick={clearError} className="btn-clear-error">×</button>
+              </div>
+            </div>
           </div>
         )}
 

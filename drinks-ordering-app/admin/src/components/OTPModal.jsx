@@ -145,7 +145,7 @@ const OTPModal = ({
     return availableOrders
       .filter(ord => ord.status === 'ready') // Only show ready orders
       .map(ord => ({
-        label: `${ord.orderNumber} - R${ord.totalAmount.toFixed(2)}`,
+        label: `${ord.orderNumber} - R${ord.total_price}`,
         value: ord
       }));
   };
@@ -218,7 +218,7 @@ const OTPModal = ({
               <Autocomplete
                 options={getOrderOptions()}
                 getOptionLabel={(option) => option.label}
-                value={selectedOrder ? { label: `${selectedOrder.orderNumber} - R${selectedOrder.totalAmount.toFixed(2)}`, value: selectedOrder } : null}
+                value={selectedOrder ? { label: `${selectedOrder.orderNumber} - R${selectedOrder.total_price}`, value: selectedOrder } : null}
                 onChange={handleOrderSelection}
                 renderInput={(params) => (
                   <TextField
@@ -254,7 +254,7 @@ const OTPModal = ({
                 <strong>Order:</strong> {(order || selectedOrder)?.orderNumber}
               </Typography>
               <Typography variant="body2">
-                <strong>Total:</strong> R{((order?.totalAmount ?? selectedOrder?.totalAmount) ?? 0).toFixed(2)}
+                <strong>Total:</strong> R{Number(order?.total_price ?? selectedOrder?.totalAmount ?? 0).toFixed(2)}
               </Typography>
               <Typography variant="body2">
                 <strong>Items:</strong> {(order || selectedOrder)?.items.map(item => 
