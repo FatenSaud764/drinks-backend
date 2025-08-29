@@ -9,13 +9,14 @@
 }
 
 .prodplussearch{
+    margin-top: 8vh;
     height: auto;
     width: 100%;
     min-height: 100vh;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
-    row-gap: 2vh;
+    grid-template-rows: 8vh auto auto;
+    row-gap: 1vh;
     justify-content: center;
     justify-items: center;
 }
@@ -37,7 +38,7 @@
     column-gap: 9vw;
     row-gap: 18vw;
     height: auto;
-    width: auto;
+    width: 91.2vw;
 }
 
 .menu{
@@ -75,7 +76,8 @@
     width: 40.5vw;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 40w 4vw 8vw;
+    grid-template-rows: 51vw 6vw 8vw;
+    row-gap: 3vw;
     text-align: center;
     border: 0.8vw solid #F59E0B;
     border-radius: 2.98vw;
@@ -95,7 +97,7 @@
 .productdesc{
     margin-top: 0;
     font-family: 'Roboto Slab';
-    width: 40vw;
+    width: 39vw;
     font-size: 3.5vw;
 }
 
@@ -119,6 +121,8 @@
 }
 
 .additem{
+    display: flex;
+    margin-top: -2vw;
     height: 7vw;
     width: 7vw;
     border-radius: 100%;
@@ -130,4 +134,5 @@
     align-items: center;
     align-content: center;
     cursor: pointer;
+    justify-content: center;
 }

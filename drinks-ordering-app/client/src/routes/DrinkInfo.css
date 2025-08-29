@@ -59,15 +59,3 @@
     border: 3px solid #F59E0B;
     object-fit: cover;
 }
-
-.nav{
-    position: fixed;
-    height: 8vh;
-    width: 100vw;
-    background: #2563EB;
-    z-index: 999;
-}
-
-#dark .nav{
-    background:#F59E0B !important;
-}

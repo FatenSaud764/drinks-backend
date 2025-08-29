@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 import './Products.css'
 import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct } from '../contexts/contexts';
 import ThemeButton from '../components/ThemeButton';
@@ -12,6 +12,8 @@ import Fuse from 'fuse.js'
 import { useMemo } from 'react';
 import AddItems from '../components/AddItems.jsx';
 import NavBar from '../components/NavBar.jsx';
+import CartModal from '../components/CartModal.jsx';
+export const CartModalBoolean = createContext(false);
 
 
 const Products = () => {
@@ -23,6 +25,8 @@ const Products = () => {
   const {alcoholicfilter, setAlcoholicFilter} = useContext(AlcoholicFilter);
   const {category, setCategory} = useContext(DrinkCategory);
   const keys = ['name'];
+  const [cartModal, setCartModal] = useState(false);
+  const [drinkAdded, setDrinkAdded] = useState('');
 
 
   const fuse = useMemo(() => {
@@ -45,6 +49,9 @@ const Products = () => {
       <NavBar />
       <div className='prodplussearch'>
         <div><SearchBar /></div>
+        <CartModalBoolean.Provider value={{cartModal, setCartModal}}>
+        {cartModal && <CartModal/>}
+        </CartModalBoolean.Provider>
         <div className='prodlist'>
         {sortedProducts.map((product) => {
           
@@ -54,7 +61,7 @@ const Products = () => {
               <div className='productdesc'>{product.name}</div>
               <div className='additemwrapper'>
               <div className='productprice'>R{product.price}</div>
-              {product.available && <button className='additem' onClick={() => {alert(`Added ${product.name} to Cart!`)}}>+</button>}
+              {product.available && <button className='additem' onClick={() => {setCartModal(true); }}>+</button>}
               </div>
               </div>
         
