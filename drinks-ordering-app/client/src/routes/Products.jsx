@@ -11,7 +11,7 @@ import nostock from 'shared/assets/soldout.png'
 import Fuse from 'fuse.js'
 import { useMemo } from 'react';
 import AddItems from '../components/AddItems.jsx';
-
+import NavBar from '../components/NavBar'
 
 const Products = () => {
   const {products, setProducts} = useContext(ProductList);
@@ -22,7 +22,6 @@ const Products = () => {
   const {alcoholicfilter, setAlcoholicFilter} = useContext(AlcoholicFilter);
   const {category, setCategory} = useContext(DrinkCategory);
   const keys = ['name'];
-
 
   const fuse = useMemo(() => {
   return new Fuse(products, {
@@ -41,13 +40,7 @@ const Products = () => {
 
   return (
     <div className='prodwrapper' id={theme}>
-      <div className='nav'>
-        <div className='navbuttons'>
-        <div className='themeprod'><ThemeButton /></div>
-        <button className='cart' onClick={() => {navigate('/Cart')}}><TiShoppingCart className='carticon'/></button>
-        <button className='menu'><AiOutlineMenu className='menuicon' /></button>
-        </div>
-      </div>
+      <div><NavBar /></div>
       <div><SearchBar /></div>
       <div className='prodlist'>
       {sortedProducts.map((product) => {
