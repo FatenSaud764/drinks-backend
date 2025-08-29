@@ -1,15 +1,29 @@
 .prodwrapper{
     justify-content: center;
     justify-items: center;
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: 10vh 1fr 1fr;
-    column-gap: 1vw;
-    height: auto;
     width: auto;
     min-height: 100vh;
+    height: auto;
     overflow-y: auto;
     background: #f5f0eb;
+}
+
+.prodplussearch{
+    height: auto;
+    width: 100%;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    row-gap: 2vh;
+    justify-content: center;
+    justify-items: center;
+}
+
+.footer{
+    margin-top: 4vh;
+    height: 5vh;
+    width: 100%;
 }
 
 .prodwrapper#dark{
@@ -17,27 +31,13 @@
 }
 
 .prodlist{
-    justify-content: center;
-    justify-items: center;
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 40.5vw 40.5vw;
     grid-auto-rows: 60vw;
-    column-gap: 10vw;
-    row-gap: 20vw;
-    height: 0vh;
+    column-gap: 9vw;
+    row-gap: 18vw;
+    height: auto;
     width: auto;
-}
-
-.nav{
-    position: fixed;
-    height: 8vh;
-    width: 100vw;
-    background: #2563EB;
-    z-index: 999;
-}
-
-#dark .nav{
-    background: rgb(45, 75, 113);
 }
 
 .menu{
@@ -57,50 +57,12 @@
     color: white;
 }
 
-.themeprod{
-    position: absolute;
-    transform: translate(-50%, -50%);
-    top: 50%;
-    left: 93%;
-}
 
-.navbuttons{
-    position: relative;
-    height: 8vh;
-    width: 90vw;
-    margin-left: 5vw;
-}
-
-.cart{
-    position: absolute;
-    position: relative;
-    transform: translate(-50%, -50%);
-    left: 75%;
-    top: 50%;
-    width: 4vh;
-    height: 4vh;
-    border-radius: 100%;
-    border: none;
-    background: white;
-}
-
-.carticon{
-    position: absolute;
-    transform: translate(-50%, -50%);
-    left: 50%;
-    top: 50%;
-    width: 2.7vh;
-    height: 2.7vh;
-    color:black;
-}
 
 .drinkcard{
-    position: absolute;
-    transform: translate(-50%, -50%);
-    left: 49.99%;
-    width: 40.5vw;
-    height: 50vw;
-    border-radius: 3vw;
+    width: 100%;
+    height: 51vw;
+    border-radius: 2.55vw;
     border: none;
     object-fit: cover;
     background: rgb(255, 255, 255);
@@ -108,25 +70,25 @@
 
 
 .productdisplay{
-    position: relative;
-    margin-top: 9vh;
     height: auto;
     min-height: 72vw;
-    overflow-y: auto;
     width: 40.5vw;
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: 40w 4vw 8vw;
     text-align: center;
-    border: 2px solid #F59E0B;
-    border-radius: 3vw;
+    border: 0.8vw solid #F59E0B;
+    border-radius: 2.98vw;
 }
 
 .productbutton{
-    width: 40vw;
-    height: 50vw;
-    border-radius: 3vw;
-    border: 2px solid #F59E0B;
+    width: 100%;
+    height: 51vw;
+    border-radius: 2.55vw;
+    justify-items: center;
+    justify-content: center;
+    align-items: center;
+    border: none;
 }
 
 

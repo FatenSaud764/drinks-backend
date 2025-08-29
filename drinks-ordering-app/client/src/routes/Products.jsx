@@ -11,6 +11,7 @@ import nostock from 'shared/assets/soldout.png'
 import Fuse from 'fuse.js'
 import { useMemo } from 'react';
 import AddItems from '../components/AddItems.jsx';
+import NavBar from '../components/NavBar.jsx';
 
 
 const Products = () => {
@@ -41,30 +42,26 @@ const Products = () => {
 
   return (
     <div className='prodwrapper' id={theme}>
-      <div className='nav'>
-        <div className='navbuttons'>
-        <div className='themeprod'><ThemeButton /></div>
-        <button className='cart' onClick={() => {navigate('/Cart')}}><TiShoppingCart className='carticon'/></button>
-        <button className='menu'><AiOutlineMenu className='menuicon' /></button>
-        </div>
-      </div>
-      <div><SearchBar /></div>
-      <div className='prodlist'>
-      {sortedProducts.map((product) => {
+      <NavBar />
+      <div className='prodplussearch'>
+        <div><SearchBar /></div>
+        <div className='prodlist'>
+        {sortedProducts.map((product) => {
+          
+          return(
+              <div key={product.id} className='productdisplay'>
+              <button className='productbutton' onClick={() => {if(product.available){setSelectedDrink(product); navigate('/drinkinfo');}}}><img src={product.available ? `http://127.0.0.1:8000${product.image}` : nostock} className='drinkcard'/></button>
+              <div className='productdesc'>{product.name}</div>
+              <div className='additemwrapper'>
+              <div className='productprice'>R{product.price}</div>
+              {product.available && <button className='additem' onClick={() => {alert(`Added ${product.name} to Cart!`)}}>+</button>}
+              </div>
+              </div>
         
-        return(
-            <div key={product.id} className='productdisplay'>
-            <button className='productbutton' onClick={() => {if(product.available){setSelectedDrink(product); navigate('/drinkinfo');}}}><img src={product.available ? `http://127.0.0.1:8000${product.image}` : nostock} className='drinkcard'/></button>
-            <div className='productdesc'>{product.name}</div>
-            {product.available &&
-            <div className='additemwrapper'>
-            <div className='productprice'>R{product.price}</div>
-            <button className='additem' onClick={() => {alert(`Added ${product.name} to Cart!`)}}>+</button>
-            </div>}
-            </div>
-      
-        )
-      })}
+          )
+        })}
+        </div>
+      <div className='footer'></div>
       </div>
     </div>
   )
