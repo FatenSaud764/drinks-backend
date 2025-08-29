@@ -4,7 +4,7 @@ import Products from './routes/Products';
 import Cart from './routes/Cart';
 import './index.css';
 import { createContext, useEffect, useState } from 'react';
-import { LightDark, ProductList, Search, SelectedProduct, Orders, AlcoholicFilter} from './contexts/contexts';
+import { LightDark, ProductList, Search, SelectedProduct, Orders, AlcoholicFilter, DrinkCategory} from './contexts/contexts';
 import AxiosInstance from './components/Axios';
 import DrinkInfo from './routes/DrinkInfo';
 
@@ -17,6 +17,7 @@ const App = () => {
   const stored = localStorage.getItem('selected');
   return stored ? JSON.parse(stored) : {};
 });
+  const [category, setCategory] = useState('all');
 
 
 const [orders, setOrders] = useState([{}]);
@@ -60,6 +61,7 @@ const [orders, setOrders] = useState([{}]);
 
   return (
     <>
+    <DrinkCategory.Provider value={{category, setCategory}}>
     <AlcoholicFilter.Provider value={{alcoholicfilter, setAlcoholicFilter}}>
     <Orders.Provider value={{orders, setOrders}}>
     <SelectedProduct.Provider value={{selecteddrink, setSelectedDrink}}>
@@ -78,6 +80,7 @@ const [orders, setOrders] = useState([{}]);
     </SelectedProduct.Provider>
     </Orders.Provider>
     </AlcoholicFilter.Provider>
+    </DrinkCategory.Provider>
     </>
   );
 }

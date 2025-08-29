@@ -2,6 +2,7 @@ import React, { useContext } from 'react'
 import { LightDark, SelectedProduct } from '../contexts/contexts'
 import NavBar from '../components/NavBar';
 import './DrinkInfo.css'
+import AddItems from '../components/AddItems';
 
 const DrinkInfo = () => {
     const {selecteddrink, setSelectedDrink} = useContext(SelectedProduct);
@@ -17,7 +18,7 @@ const DrinkInfo = () => {
         <div className='drinkprice'>
           R{selecteddrink.price}
         </div>
-        <button className='addtocart' onClick={() => alert(`Added ${selecteddrink.name} to Cart!`)}>Add to Cart</button>
+        <AddItems prod={selecteddrink}  />
     </div>
   )
 }

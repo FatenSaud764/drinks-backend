@@ -1,6 +1,6 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import './Products.css'
-import { AlcoholicFilter, LightDark, ProductList, SelectedProduct } from '../contexts/contexts';
+import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct } from '../contexts/contexts';
 import ThemeButton from '../components/ThemeButton';
 import { TiShoppingCart } from "react-icons/ti";
 import { AiOutlineMenu } from "react-icons/ai";
@@ -10,6 +10,7 @@ import { Search } from '../contexts/contexts';
 import nostock from 'shared/assets/soldout.png'
 import Fuse from 'fuse.js'
 import { useMemo } from 'react';
+import AddItems from '../components/AddItems.jsx';
 
 
 const Products = () => {
@@ -19,6 +20,7 @@ const Products = () => {
   const {search, setSearch} = useContext(Search);
   const {selecteddrink, setSelectedDrink} = useContext(SelectedProduct);
   const {alcoholicfilter, setAlcoholicFilter} = useContext(AlcoholicFilter);
+  const {category, setCategory} = useContext(DrinkCategory);
   const keys = ['name'];
 
 
@@ -35,8 +37,7 @@ const Products = () => {
 
   const sortedProducts = [...filtered].sort((a, b) => {
   return (a.available === b.available) ? 0 : a.available ? -1 : 1;
-});
-  const sortedProducts2 = [... sortedProducts].sort((a,b) => {if(a.available && b.available) {return a.name.localeCompare(b.name)}})
+}).sort((a,b) => {if(a.available && b.available) {return a.name.localeCompare(b.name)}}).filter((a) => {return category==="alcoholic" ? a.category==="Alcoholic" : category==="nonalcoholic" ? a.category==="Non-Alcoholic" : a});
 
   return (
     <div className='prodwrapper' id={theme}>
@@ -49,12 +50,19 @@ const Products = () => {
       </div>
       <div><SearchBar /></div>
       <div className='prodlist'>
-      {sortedProducts2.map((product) => {
+      {sortedProducts.map((product) => {
+        
         return(
             <div key={product.id} className='productdisplay'>
             <button className='productbutton' onClick={() => {if(product.available){setSelectedDrink(product); navigate('/drinkinfo');}}}><img src={product.available ? `http://127.0.0.1:8000${product.image}` : nostock} className='drinkcard'/></button>
             <div className='productdesc'>{product.name}</div>
+            {product.available &&
+            <div className='additemwrapper'>
+            <div className='productprice'>R{product.price}</div>
+            <button className='additem' onClick={() => {alert(`Added ${product.name} to Cart!`)}}>+</button>
+            </div>}
             </div>
+      
         )
       })}
       </div>
