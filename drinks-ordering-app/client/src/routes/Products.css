@@ -9,6 +9,7 @@
     width: auto;
     min-height: 100vh;
     overflow-y: auto;
+    background: #f5f0eb;
 }
 
 .prodwrapper#dark{
@@ -22,7 +23,7 @@
     grid-template-columns: 1fr 1fr;
     grid-auto-rows: 60vw;
     column-gap: 10vw;
-    row-gap: 6vw;
+    row-gap: 20vw;
     height: 0vh;
     width: auto;
 }
@@ -97,40 +98,74 @@
     position: absolute;
     transform: translate(-50%, -50%);
     left: 49.99%;
-    width: 39.5vw;
-    height: 49.5vw;
-    border-radius: 10%;
+    width: 40.5vw;
+    height: 50vw;
+    border-radius: 3vw;
     border: none;
     object-fit: cover;
-    background: white;
+    background: rgb(255, 255, 255);
 }
 
 
 .productdisplay{
     position: relative;
     margin-top: 9vh;
-    height: 60vw;
-    width: 40vw;
+    height: auto;
+    min-height: 72vw;
+    overflow-y: auto;
+    width: 40.5vw;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 40vw 20vw;
-    row-gap: 12vw;
+    grid-template-rows: 40w 4vw 8vw;
     text-align: center;
+    border: 2px solid #F59E0B;
+    border-radius: 3vw;
 }
 
 .productbutton{
     width: 40vw;
     height: 50vw;
-    border-radius: 10%;
-    border: 3px solid #F59E0B;
+    border-radius: 3vw;
+    border: 2px solid #F59E0B;
 }
 
 
 .productdesc{
+    margin-top: 0;
     font-family: 'Roboto Slab';
-    font-size: 4vw;
+    width: 40vw;
+    font-size: 3.5vw;
+}
+
+.productprice{
+    font-size: 3.2vw;
+    font-family: 'Lilita One';
+    color: #F59E0B;
 }
 
 #dark .productdesc{
     color: white !important;
+}
+
+.additemwrapper{
+    display: flex;
+    justify-content: space-between;
+    width: 22vw;
+    height: 7vw;
+    margin-left: 15vw;
+    align-items: center;
+}
+
+.additem{
+    height: 7vw;
+    width: 7vw;
+    border-radius: 100%;
+    border: none;
+    background: #2563EB;
+    color: white;
+    font-size: 22px;
+    text-align: center;
+    align-items: center;
+    align-content: center;
+    cursor: pointer;
 }

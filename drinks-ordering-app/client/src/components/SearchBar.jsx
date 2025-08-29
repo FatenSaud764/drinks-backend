@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { AlcoholicFilter, Search } from '../contexts/contexts';
+import { AlcoholicFilter, DrinkCategory, Search } from '../contexts/contexts';
 import { useRef } from 'react';
 import './SearchBar.css';
 import { BsSearch } from "react-icons/bs";
@@ -9,6 +9,9 @@ const SearchBar = () => {
     const searchterms = useRef('');
     const submit = useRef(null);
     const {alcoholicfilter, setAlcoholicFilter} = useContext(AlcoholicFilter);
+    const {category, setCategory} = useContext(DrinkCategory);
+
+    console.log('category', category);
 
 
   return (
@@ -17,8 +20,11 @@ const SearchBar = () => {
             <div className='searchwrap'>
                 <input type='search' className='search' ref={searchterms} placeholder='Search' onChange={(e) => {submit.current.click(); e.preventDefault();}}/>
                 <input type='submit' ref={submit} style={{display:'none'}}/>
-                <button className='submitsearch' onClick={(e) => {submit.current.click(); e.preventDefault();}}><BsSearch className='searchicon' /></button>
-                <button className='filter' onClick={() => {if(alcoholicfilter=="alcoholic") {setAlcoholicFilter("non-alcoholic")} else{setAlcoholicFilter("alcoholic")}}}>{alcoholicfilter.toUpperCase()}</button>
+                <select value={category} className='selectcategory' onChange={(e) => {setCategory(e.target.value)}}>
+                  <option value='all'>All Drinks</option>
+                  <option value='alcoholic'>Alcoholic</option>
+                  <option value='nonalcoholic'>Non-Alcoholic</option>
+                </select>
             </div>
         </form>
     </>

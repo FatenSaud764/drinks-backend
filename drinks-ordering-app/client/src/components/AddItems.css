@@ -1,0 +1,28 @@
+.additemswrapper{
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: auto auto auto;
+    column-gap: 1vw;
+    width: auto;
+    min-width: 17vw;
+    overflow-x: auto;
+    height: 8vw;
+    color: white;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.additembutton{
+    width: 5vw;
+    height: 5vw;
+    border-radius: 100%;
+    border: none;
+    align-items: center;
+    vertical-align: middle;
+}
+
+.itemquantity{
+    text-align: center;
+    width: 4vw;
+}

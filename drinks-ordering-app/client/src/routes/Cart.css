@@ -9,6 +9,7 @@
     width: auto;
     min-height: 100vh;
     overflow-y: auto;
+    background: #f5f0eb;
 }
 
 .cartwrapper#dark{
@@ -135,11 +136,11 @@
   margin-top: 91vh;
   width: 100vw;
   height: 9vh;
-  background: #2563EB;
+  background: none;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  color: white;
+  color: black;
   flex-shrink: 0;
   min-height: 8vh;
 }
@@ -154,8 +155,10 @@
 }
 
 #dark .cart-footer{
-  background: #F59E0B;
+  color: white;
 }
+
+
 
 .checkout-btn {
   display: flex;
@@ -180,10 +183,6 @@
   z-index: 999;
 }
 
-#dark .checkout-btn{
-  background: white;
-  color:#F59E0B;
-}
 
 .empty-cart {
   text-align: center;

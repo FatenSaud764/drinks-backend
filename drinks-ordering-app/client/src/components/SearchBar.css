@@ -12,8 +12,8 @@
     border: 2px solid #F59E0B;
     border-radius: 30vh;
     padding-left: 4vw;
-    width: 40vw;
-    height:4vh;
+    width: 50vw;
+    height:3.4vh;
     cursor: pointer;
     font-family: 'Lalita One';
 
@@ -23,33 +23,17 @@
     outline: none;
 }
 
-.submitsearch{
-    margin-left: 1.3vh;
-    border-radius: 100%;
-    width: 4.1vh;
-    height: 4.1vh;
-    border: none;
-    background: #F59E0B;
-    position: relative;
-}
 
-.searchicon{
-    color: white !important;
-    margin-top: 0.2vh;
-    height: 2vh;
-    width: 2vh;
-}
 
-.filter{
-    width: 21vw;
-    height: 4vh;
+.selectcategory{
+    margin-left: 13vw;
     text-align: center;
-    font-size: 10px;
-    margin-left: 6vh;
+    width: 28vw;
+    height: 2.8vh;
+    font-size: 13px;
     background: #F59E0B;
     color: white;
+    border-radius: 2vw;
     border: none;
-    border-radius: 5px;
-    font-family: 'Lilita One' !important;
-    cursor: pointer;
+    font-family: 'Lilita One';
 }
