@@ -11,10 +11,9 @@ import nostock from 'shared/assets/soldout.png'
 import Fuse from 'fuse.js'
 import { useMemo } from 'react';
 import AddItems from '../components/AddItems.jsx';
-import NavBar from '../components/NavBar.jsx';
 import CartModal from '../components/CartModal.jsx';
 export const CartModalBoolean = createContext(false);
-
+import NavBar from '../components/NavBar'
 
 const Products = () => {
   const {products, setProducts} = useContext(ProductList);
@@ -27,7 +26,6 @@ const Products = () => {
   const keys = ['name'];
   const [cartModal, setCartModal] = useState(false);
   const [drinkAdded, setDrinkAdded] = useState('');
-
 
   const fuse = useMemo(() => {
   return new Fuse(products, {
@@ -55,7 +53,7 @@ const Products = () => {
         <div className='prodlist'>
         {sortedProducts.map((product) => {
           
-          return(
+          return (
               <div key={product.id} className='productdisplay'>
               <button className='productbutton' onClick={() => {if(product.available){setSelectedDrink(product); navigate('/drinkinfo');}}}><img src={product.available ? `http://127.0.0.1:8000${product.image}` : nostock} className='drinkcard'/></button>
               <div className='productdesc'>{product.name}</div>
@@ -64,7 +62,7 @@ const Products = () => {
               {product.available && <button className='additem' onClick={() => {setCartModal(true); }}>+</button>}
               </div>
               </div>
-        
+       
           )
         })}
         </div>
