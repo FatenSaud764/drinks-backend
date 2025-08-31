@@ -13,7 +13,6 @@ const SearchBar = () => {
 
     console.log('category', category);
 
-
   return (
     <>
         <form onSubmit={(e) => {setSearch(searchterms.current.value); e.preventDefault();}}>

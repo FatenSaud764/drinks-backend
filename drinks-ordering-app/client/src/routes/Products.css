@@ -28,18 +28,6 @@
     width: auto;
 }
 
-.nav{
-    position: fixed;
-    height: 8vh;
-    width: 100vw;
-    background: #2563EB;
-    z-index: 999;
-}
-
-#dark .nav{
-    background: rgb(45, 75, 113);
-}
-
 .menu{
     position: absolute;
     transform: translate(-50%, -50%);
@@ -57,43 +45,6 @@
     color: white;
 }
 
-.themeprod{
-    position: absolute;
-    transform: translate(-50%, -50%);
-    top: 50%;
-    left: 93%;
-}
-
-.navbuttons{
-    position: relative;
-    height: 8vh;
-    width: 90vw;
-    margin-left: 5vw;
-}
-
-.cart{
-    position: absolute;
-    position: relative;
-    transform: translate(-50%, -50%);
-    left: 75%;
-    top: 50%;
-    width: 4vh;
-    height: 4vh;
-    border-radius: 100%;
-    border: none;
-    background: white;
-}
-
-.carticon{
-    position: absolute;
-    transform: translate(-50%, -50%);
-    left: 50%;
-    top: 50%;
-    width: 2.7vh;
-    height: 2.7vh;
-    color:black;
-}
-
 .drinkcard{
     position: absolute;
     transform: translate(-50%, -50%);
@@ -105,7 +56,6 @@
     object-fit: cover;
     background: rgb(255, 255, 255);
 }
-
 
 .productdisplay{
     position: relative;
@@ -128,7 +78,6 @@
     border-radius: 3vw;
     border: 2px solid #F59E0B;
 }
-
 
 .productdesc{
     margin-top: 0;

@@ -3,16 +3,16 @@ import { LightDark } from '../contexts/contexts'
 import './NavBar.css'
 import ThemeButton from './ThemeButton'
 import { TiShoppingCart } from "react-icons/ti";
-import { AiOutlineMenu } from "react-icons/ai";
-import { useNavigate, NavLink } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext.jsx'
+import { useNavigate, NavLink, Link } from 'react-router-dom';
+import useAuth from '../contexts/AuthContext.jsx'
 
 export default function NavBar() {
   const {theme, setTheme} = useContext(LightDark);
   const navigate = useNavigate();
   const menuRef = useRef(null)
   const navRef = useRef(null)
-  const { user, login, logout } = useAuth()
+  
+  const { user, login, logout } = useAuth() || {}
 
   const closeMenu = () => {
     if (menuRef.current) menuRef.current.removeAttribute('open')
@@ -35,9 +35,8 @@ export default function NavBar() {
   }, [])
 
   return (
-    <header ref={navRef} className="nav glass">
+    <header ref={navRef} className="nav" id={theme}>
       <div className="nav-left">
-        {/* Mobile menu */}
         <details className="hamburger" ref={menuRef} role="navigation">
           <summary aria-label="Menu" aria-expanded={menuRef.current?.open ? 'true' : 'false'} aria-controls="hamburger-sidebar" role="button">
             <span className={`summary-hamburger ${menuRef.current?.open ? 'open' : ''}`}>
@@ -55,16 +54,51 @@ export default function NavBar() {
                 <NavLink to="/products" className="menu-btn" onClick={closeMenu}>Products</NavLink>
                 {user && <NavLink to="/cart" className="menu-btn" onClick={closeMenu}>Cart</NavLink>}
                 {user && <NavLink to="/orders" className="menu-btn" onClick={closeMenu}>Previous Orders</NavLink>}
+
+                <div className="menu-divider"></div>
+                {user ? (
+                  <>
+                    <div className="menu-user-info">Hi, {user.username}</div>
+                    <button className="menu-btn menu-logout" onClick={() => {logout(); closeMenu();}}>Logout</button>
+                  </>
+                ) : (
+                  <button className="menu-btn menu-login" onClick={() => {login('guest'); closeMenu();}}>Login</button>
+                )}
               </nav>
             </div>
           </aside>
         </details>
+        
+        <Link to="/" className="brand" aria-label="SwiftServe">
+          <span className="brand-text">SwiftServe</span>
+        </Link>
       </div>
-      <div className='nav' id={theme}>
-          <div className='navbuttons'>
-            <div className='themeprod'><ThemeButton /></div>
-            <button className='cart' onClick={() => {navigate('/Cart')}}><TiShoppingCart className='carticon'/></button>
+
+      <nav className="nav-center" aria-label="Primary">
+        <NavLink to="/" end>Home</NavLink>
+        <NavLink to="/products">Products</NavLink>
+        {user && <NavLink to="/cart">Cart</NavLink>}
+        {user && <NavLink to="/orders" className="hide-sm">Previous Orders</NavLink>}
+      </nav>
+
+      <div className='nav-right'>
+        <div className='navbuttons'>
+          <div className='themeprod'>
+            <ThemeButton />
           </div>
+          <button className='cart' onClick={() => {navigate('/cart')}}>
+            <TiShoppingCart className='carticon'/>
+          </button>
+          
+          {user ? (
+            <>
+              <span className="logged-in-username hide-sm">Hi, {user.username}</span>
+              <button className="user-btn hide-sm" onClick={logout}>Logout</button>
+            </>
+          ) : (
+            <button className="user-btn hide-sm" onClick={() => login('guest')}>Login</button>
+          )}
+        </div>
       </div>
     </header>
   )
