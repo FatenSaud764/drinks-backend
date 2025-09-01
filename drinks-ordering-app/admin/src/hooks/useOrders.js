@@ -226,3 +226,41 @@ export const useOrderHistory = () => {
     clearError
   };
 };
+
+// Hook for OTP verification
+export const useOrderOTP = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [verified, setVerified] = useState(false);
+
+  const verifyOTP = async (orderId, otp) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await ordersAPI.verifyOrderOTP(orderId, otp);
+      setVerified(true);
+      return result;
+    } catch (err) {
+      setError(err.message);
+      setVerified(false);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearError = () => setError(null);
+  const resetVerification = () => {
+    setVerified(false);
+    setError(null);
+  };
+
+  return {
+    loading,
+    error,
+    verified,
+    verifyOTP,
+    clearError,
+    resetVerification
+  };
+};
