@@ -98,11 +98,9 @@ class OrderOTP(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='otp')
     code_hash = models.CharField(max_length=128)
     code_plain = models.CharField(max_length=10)  # Stored temporarily for owner display
-    expires_at = models.DateTimeField()
+    # expires_at removed, OTPs do not expire
     last_sent_at = models.DateTimeField(null=True, blank=True)
     is_used = models.BooleanField(default=False)
-    attempts = models.PositiveSmallIntegerField(default=0)
-    max_attempts = models.PositiveSmallIntegerField(default=5)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -112,10 +110,6 @@ class OrderOTP(models.Model):
 
     def check_code(self, code: str) -> bool:
         return check_password(code, self.code_hash)
-
-    @property
-    def is_expired(self) -> bool:
-        return timezone.now() >= self.expires_at
 
     def __str__(self):
         return f"OTP for Order #{self.order_id}"

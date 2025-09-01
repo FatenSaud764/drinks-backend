@@ -167,47 +167,10 @@ class OrderViewset(viewsets.ViewSet):
             otp = order.otp
         except OrderOTP.DoesNotExist:
             return Response({'detail': 'No OTP yet.'}, status=status.HTTP_404_NOT_FOUND)
-        if otp.is_used or otp.is_expired:
-            return Response({'detail': 'OTP expired or used.'}, status=status.HTTP_400_BAD_REQUEST)
-        return Response({'code': otp.code_plain, 'expires_at': otp.expires_at})
+        if otp.is_used:
+            return Response({'detail': 'OTP already used.'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'code': otp.code_plain})
 
-    # Owner-only: regenerate OTP with 60s throttle until order completed/cancelled
-    @action(detail=True, methods=['post'], url_path='otp/regenerate')
-    def regenerate_otp(self, request, pk=None):
-        """
-        POST /api/orders/{id}/otp/regenerate/
-        Regenerate the OTP for an order if allowed (throttled by cooldown).
-        """
-        from django.conf import settings
-        order = get_object_or_404(self.get_queryset(request), pk=pk)
-        # Owner-only
-        req_user = request.user if getattr(request, 'user', None) and request.user.is_authenticated else User.objects.first()
-        if order.user_id != getattr(req_user, 'id', None):
-            return Response({'detail': 'Forbidden'}, status=status.HTTP_403_FORBIDDEN)
-        if order.status in ('completed', 'cancelled'):
-            return Response({'detail': 'Order already finalized.'}, status=status.HTTP_400_BAD_REQUEST)
-        if order.status != 'ready':
-            return Response({'detail': 'Can regenerate only when order is ready.'}, status=status.HTTP_400_BAD_REQUEST)
-        cooldown = getattr(settings, 'OTP_RESEND_COOLDOWN_SECONDS', 60)
-        ttl = getattr(settings, 'OTP_TTL_SECONDS', 600)
-        now = timezone.now()
-        try:
-            otp = order.otp
-        except OrderOTP.DoesNotExist:
-            otp = OrderOTP(order=order, max_attempts=getattr(settings, 'OTP_MAX_ATTEMPTS', 5))
-        else:
-            if otp.last_sent_at and (now - otp.last_sent_at).total_seconds() < cooldown:
-                return Response({'detail': 'Please wait before regenerating.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
-
-        from .otp_utils import generate_numeric_code
-        code = generate_numeric_code(getattr(settings, 'OTP_CODE_LENGTH', 6))
-        otp.set_code(code)
-        otp.expires_at = now + timedelta(seconds=ttl)
-        otp.attempts = 0
-        otp.is_used = False
-        otp.last_sent_at = now
-        otp.save()
-        return Response({'code': otp.code_plain, 'expires_at': otp.expires_at})
 
     # Staff action: verify OTP and complete the order
     @action(detail=True, methods=['post'], url_path='otp/verify')
@@ -226,13 +189,7 @@ class OrderViewset(viewsets.ViewSet):
             return Response({'detail': 'No OTP for this order.'}, status=status.HTTP_400_BAD_REQUEST)
         if otp.is_used:
             return Response({'detail': 'OTP already used.'}, status=status.HTTP_400_BAD_REQUEST)
-        if otp.is_expired:
-            return Response({'detail': 'OTP expired.'}, status=status.HTTP_400_BAD_REQUEST)
-        if otp.attempts >= otp.max_attempts:
-            return Response({'detail': 'Too many attempts.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
         if not otp.check_code(code):
-            otp.attempts += 1
-            otp.save(update_fields=['attempts', 'updated_at'])
             return Response({'detail': 'Invalid code.'}, status=status.HTTP_400_BAD_REQUEST)
         # success
         otp.is_used = True

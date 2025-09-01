@@ -145,9 +145,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # OTP configuration
 OTP_CODE_LENGTH = 6
-OTP_TTL_SECONDS = 600  # 10 minutes
-OTP_RESEND_COOLDOWN_SECONDS = 60  # 60 seconds regenerate throttle
-OTP_MAX_ATTEMPTS = 5
 
 # Configure DRF
 REST_FRAMEWORK = {
