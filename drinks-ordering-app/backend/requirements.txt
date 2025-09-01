@@ -5,3 +5,5 @@ sqlparse==0.5.3
 djangorestframework==3.16.1
 django-cors-headers==4.7.0
 pillow==11.3.0
+drf-spectacular==0.25.0
+setuptools==67.7.2

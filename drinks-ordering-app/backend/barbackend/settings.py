@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'barbackend.apps.BarbackendConfig',
     'rest_framework',
-    'corsheaders'
+    'corsheaders',
+    'drf_yasg',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -146,3 +148,16 @@ OTP_CODE_LENGTH = 6
 OTP_TTL_SECONDS = 600  # 10 minutes
 OTP_RESEND_COOLDOWN_SECONDS = 60  # 60 seconds regenerate throttle
 OTP_MAX_ATTEMPTS = 5
+
+# Configure DRF
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# drf-spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Bar Backend API',
+    'DESCRIPTION': 'API documentation for the Bar Backend',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
