@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'barbackend.apps.BarbackendConfig',
     'rest_framework',
     'corsheaders',
-    'drf_yasg',
     'drf_spectacular',
 ]
 
