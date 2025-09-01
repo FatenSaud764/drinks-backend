@@ -15,20 +15,20 @@ export const ordersAPI = {
 
     // Fetch orders with filters
     try {
-        const response = await api.get(`/api/orders/?${params.toString()}`);
-        return response.data;
+      const response = await api.get(`/api/orders/?${params.toString()}`);
+      return response.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to fetch orders");
+      throw new Error(error.response?.data?.message || "Failed to fetch orders");
     }
   },
 
   // Fetch specific order details
   fetchOrder: async (orderId) => {
     try {
-        const response = await api.get(`/api/orders/${orderId}/`);
-        return response.data;
+      const response = await api.get(`/api/orders/${orderId}/`);
+      return response.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to fetch order details");
+      throw new Error(error.response?.data?.message || "Failed to fetch order details");
     }
   },
 
@@ -37,42 +37,54 @@ export const ordersAPI = {
   // Update order status
   updateOrderStatus: async (orderId, status) => {
     try {
-        const response = await api.patch(`/api/orders/${orderId}/status/`, {
-            status: status
-        });
-        return response.data;
+      const response = await api.patch(`/api/orders/${orderId}/status/`, {
+        status: status
+      });
+      return response.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to update order status");
+      throw new Error(error.response?.data?.message || "Failed to update order status");
     }
   },
 
   // Get orders by status (for active orders page)
   fetchActiveOrders: async () => {
     try {
-        const response = await api.get('/api/orders/?status=pending,preparing,ready');
-        return response.data;
+      const response = await api.get('/api/orders/?status=pending,preparing,ready');
+      return response.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to fetch active orders");
+      throw new Error(error.response?.data?.message || "Failed to fetch active orders");
     }
   },
 
   // Fetched completed/cancelled orders (for history page)
   fetchOrderHistory: async () => {
     try {
-        const response = await api.get("/api/orders/?status=completed,cancelled");
-        return response.data;
+      const response = await api.get("/api/orders/?status=completed,cancelled");
+      return response.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to fetch order history");
+      throw new Error(error.response?.data?.message || "Failed to fetch order history");
     }
   },
 
   // Restore cancelled order (change status back to pending)
   restoreOrder: async (orderId) => {
     try {
-        const response = await api.patch(`api/orders/${orderId}/status/`, { status: "pending" });
-        return response.data;
+      const response = await api.patch(`api/orders/${orderId}/status/`, { status: "pending" });
+      return response.data;
     } catch (error) {
-        throw new Error(error.response?.data?.message || "Failed to restore order");
+      throw new Error(error.response?.data?.message || "Failed to restore order");
+    }
+  },
+
+  // Verify OTP to complete order (when customer provides OTP)
+  verifyOrderOTP: async (orderId, otp) => {
+    try {
+      const response = await api.post(`/api/orders/${orderId}/otp/verify/`, {
+        otp: otp
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Failed to verify OTP");
     }
   },
 };
