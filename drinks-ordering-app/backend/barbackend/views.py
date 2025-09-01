@@ -81,7 +81,9 @@ class OrderViewset(viewsets.ViewSet):
     serializer_class = OrderSerializer
 
     def get_queryset(self, request):
-        # TEMP: return all orders without checking user
+        """
+        Returns a queryset of all orders. (TEMP: does not filter by user)
+        """
         return Order.objects.all()
 
     def list(self, request):
@@ -150,6 +152,10 @@ class OrderViewset(viewsets.ViewSet):
     # Owner-only: fetch current OTP (plaintext) if order is ready and not completed/cancelled
     @action(detail=True, methods=['get'], url_path='otp')
     def get_otp(self, request, pk=None):
+        """
+        GET /api/orders/{id}/otp/
+        Retrieve the OTP for an order if the order is ready and not completed/cancelled.
+        """
         order = get_object_or_404(self.get_queryset(request), pk=pk)
         # Owner-only: compare with authenticated user or fallback first user (dev behavior)
         req_user = request.user if getattr(request, 'user', None) and request.user.is_authenticated else User.objects.first()
@@ -168,6 +174,10 @@ class OrderViewset(viewsets.ViewSet):
     # Owner-only: regenerate OTP with 60s throttle until order completed/cancelled
     @action(detail=True, methods=['post'], url_path='otp/regenerate')
     def regenerate_otp(self, request, pk=None):
+        """
+        POST /api/orders/{id}/otp/regenerate/
+        Regenerate the OTP for an order if allowed (throttled by cooldown).
+        """
         from django.conf import settings
         order = get_object_or_404(self.get_queryset(request), pk=pk)
         # Owner-only
@@ -202,6 +212,10 @@ class OrderViewset(viewsets.ViewSet):
     # Staff action: verify OTP and complete the order
     @action(detail=True, methods=['post'], url_path='otp/verify')
     def verify_otp(self, request, pk=None):
+        """
+        POST /api/orders/{id}/otp/verify/
+        Verify the OTP for an order and complete the order if successful.
+        """
         order = get_object_or_404(self.get_queryset(request), pk=pk)
         code = str(request.data.get('code', '')).strip()
         if not code:
@@ -245,7 +259,9 @@ class CartViewset(viewsets.ViewSet):
     serializer_class = CartSerializer
 
     def get_cart(self, request):
-        # TEMP: return cart of first user
+        """
+        Helper method to get or create the current user's cart.
+        """
         user = request.user if request.user.is_authenticated else User.objects.first()
         cart, _ = Cart.objects.get_or_create(user=user)
         return cart
