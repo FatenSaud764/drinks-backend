@@ -4,6 +4,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from .models import Drink, Order, OrderItem, OrderOTP
+from django.db import IntegrityError
 from .otp_utils import generate_numeric_code
 
 
@@ -25,13 +26,17 @@ def ensure_order_otp(order: Order) -> None:
     OTPs do not expire or track attempts; they remain valid until used.
     """
     otp, _ = OrderOTP.objects.get_or_create(order=order)
-    code = generate_numeric_code()
-    otp.set_code(code)
-    otp.is_used = False
-    otp.last_sent_at = timezone.now()
-    otp.save(update_fields=[
-        'code_hash', 'code_plain', 'is_used', 'last_sent_at', 'updated_at'
-    ])
+    # Generate and persist a unique code, retrying if a rare race happens
+    for _ in range(5):
+        code = generate_numeric_code()
+        otp.set_code(code)
+        otp.is_used = False
+        otp.last_sent_at = timezone.now()
+        try:
+            otp.save(update_fields=['code_hash', 'code_plain', 'is_used', 'last_sent_at', 'updated_at'])
+            break
+        except IntegrityError:
+            continue
 
 
 @receiver(pre_save, sender=Order)

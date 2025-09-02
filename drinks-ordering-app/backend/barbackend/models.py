@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Q
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
 
@@ -113,3 +114,13 @@ class OrderOTP(models.Model):
 
     def __str__(self):
         return f"OTP for Order #{self.order_id}"
+
+    class Meta:
+        constraints = [
+            # Ensure active (not used) OTP codes are globally unique
+            models.UniqueConstraint(
+                fields=["code_plain"],
+                condition=Q(is_used=False),
+                name="uniq_active_otp_code_plain",
+            )
+        ]
