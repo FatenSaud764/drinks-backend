@@ -9,129 +9,134 @@ import {
   Typography,
   Box,
   Alert,
-  IconButton,
-  Autocomplete
-} from '@mui/material'; // Using basic dialog components from MUI
+  IconButton
+} from '@mui/material';
 import { Close as CloseIcon, Lock as LockIcon, Search as SearchIcon } from '@mui/icons-material';
-import { validateCompletionPIN, validateOrderPIN } from '../services/OrderService';
+import { useOrderOTP } from '../hooks/useOrders';
+import { useInventory } from '../hooks/useInventory';
+import { normaliseOrder } from '../utils/normaliseOrder';
 
 const OTPModal = ({ 
   open, 
   onClose, 
   onConfirm, 
-  order = null, // null when used for "find order by PIN" mode
-  mode = 'complete', // 'complete' or 'find'
+  order = null,
+  mode = 'complete',
   title,
   message,
-  availableOrders = [] // for autocomplete in find mode
+  availableOrders = []
 }) => {
   const [pin, setPin] = useState('');
-  const [orderQuery, setOrderQuery] = useState('');
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [foundOrder, setFoundOrder] = useState(null);
+  const [localError, setLocalError] = useState('');
 
-  // Dynamic titles and messages based on mode
+  // Use the OTP verification hook
+  const { 
+    loading: otpLoading, 
+    error: otpError, 
+    verifyOTP, 
+    clearError: clearOtpError, 
+    resetVerification 
+  } = useOrderOTP();
+
+  // Use the inventory hook to get drink data
+  const { drinks } = useInventory();
+
+  // Helper function to get drink details by ID
+  const getDrinkById = (drinkId) => {
+    return drinks.find(drink => drink.id === drinkId);
+  };
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (open) {
+      setPin('');
+      setFoundOrder(null);
+      setLocalError('');
+      resetVerification();
+      clearOtpError();
+    }
+  }, [open]);
+
   const getTitle = () => {
     if (title) return title;
-    return mode === 'find' ? 'Complete Order - Find by PIN' : 'PIN Authentication Required';
+    return mode === 'find' ? 'Complete Order by PIN' : 'PIN Authentication Required';
   };
 
   const getMessage = () => {
     if (message) return message;
     return mode === 'find' 
-      ? 'Enter PIN or search for order to complete:' 
+      ? 'Enter your order PIN to find and complete your order:' 
       : 'Please enter your PIN to complete this order:';
   };
 
-  // Clear form when modal opens/closes
-  useEffect(() => {
-    if (open) {
-      setPin('');
-      setOrderQuery('');
-      setSelectedOrder(null);
-      setError('');
-      setLoading(false);
+  const findOrderByPin = async (pinValue) => {
+    if (!pinValue || !pinValue.trim()) return null;
+    
+    // Ensure PIN is always treated as a string
+    const pinString = pinValue.trim().toString();
+    
+    // Try to verify PIN against each ready order
+    for (const availableOrder of availableOrders) {
+      try {
+        const normalisedOrder = normaliseOrder(availableOrder);
+        await verifyOTP(normalisedOrder.id, pinString);
+        return normalisedOrder;
+      } catch (err) {
+        // Continue to next order if PIN doesn't match this one
+        continue;
+      }
     }
-  }, [open]);
+    return null;
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
+    setLocalError('');
+    clearOtpError();
+
+    if (!pin.trim()) {
+      setLocalError('Please enter a PIN');
+      return;
+    }
+
+    // Ensure PIN is always sent as a string
+    const pinString = pin.trim().toString();
 
     try {
-      // Simulate a small delay for better UX
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
       if (mode === 'find') {
-        // Find order by PIN mode
-        let targetOrder = selectedOrder;
-        
-        // If no order selected from dropdown, try to find by PIN
-        if (!targetOrder && pin.trim()) {
-          targetOrder = findOrderByPin(pin);
-        }
+        const targetOrder = await findOrderByPin(pinString);
         
         if (!targetOrder) {
-          setError('No order found for this PIN. Please check and try again.');
-          setPin('');
-          setLoading(false);
+          setLocalError('No ready order found for this PIN. Please check and try again.');
           return;
         }
 
-        // Validate PIN for the found order - use order-specific validation
-        const isValid = validateOrderPIN(pin, targetOrder.orderNumber) || validateCompletionPIN(pin);
-        
-        if (isValid) {
-          onConfirm(true, targetOrder); // Pass the found order
-          handleClose();
-        } else {
-          setError(`Invalid PIN for order ${targetOrder.orderNumber}. Please try again.`);
-          setPin('');
-        }
+        // Set the found order to display its details
+        setFoundOrder(targetOrder);
+        onConfirm(true, targetOrder);
+        handleClose();
       } else {
-        // Standard PIN validation mode for specific order
-        const isValid = validateOrderPIN(pin, order?.orderNumber) || validateCompletionPIN(pin);
-        
-        if (isValid) {
-          onConfirm(true, order);
-          handleClose();
-        } else {
-          setError('Invalid PIN. Please try again.');
-          setPin('');
+        if (!order) {
+          setLocalError('No order specified for verification.');
+          return;
         }
+
+        const normalisedOrder = normaliseOrder(order);
+        await verifyOTP(normalisedOrder.id, pinString);
+        onConfirm(true, normalisedOrder);
+        handleClose();
       }
     } catch (err) {
-      setError('Authentication failed. Please try again.');
-    } finally {
-      setLoading(false);
+      if (mode === 'find') {
+        setLocalError('Invalid PIN or no matching ready order found. Please try again.');
+      } else {
+        setLocalError('Invalid PIN. Please try again.');
+      }
     }
   };
 
-  // Find order by PIN - matches PIN to last digit of order number
-  const findOrderByPin = (pinValue) => {
-    if (!pinValue || !pinValue.trim()) return null;
-    
-    // Look for order where the PIN matches the last digit of the order number
-    // - Just for now until backend is up and runnin'
-    const matchingOrder = availableOrders.find(order => {
-      // Extract last digit from order number (e.g., "ORD-003" -> "3")
-      const orderDigit = order.orderNumber.split('-')[1] || order.orderNumber.slice(-3);
-      const lastDigit = orderDigit.slice(-1);
-      
-      return lastDigit === pinValue.trim();
-    });
-    
-    return matchingOrder;
-  };
-
   const handleClose = () => {
-    setPin('');
-    setOrderQuery('');
-    setSelectedOrder(null);
-    setError('');
-    setLoading(false);
     onClose();
   };
 
@@ -140,32 +145,17 @@ const OTPModal = ({
     handleClose();
   };
 
-  // Filter orders for autocomplete
-  const getOrderOptions = () => {
-    return availableOrders
-      .filter(ord => ord.status === 'ready') // Only show ready orders
-      .map(ord => ({
-        label: `${ord.orderNumber} - R${ord.total_price}`,
-        value: ord
-      }));
+  const handlePinChange = (e) => {
+    setPin(e.target.value);
+    setLocalError('');
+    clearOtpError();
+    setFoundOrder(null); // Clear any previously found order when typing
   };
 
-  // When an order is selected from dropdown, extract and set the PIN
-  const handleOrderSelection = (event, newValue) => {
-    const order = newValue?.value || null;
-    setSelectedOrder(order);
-    
-    // Auto-fill PIN when order is selected
-    if (order) {
-      const orderDigit = order.orderNumber.split('-')[1] || order.orderNumber.slice(-3);
-      const lastDigit = orderDigit.slice(-1);
-      setPin(lastDigit);
-    } else {
-      setPin('');
-    }
-    
-    setError(''); // Clear error when order is selected
-  };
+  const displayError = otpError || localError;
+
+  // Display the order (either the passed order or the found order)
+  const displayOrder = order ? normaliseOrder(order) : foundOrder;
 
   return (
     <Dialog 
@@ -173,12 +163,10 @@ const OTPModal = ({
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
-      slotProps={{
-        paper: {
-          sx: {
-            borderRadius: 2,
-            minHeight: mode === 'find' ? 450 : 350
-          }
+      sx={{
+        '& .MuiDialog-paper': {
+          borderRadius: 2,
+          minHeight: 350
         }
       }}
     >
@@ -199,7 +187,7 @@ const OTPModal = ({
         <IconButton 
           onClick={handleClose} 
           size="small"
-          disabled={loading}
+          disabled={otpLoading}
           sx={{ color: 'inherit' }}
         >
           <CloseIcon />
@@ -211,34 +199,32 @@ const OTPModal = ({
           <Typography variant="body1" sx={{ mb: 2 }}>
             {getMessage()}
           </Typography>
-          
-          {/* Order Search (Find Mode) */}
-          {mode === 'find' && (
-            <Box sx={{ mb: 3 }}>
-              <Autocomplete
-                options={getOrderOptions()}
-                getOptionLabel={(option) => option.label}
-                value={selectedOrder ? { label: `${selectedOrder.orderNumber} - R${selectedOrder.total_price}`, value: selectedOrder } : null}
-                onChange={handleOrderSelection}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Search Orders"
-                    placeholder="Type to search orders..."
-                    variant="outlined"
-                    disabled={loading}
-                  />
-                )}
-                sx={{ mb: 2 }}
-              />
-              <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                Or enter PIN below to find the order automatically
-              </Typography>
-            </Box>
-          )}
 
-          {/* Order Details (Complete Mode or when order is selected) */}
-          {(order || selectedOrder) && (
+          {/* PIN Input */}
+          <TextField
+            autoFocus
+            fullWidth
+            label="Enter PIN"
+            type="text"
+            variant="outlined"
+            value={pin}
+            onChange={handlePinChange}
+            disabled={otpLoading}
+            inputProps={{
+              maxLength: 10,
+              style: { 
+                fontSize: '1.2rem', 
+                textAlign: 'center',
+                letterSpacing: '0.2rem'
+              }
+            }}
+            sx={{ mb: 2 }}
+            placeholder="Enter PIN"
+            helperText="Enter the PIN from your order receipt"
+          />
+
+          {/* Order Details - Show after order is found or if order is pre-selected */}
+          {displayOrder && (
             <Box sx={{ 
               bgcolor: 'grey.50', 
               p: 2, 
@@ -251,69 +237,44 @@ const OTPModal = ({
                 Order Details:
               </Typography>
               <Typography variant="body2">
-                <strong>Order:</strong> {(order || selectedOrder)?.orderNumber}
+                <strong>Order:</strong> {displayOrder.orderNumber}
               </Typography>
               <Typography variant="body2">
-                <strong>Total:</strong> R{Number(order?.total_price ?? selectedOrder?.totalAmount ?? 0).toFixed(2)}
+                <strong>Total:</strong> R{displayOrder.totalAmount.toFixed(2)}
               </Typography>
-              <Typography variant="body2">
-                <strong>Items:</strong> {(order || selectedOrder)?.items.map(item => 
-                  `${item.quantity}x ${item.name}`
-                ).join(', ')}
+              <Typography variant="body2" sx={{ mb: 1 }}>
+                <strong>Items:</strong>
               </Typography>
+              <Box sx={{ ml: 2 }}>
+                {displayOrder.items?.map((item, index) => {
+                  const drink = getDrinkById(item.drink_id);
+                  const itemName = drink?.name || 'Unknown Item';
+                  
+                  return (
+                    <Typography key={index} variant="body2" color="text.secondary">
+                      {item.quantity}x {itemName}
+                    </Typography>
+                  );
+                }) || (
+                  <Typography variant="body2" color="text.secondary">
+                    No items listed
+                  </Typography>
+                )}
+              </Box>
             </Box>
           )}
 
-          <TextField
-            autoFocus={mode !== 'find'}
-            fullWidth
-            label="Enter PIN"
-            type="password"
-            variant="outlined"
-            value={pin}
-            onChange={(e) => {
-              setPin(e.target.value);
-              // Clear selected order if user manually types PIN
-              if (mode === 'find' && e.target.value !== '' && selectedOrder) {
-                const expectedPin = selectedOrder.orderNumber.split('-')[1]?.slice(-1) || selectedOrder.orderNumber.slice(-1);
-                if (e.target.value !== expectedPin) {
-                  setSelectedOrder(null);
-                }
-              }
-            }}
-            disabled={loading}
-            slotProps={{
-              input: {
-                maxLength: 10,
-                style: { 
-                  fontSize: '1.2rem', 
-                  textAlign: 'center',
-                  letterSpacing: '0.2rem'
-                }
-              }
-            }}
-            sx={{ mb: 2 }}
-            placeholder="Enter PIN"
-          />
-
-          {error && (
+          {displayError && (
             <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
+              {displayError}
             </Alert>
           )}
-
-          <Typography variant="caption" color="text.secondary">
-            {mode === 'find' 
-              ? 'Enter PIN "3" for ORD-003, PIN "5" for ORD-005, etc. Or use universal PIN "0"'
-              : 'Use the order-specific PIN or universal PIN "0"'
-            }
-          </Typography>
         </DialogContent>
 
         <DialogActions sx={{ px: 3, pb: 3 }}>
           <Button 
             onClick={handleCancel}
-            disabled={loading}
+            disabled={otpLoading}
             color="inherit"
           >
             Cancel
@@ -321,10 +282,10 @@ const OTPModal = ({
           <Button 
             type="submit"
             variant="contained"
-            disabled={loading || !pin.trim()}
+            disabled={otpLoading || !pin.trim()}
             color={mode === 'find' ? 'info' : 'warning'}
           >
-            {loading ? 'Processing...' : mode === 'find' ? 'Find & Complete' : 'Confirm Completion'}
+            {otpLoading ? 'Verifying...' : mode === 'find' ? 'Find & Complete' : 'Confirm Completion'}
           </Button>
         </DialogActions>
       </form>

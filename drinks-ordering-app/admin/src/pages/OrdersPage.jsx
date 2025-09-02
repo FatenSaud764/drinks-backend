@@ -13,7 +13,6 @@ import {
 } from '../utils/OrderUtils';
 import { normaliseOrder } from '../utils/normaliseOrder';
 import { useActiveOrders } from '../hooks/useOrders';
-import { validateCompletionPIN, validateOrderPIN } from '../services/OrderService';
 // Notifications
 import { toast } from 'react-toastify'; // For client-side notifications
 import { useSnackbar } from '../contexts/SnackbarContext';
@@ -110,7 +109,7 @@ const OrdersPage = () => {
     setPinModalOpen(true);
   };
 
-  // Get ready orders for the PIN modal autocomplete
+  // Get ready orders for the PIN modal
   const getReadyOrders = () => {
     return orders.filter(order => order.status === ORDER_STATUSES.READY);
   };
@@ -224,12 +223,11 @@ const OrdersPage = () => {
           order={pendingCompletionOrder}
           mode={pinModalMode}
           availableOrders={getReadyOrders()}
-          title={pinModalMode === 'find' ? 'Complete Order - Find by PIN' : 'PIN Required for Order Completion'}
+          title={pinModalMode === 'find' ? 'Complete Order by PIN' : 'PIN Required for Order Completion'}
           message={pinModalMode === 'find' 
-            ? 'Enter PIN or search for order to complete:' 
+            ? 'Enter your order PIN to find and complete an order:'
             : `Please enter PIN to complete order ${pendingCompletionOrder?.orderNumber || `#${pendingCompletionOrder?.id}`}:`
           }
-          validatePIN={pinModalMode === 'find' ? validateCompletionPIN : (pin) => validateOrderPIN(pin, pendingCompletionOrder?.orderNumber || `${pendingCompletionOrder?.id}`)}
         />
       </div>
     </div>

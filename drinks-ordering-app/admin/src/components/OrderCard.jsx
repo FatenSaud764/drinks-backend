@@ -9,7 +9,7 @@ import {
   getStatusOptions,
   notifyClientReminder
 } from '../utils/OrderUtils';
-import { useInventory } from '../hooks/useInventory'; // Add this import
+import { useInventory } from '../hooks/useInventory';
 import '../styles/OrderCard.css';
 
 const OrderCard = ({ 
@@ -140,7 +140,7 @@ const ActiveOrderActions = ({ order, onUpdateStatus }) => {
         <button 
           className="notify-button"
           onClick={() => notifyClientReminder(order.id)}
-          title="Remind customer to collect their completed order"
+          title="Remind customer to collect their order"
         >
           Remind Customer
         </button>

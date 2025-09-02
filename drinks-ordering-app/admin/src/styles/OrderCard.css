@@ -17,14 +17,6 @@
   letter-spacing: 0.5px;
 }
 
-/* .note-content {
-  font-size: 0.95rem;
-  color: var(--text-primary) !important;
-  line-height: 1.4;
-  word-wrap: break-word;
-  white-space: pre-wrap;
-} */
-
 .note-content {
   font-size: 0.95rem;
   color: var(--text-primary) !important;
