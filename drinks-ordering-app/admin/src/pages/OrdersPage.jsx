@@ -11,6 +11,7 @@ import {
   getActiveOrderStatusCounts,
   notifyClient,
 } from '../utils/OrderUtils';
+import { normaliseOrder } from '../utils/normaliseOrder';
 import { useActiveOrders } from '../hooks/useOrders';
 import { validateCompletionPIN, validateOrderPIN } from '../services/OrderService';
 // Notifications
@@ -203,17 +204,9 @@ const OrdersPage = () => {
             filteredOrders.map(order => (
               <OrderCard
                 key={order.id}
-                order={{
-                  ...order,
-                  id: parseInt(order.id),
-                  totalAmount: parseFloat(order.total_price || order.totalAmount || 0),
-                  orderTime: new Date(order.created_at || order.orderTime),
-                  lastUpdated: new Date(order.updated_at || order.lastUpdated),
-                  orderNumber: order.orderNumber || `#${order.id}`
-                }}
+                order={normaliseOrder(order)}
                 onUpdateStatus={handleUpdateOrderStatus}
                 isHistory={false}
-                loading={loading}
               />
             ))
           )}

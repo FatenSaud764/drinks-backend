@@ -10,6 +10,7 @@ import {
   notifyClientReminder
 } from '../utils/OrderUtils';
 import { useInventory } from '../hooks/useInventory'; // Add this import
+import '../styles/OrderCard.css';
 
 const OrderCard = ({ 
   order, 
@@ -68,6 +69,14 @@ const OrderCard = ({
           <span><strong>Total:</strong></span>
           <span className="total-amount"><strong>{formatCurrency(order.totalAmount)}</strong></span>
         </div>
+        
+        {/* Customer note to be displayed here */}
+        {order.note && order.note.trim() && (
+          <div className="order-note">
+            <div className="note-label">Customer Note:</div>
+            <div className="note-content">{order.note}</div>
+          </div>
+        )}
       </div>
 
       {!isHistory ? (

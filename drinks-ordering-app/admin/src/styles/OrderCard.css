@@ -1,0 +1,58 @@
+/* Order Note Styling */
+.order-note {
+  margin-top: 12px;
+  padding: 10px 10px;
+  background-color: var(--bg-primary) !important;
+  border: 1px solid var(--border-color-secondary) !important;
+  border-radius: 6px;
+  border-left: 3px solid var(--accent-secondary) !important;
+}
+
+.note-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-secondary) !important;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* .note-content {
+  font-size: 0.95rem;
+  color: var(--text-primary) !important;
+  line-height: 1.4;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+} */
+
+.note-content {
+  font-size: 0.95rem;
+  color: var(--text-primary) !important;
+  line-height: 1.4;
+  word-wrap: break-word;
+  white-space: pre-wrap; /* Preserves line breaks if customer added them */
+  max-height: calc(1.4em * 5); /* 5 lines maximum (line-height * 5) */
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Make sure the note doesn't break the card layout */
+.order-items {
+  position: relative;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .order-note {
+    padding: 8px 10px;
+    margin-top: 10px;
+  }
+  
+  .note-label {
+    font-size: 0.8rem;
+  }
+  
+  .note-content {
+    font-size: 0.9rem;
+  }
+}
