@@ -5,12 +5,12 @@ import FilterControls from '../components/FilterControls';
 import OTPModal from '../components/OTPModal';
 import { Lock as LockIcon } from '@mui/icons-material';
 import {
-  ORDER_STATUSES,
   filterOrdersByStatus,
   filterOrdersBySearch,
   getActiveOrderStatusCounts,
   notifyClient,
 } from '../utils/OrderUtils';
+import { ORDER_STATUSES } from 'shared/types';
 import { normaliseOrder } from '../utils/normaliseOrder';
 import { useActiveOrders } from '../hooks/useOrders';
 // Notifications

@@ -3,12 +3,12 @@ import '../styles/Pages.css';
 import OrderCard from '../components/OrderCard';
 import FilterControls from '../components/FilterControls';
 import {
-  ORDER_STATUSES,
   filterOrdersByStatus,
   filterOrdersBySearch,
   filterOrdersByDate,
   getHistoryOrderStatusCounts
 } from '../utils/OrderUtils';
+import { ORDER_STATUSES } from 'shared/types';
 import { useOrderHistory } from '../hooks/useOrders';
 // Notifications
 import { useSnackbar } from '../contexts/SnackbarContext'; // Snackbar notifications

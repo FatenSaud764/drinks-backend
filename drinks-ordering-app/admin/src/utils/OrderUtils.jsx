@@ -1,13 +1,5 @@
 import { toast } from 'react-toastify';
-
-// Order status constants and flows
-export const ORDER_STATUSES = {
-  PENDING: 'pending',
-  PREPARING: 'preparing',
-  READY: 'ready',
-  COMPLETED: 'completed',
-  CANCELLED: 'cancelled'
-};
+import { ORDER_STATUSES } from 'shared/types';
 
 export const STATUS_FLOW = [
   ORDER_STATUSES.PENDING,

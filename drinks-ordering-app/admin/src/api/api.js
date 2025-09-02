@@ -28,8 +28,17 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.error('API Error:', error.response?.data || error.message);
-    return Promise.reject(error);
+    // Don't log expected PIN verification errors when searching for orders
+    const isOTPVerificationError = 
+      error.config?.url?.includes('/otp/verify/') && 
+      error.response?.status === 400 &&
+      error.response?.data?.detail === 'Invalid code.';
+    
+    if (!isOTPVerificationError) {
+      console.error('API Error:', error.response?.data || error.message); // Old behavior preserved
+    }
+    
+    return Promise.reject(error); // Old behavior preserved
   }
 );
 

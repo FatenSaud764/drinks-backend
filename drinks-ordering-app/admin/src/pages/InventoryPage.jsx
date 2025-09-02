@@ -4,6 +4,7 @@ import { useInventory } from '../hooks/useInventory';
 import '../styles/Pages.css';
 import '../styles/InventoryPage.css';
 import '../styles/Modal.css';
+import { DRINK_CATEGORIES } from 'shared/types';
 // Notifications
 import { useSnackbar } from '../contexts/SnackbarContext';
 
@@ -23,11 +24,6 @@ const InventoryPage = () => {
   } = useInventory();
 
   const { showSnackbar } = useSnackbar();
-
-  const DRINK_CATEGORIES = [
-    'Alcoholic',
-    'Non-Alcoholic',
-  ];
 
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
@@ -508,7 +504,7 @@ const InventoryPage = () => {
                         required
                       >
                         <option value="">Select Category</option>
-                        {DRINK_CATEGORIES.map(category => (
+                        {Object.values(DRINK_CATEGORIES).map(category => (
                           <option key={category} value={category}>{category}</option>
                         ))}
                       </select>
