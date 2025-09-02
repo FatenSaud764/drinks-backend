@@ -80,11 +80,12 @@ export const ordersAPI = {
   verifyOrderOTP: async (orderId, otp) => {
     try {
       const response = await api.post(`/api/orders/${orderId}/otp/verify/`, {
-        otp: otp
+        code: otp
       });
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Failed to verify OTP");
+      const errData = error.response?.data;
+      throw new Error(errData?.message || errData?.detail || "Failed to verify OTP");
     }
   },
 };
