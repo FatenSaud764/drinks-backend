@@ -1,16 +1,31 @@
-# your_app/management/commands/create_dummy_data.py
-
 from django.core.management.base import BaseCommand
+from django.db import transaction
+from django.contrib.auth.hashers import make_password
+from django.conf import settings
 from decimal import Decimal
 import random
+import itertools
+import os
 
-from barbackend.models import User, Drink, Cart, CartItem, Order, OrderItem 
+from barbackend.models import (
+    User,
+    Drink,
+    Cart,
+    CartItem,
+    Order,
+    OrderItem,
+    OrderOTP,
+)
+
 
 class Command(BaseCommand):
-    help = 'Create dummy data for the bar ordering app'
+    help = 'Create deterministic dummy data for the bar ordering app (users, drinks, carts, orders, OTPs)'
 
+    @transaction.atomic
     def handle(self, *args, **kwargs):
         self.stdout.write("Clearing old data...")
+        # Order of deletion to satisfy FK constraints
+        OrderOTP.objects.all().delete()
         OrderItem.objects.all().delete()
         Order.objects.all().delete()
         CartItem.objects.all().delete()
@@ -18,48 +33,126 @@ class Command(BaseCommand):
         Drink.objects.all().delete()
         User.objects.all().delete()
 
-        self.stdout.write("Creating users...")
-        users = [
-            User(username='alice', email='alice@example.com', password_hash='hashed_pw1', role='customer'),
-            User(username='bob', email='bob@example.com', password_hash='hashed_pw2', role='customer'),
-            User(username='carol', email='carol@example.com', password_hash='hashed_pw3', role='staff'),
-        ]
-        User.objects.bulk_create(users)
+        # Seed control for repeatability
+        random.seed(42)
 
-        users = list(User.objects.all())
-
-        self.stdout.write("Creating drinks...")
-        drinks = [
-            Drink(name='Coca-Cola', description='Classic Coke', price=Decimal('1.50'), available=True),
-            Drink(name='Orange Juice', description='Freshly squeezed', price=Decimal('2.00'), available=True),
-            Drink(name='Beer', description='Local craft beer', price=Decimal('3.50'), available=True),
-            Drink(name='Water', description='Still water', price=Decimal('1.00'), available=True),
+        # --- Users ---
+        self.stdout.write("Creating users (customers + staff)...")
+        customer_defs = [
+            ("alice", "alice@example.com", "alice123"),
+            ("bob", "bob@example.com", "bob123"),
+            ("carol", "carol@example.com", "carol123"),
         ]
+        staff_defs = [
+            ("admin", "admin@example.com", "admin123"),  # designated admin staff
+            ("dave", "dave@example.com", "dave123"),
+            ("eve", "eve@example.com", "eve123"),
+        ]
+        create_users = []
+        for uname, email, pwd in customer_defs:
+            create_users.append(User(username=uname, email=email, password_hash=make_password(pwd), role='customer'))
+        for uname, email, pwd in staff_defs:
+            create_users.append(User(username=uname, email=email, password_hash=make_password(pwd), role='staff'))
+        User.objects.bulk_create(create_users)
+        users = list(User.objects.order_by('id'))
+        customers = [u for u in users if u.role == 'customer']
+
+        # --- Drinks ---
+        self.stdout.write("Creating drinks with images from media/assets ...")
+        # Map friendly drink names to actual files in media/assets
+        drink_defs = [
+            ("Espresso Martini", "EspressoMartini.jpg", Decimal('11.00'), "cocktail", 50),
+            ("Gin & Tonic", "gintonic.jpg", Decimal('9.50'), "cocktail", 40),
+            ("Manhattan", "manhatten.png", Decimal('12.00'), "cocktail", 35),
+            ("Mimosa", "mimosa.png", Decimal('8.00'), "cocktail", 45),
+            ("Passionfruit Martini", "passionmartini.png", Decimal('10.50'), "cocktail", 30),
+            ("Peach Vodka", "peachvodka.jpg", Decimal('9.00'), "cocktail", 25),
+            ("Tequila Shot", "tequila.png", Decimal('5.00'), "shot", 60),
+            ("Irish Ale", "irishale.png", Decimal('6.00'), "beer", 80),
+            ("Still Water", "StillWater.jpg", Decimal('2.00'), "soft", 200),
+            ("Water", "water.jpg", Decimal('1.50'), "soft", 200),
+        ]
+
+        def resolve_image(filename: str) -> str:
+            # Ensure the file exists under MEDIA_ROOT/assets; otherwise fallback to a generic cocktail image
+            candidate = os.path.join(settings.MEDIA_ROOT, 'assets', filename)
+            if os.path.exists(candidate):
+                return f'assets/{filename}'
+            # fallback options present in repo
+            for fallback in [filename, 'cocktail.png', 'water.jpg']:
+                fb_path = os.path.join(settings.MEDIA_ROOT, 'assets', fallback)
+                if os.path.exists(fb_path):
+                    return f'assets/{fallback}'
+            # last resort: keep original name
+            return f'assets/{filename}'
+
+        drinks = []
+        for name, filename, price, category, stock in drink_defs:
+            image_path = resolve_image(filename)
+            drinks.append(
+                Drink(
+                    name=name,
+                    description=f"Delicious {name}",
+                    image=image_path,
+                    price=price,
+                    category=category,
+                    available=True,
+                    stock=stock,
+                )
+            )
         Drink.objects.bulk_create(drinks)
-        drinks = list(Drink.objects.all())
+        drinks = list(Drink.objects.order_by('id'))
 
-        self.stdout.write("Creating carts and cart items...")
+        # --- Carts ---
+        self.stdout.write("Creating a cart for every user with a few items...")
         for user in users:
-            if user.role == 'customer':
-                cart = Cart.objects.create(user=user)
-                for drink in random.sample(drinks, random.randint(1, 3)):
-                    CartItem.objects.create(cart=cart, drink=drink, quantity=random.randint(1, 5))
+            cart = Cart.objects.create(user=user, note=f"Cart for {user.username}")
+            # Add 2-3 unique drinks per cart
+            for drink in random.sample(drinks, k=3 if len(drinks) >= 3 else len(drinks)):
+                qty = random.randint(1, 3)
+                CartItem.objects.create(cart=cart, drink=drink, quantity=qty)
 
-        self.stdout.write("Creating orders and order items...")
-        for user in users:
-            if user.role == 'customer':
-                for _ in range(random.randint(1, 2)):
-                    order = Order.objects.create(
-                        user=user,
-                        status=random.choice(['pending', 'preparing', 'ready', 'completed', 'cancelled']),
-                        total_price=Decimal('0.00'),
-                    )
-                    total = Decimal('0.00')
-                    for drink in random.sample(drinks, random.randint(1, 3)):
-                        qty = random.randint(1, 4)
-                        OrderItem.objects.create(order=order, drink=drink, quantity=qty)
-                        total += drink.price * qty
-                    order.total_price = total
-                    order.save()
+        # --- Orders & OTPs ---
+        # 3 orders per each status, evenly divided among customers; store OTP in order note
+        status_cycle = [s for s, _ in Order.STATUS_CHOICES]
+        target_per_status = 3
+        total_orders = target_per_status * len(status_cycle)
 
-        self.stdout.write(self.style.SUCCESS('Dummy data created successfully!'))
+        self.stdout.write(
+            f"Creating {target_per_status} orders for each status ({total_orders} total) and generating OTPs..."
+        )
+        orders_created = []
+        user_cycle = itertools.cycle(customers)  # 15 orders / 3 customers = 5 each
+        otp_counter = 123450  # deterministic starting point for OTPs
+
+        for status in status_cycle:
+            for _ in range(target_per_status):
+                user = next(user_cycle)
+                order = Order.objects.create(
+                    user=user,
+                    status=status,
+                    note="",
+                    total_price=Decimal('0.00'),
+                )
+
+                # Add 1-3 items per order
+                num_items = random.randint(1, 3)
+                chosen = random.sample(drinks, num_items)
+                total = Decimal('0.00')
+                for drink in chosen:
+                    qty = random.randint(1, 4)
+                    OrderItem.objects.create(order=order, drink=drink, quantity=qty)
+                    total += drink.price * qty
+
+                # OTP: store hashed in OrderOTP and the plain code in order.note for testing
+                otp_code = f"{otp_counter % 1000000:06d}"
+                otp_counter += 1
+                OrderOTP.objects.create(order=order, code_hash=make_password(otp_code), code_plain=otp_code)
+                order.total_price = total
+                order.note = f"Test OTP: {otp_code}"
+                order.save(update_fields=["total_price", "note", "updated_at"])
+                orders_created.append(order)
+
+        self.stdout.write(self.style.SUCCESS(
+            f"Dummy data created: {len(users)} users, {len(drinks)} drinks, {len(users)} carts, {len(orders_created)} orders with OTPs."
+        ))
