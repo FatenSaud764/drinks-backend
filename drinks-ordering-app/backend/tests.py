@@ -1,69 +1,81 @@
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from decimal import Decimal
-from barbackend.models import User, Drink, Cart, CartItem, Order, OrderItem
-from barbackend.serializers import CartSerializer
+from django.core.files.uploadedfile import SimpleUploadedFile
+from PIL import Image
+import io
+from rest_framework.test import APIClient
+import tempfile
+import shutil
 
-class UserModelTest(TestCase):
+from barbackend.models import User, Drink, Cart, CartItem, Order, OrderItem, OrderOTP
+from barbackend.serializers import CartSerializer, DrinkSerializer
+
+
+class MediaRootTestCase(TestCase):
+    """TestCase that isolates MEDIA_ROOT to a temp directory and cleans it up."""
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls._temp_media = tempfile.mkdtemp(prefix="test_media_")
+        cls._override = override_settings(MEDIA_ROOT=cls._temp_media)
+        cls._override.enable()
+
+    @classmethod
+    def tearDownClass(cls):
+        try:
+            cls._override.disable()
+        finally:
+            shutil.rmtree(cls._temp_media, ignore_errors=True)
+            super().tearDownClass()
+
+
+def dummy_image(name='test.png'):
+    # Generate a valid in-memory PNG via Pillow to satisfy ImageField validation
+    bio = io.BytesIO()
+    Image.new('RGB', (1, 1), (255, 0, 0)).save(bio, format='PNG')
+    bio.seek(0)
+    return SimpleUploadedFile(name, bio.getvalue(), content_type='image/png')
+
+
+class ModelBasicsTest(MediaRootTestCase):
     def test_user_creation(self):
         user = User.objects.create(username='alice', email='alice@example.com', password_hash='pw', role='customer')
         self.assertEqual(user.username, 'alice')
         self.assertEqual(user.role, 'customer')
         self.assertTrue(User.objects.filter(email='alice@example.com').exists())
 
-class DrinkModelTest(TestCase):
     def test_drink_creation(self):
-        drink = Drink.objects.create(name='Coca-Cola', description='Classic Coke', price=Decimal('1.50'), available=True)
+        drink = Drink.objects.create(name='Coca-Cola', description='Classic Coke', image=dummy_image(), price=Decimal('1.50'), available=True, stock=10)
         self.assertEqual(drink.name, 'Coca-Cola')
         self.assertTrue(drink.available)
         self.assertEqual(Drink.objects.count(), 1)
 
-class CartAndCartItemTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create(username='bob', email='bob@example.com', password_hash='pw', role='customer')
-        self.drink = Drink.objects.create(name='Beer', description='Craft beer', price=Decimal('3.50'), available=True)
-
-    def test_cart_and_item(self):
-        cart = Cart.objects.create(user=self.user)
-        item = CartItem.objects.create(cart=cart, drink=self.drink, quantity=2)
-        self.assertEqual(cart.user.username, 'bob')
-        self.assertEqual(item.quantity, 2)
-        self.assertEqual(CartItem.objects.count(), 1)
-
-class OrderAndOrderItemTest(TestCase):
-    def setUp(self):
-        self.user = User.objects.create(username='carol', email='carol@example.com', password_hash='pw', role='customer')
-        self.drink1 = Drink.objects.create(name='Water', description='Still water', price=Decimal('1.00'), available=True)
-        self.drink2 = Drink.objects.create(name='Orange Juice', description='Freshly squeezed', price=Decimal('2.00'), available=True)
-
     def test_order_and_items(self):
-        order = Order.objects.create(user=self.user, status='pending', total_price=Decimal('0.00'))
-        item1 = OrderItem.objects.create(order=order, drink=self.drink1, quantity=3)
-        item2 = OrderItem.objects.create(order=order, drink=self.drink2, quantity=2)
-        total = self.drink1.price * 3 + self.drink2.price * 2
-        order.total_price = total
-        order.save()
-        self.assertEqual(Order.objects.count(), 1)
-        self.assertEqual(OrderItem.objects.count(), 2)
-        self.assertEqual(Order.objects.first().total_price, total)
+        user = User.objects.create(username='carol', email='carol@example.com', password_hash='pw', role='customer')
+        d1 = Drink.objects.create(name='Water', description='Still water', image=dummy_image('w.png'), price=Decimal('1.00'), available=True, stock=10)
+        d2 = Drink.objects.create(name='Orange Juice', description='Freshly squeezed', image=dummy_image('o.png'), price=Decimal('2.00'), available=True, stock=10)
+        order = Order.objects.create(user=user, status='pending', total_price=Decimal('0.00'))
+        OrderItem.objects.create(order=order, drink=d1, quantity=3)
+        OrderItem.objects.create(order=order, drink=d2, quantity=2)
+        total = d1.price * 3 + d2.price * 2
+        order.refresh_from_db()
+        self.assertEqual(order.total_price, total)
 
 
-class PriceChangePropagationTest(TestCase):
+class PriceAndSerializerSignalsTest(MediaRootTestCase):
     def setUp(self):
         self.user = User.objects.create(username='dave', email='dave@example.com', password_hash='pw', role='customer')
-        self.drink = Drink.objects.create(name='Lemonade', description='Fresh', price=Decimal('2.50'), available=True)
+        self.drink = Drink.objects.create(name='Lemonade', description='Fresh', image=dummy_image('l.png'), price=Decimal('2.50'), available=True, stock=10)
 
     def test_order_total_updates_when_drink_price_changes(self):
         order = Order.objects.create(user=self.user, status='pending', total_price=Decimal('0.00'))
         OrderItem.objects.create(order=order, drink=self.drink, quantity=4)
-        # initial total via signal on OrderItem save
         order.refresh_from_db()
         self.assertEqual(order.total_price, Decimal('10.00'))
 
-        # Change drink price
+        # Change drink price and ensure totals update via signals
         self.drink.price = Decimal('3.00')
         self.drink.save()
-
-        # Order total should reflect new price automatically
         order.refresh_from_db()
         self.assertEqual(order.total_price, Decimal('12.00'))
 
@@ -79,3 +91,208 @@ class PriceChangePropagationTest(TestCase):
         self.drink.save()
         data = CartSerializer(cart).data
         self.assertEqual(Decimal(str(data['total_price'])), Decimal('6.50'))
+
+
+class APITest(MediaRootTestCase):
+    def setUp(self):
+        self.client = APIClient()
+        # Create a user and their cart
+        self.user = User.objects.create(username='eve', email='eve@example.com', password_hash='pw', role='customer')
+        self.cart = Cart.objects.create(user=self.user)
+        # Drinks
+        self.drink1 = Drink.objects.create(name='Cola', description='Soda', image=dummy_image('c.png'), price=Decimal('1.25'), available=True, stock=20)
+        self.drink2 = Drink.objects.create(name='Juice', description='OJ', image=dummy_image('j.png'), price=Decimal('2.75'), available=True, stock=20)
+
+    # Drink endpoints
+    def test_drink_crud(self):
+        # list
+        r = self.client.get('/api/drink/')
+        self.assertEqual(r.status_code, 200)
+        self.assertGreaterEqual(len(r.json()), 2)
+
+        # create
+        new_img = dummy_image('n.png')
+        r = self.client.post('/api/drink/', {
+            'name': 'Tea', 'description': 'Hot', 'price': '1.80', 'available': True, 'stock': 5, 'image': new_img
+        }, format='multipart')
+        self.assertEqual(r.status_code, 201)
+        did = r.json()['id']
+
+        # retrieve
+        r = self.client.get(f'/api/drink/{did}/')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['name'], 'Tea')
+
+        # update (PUT)
+        upd_img = dummy_image('u.png')
+        r = self.client.put(f'/api/drink/{did}/', {
+            'name': 'Iced Tea', 'description': 'Cold', 'price': '2.10', 'available': True, 'stock': 15, 'image': upd_img
+        }, format='multipart')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['name'], 'Iced Tea')
+
+        # partial_update (PATCH)
+        r = self.client.patch(f'/api/drink/{did}/', {'price': '2.30'}, format='json')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['price'], '2.30')
+
+        # destroy
+        r = self.client.delete(f'/api/drink/{did}/')
+        self.assertEqual(r.status_code, 204)
+
+    # Cart endpoints
+    def test_cart_endpoints(self):
+        # list (get current cart)
+        r = self.client.get('/api/cart/')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['items'], [])
+
+        # add_item
+        r = self.client.post('/api/cart/items/', {'drink_id': self.drink1.id, 'quantity': 3}, format='json')
+        self.assertEqual(r.status_code, 200)
+        cart_data = r.json()
+        self.assertEqual(len(cart_data['items']), 1)
+        item_id = cart_data['items'][0]['id']
+
+        # add same item again increments quantity
+        r = self.client.post('/api/cart/items/', {'drink_id': self.drink1.id, 'quantity': 2}, format='json')
+        self.assertEqual(r.status_code, 200)
+        items = r.json()['items']
+        self.assertEqual(len(items), 1)
+        self.assertEqual(items[0]['quantity'], 5)
+
+        # update_item (PUT)
+        # Use actual cart PK to satisfy detail route
+        r = self.client.put(f'/api/cart/{self.cart.id}/items/{item_id}/', {'quantity': 5}, format='json')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(len(r.json()['items']), 1)
+
+        # update_item (PATCH) reduce quantity
+        r = self.client.patch(f'/api/cart/{self.cart.id}/items/{item_id}/', {'quantity': 1}, format='json')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['items'][0]['quantity'], 1)
+
+        # remove_item
+        r = self.client.delete(f'/api/cart/{self.cart.id}/items/{item_id}/')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['items'], [])
+
+        # add multiple and clear_cart
+        self.client.post('/api/cart/items/', {'drink_id': self.drink1.id, 'quantity': 1}, format='json')
+        self.client.post('/api/cart/items/', {'drink_id': self.drink2.id, 'quantity': 2}, format='json')
+        r = self.client.delete('/api/cart/clear/')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['items'], [])
+
+        # partial_update note
+        r = self.client.patch('/api/cart/', {'note': 'No ice'}, format='json')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['note'], 'No ice')
+
+    # Orders endpoints including OTP flow
+    def test_orders_flow(self):
+        # add item to cart
+        self.client.post('/api/cart/items/', {'drink_id': self.drink1.id, 'quantity': 2}, format='json')
+
+        # create order from cart
+        r = self.client.post('/api/orders/', {}, format='json')
+        self.assertEqual(r.status_code, 201)
+        order_id = r.json()['id']
+
+        # ensure cart cleared
+        r_cart = self.client.get('/api/cart/')
+        self.assertEqual(r_cart.status_code, 200)
+        self.assertEqual(r_cart.json()['items'], [])
+
+        # list orders
+        r = self.client.get('/api/orders/')
+        self.assertEqual(r.status_code, 200)
+        self.assertTrue(any(o['id'] == order_id for o in r.json()))
+
+        # retrieve
+        r = self.client.get(f'/api/orders/{order_id}/')
+        self.assertEqual(r.status_code, 200)
+
+        # get_otp should fail before ready
+        r = self.client.get(f'/api/orders/{order_id}/otp/')
+        self.assertEqual(r.status_code, 400)
+
+        # change_status to ready (generate OTP via signal)
+        r = self.client.patch(f'/api/orders/{order_id}/status/', {'status': 'ready'}, format='json')
+        self.assertEqual(r.status_code, 200)
+
+        # ensure OTP exists
+        self.assertTrue(OrderOTP.objects.filter(order_id=order_id).exists())
+
+        # get_otp
+        r = self.client.get(f'/api/orders/{order_id}/otp/')
+        self.assertEqual(r.status_code, 200)
+        code = r.json()['code']
+        self.assertTrue(len(code) >= 4)
+
+        # verify_otp
+        r = self.client.post(f'/api/orders/{order_id}/otp/verify/', {'code': code}, format='json')
+        self.assertEqual(r.status_code, 200)
+        self.assertIn('OTP verified', r.json()['detail'])
+
+        # second verify should fail as used
+        r = self.client.post(f'/api/orders/{order_id}/otp/verify/', {'code': code}, format='json')
+        self.assertEqual(r.status_code, 400)
+
+        # cancel a pending order
+        r = self.client.post('/api/cart/items/', {'drink_id': self.drink2.id, 'quantity': 1}, format='json')
+        r = self.client.post('/api/orders/', {}, format='json')
+        self.assertEqual(r.status_code, 201)
+        pending_id = r.json()['id']
+        r = self.client.delete(f'/api/orders/{pending_id}/')
+        self.assertEqual(r.status_code, 204)
+
+        # cannot cancel non-pending
+        r = self.client.post('/api/cart/items/', {'drink_id': self.drink2.id, 'quantity': 1}, format='json')
+        r = self.client.post('/api/orders/', {}, format='json')
+        self.assertEqual(r.status_code, 201)
+        non_pending_id = r.json()['id']
+        _ = self.client.patch(f'/api/orders/{non_pending_id}/status/', {'status': 'preparing'}, format='json')
+        r = self.client.delete(f'/api/orders/{non_pending_id}/')
+        self.assertEqual(r.status_code, 400)
+
+
+class ModelBehaviorTest(MediaRootTestCase):
+    def test_drink_auto_availability(self):
+        d = Drink.objects.create(name='Auto', description='', image=dummy_image('a.png'), price=Decimal('1.00'), available=True, stock=10)
+        self.assertTrue(d.available)
+        d.stock = 3
+        d.save()
+        d.refresh_from_db()
+        self.assertFalse(d.available)
+        d.stock = 7
+        d.save()
+        d.refresh_from_db()
+        self.assertTrue(d.available)
+
+    def test_drink_manual_availability_toggle(self):
+        d = Drink.objects.create(name='Manual', description='', image=dummy_image('m.png'), price=Decimal('1.00'), available=True, stock=10)
+        # Manual toggle via serializer should preserve availability even if stock high
+        s = DrinkSerializer(d, data={'available': False}, partial=True)
+        self.assertTrue(s.is_valid(), s.errors)
+        s.save()
+        d.refresh_from_db()
+        self.assertFalse(d.available)
+        # Increase stock should not auto-enable due to _manual_availability flag set in update
+        d.stock = 20
+        d.save()
+        d.refresh_from_db()
+        self.assertFalse(d.available)
+
+    def test_order_total_recalculates_on_item_delete(self):
+        u = User.objects.create(username='tom', email='tom@example.com', password_hash='pw', role='customer')
+        d1 = Drink.objects.create(name='D1', description='', image=dummy_image('d1.png'), price=Decimal('2.00'), available=True, stock=10)
+        d2 = Drink.objects.create(name='D2', description='', image=dummy_image('d2.png'), price=Decimal('3.00'), available=True, stock=10)
+        o = Order.objects.create(user=u, status='pending', total_price=Decimal('0.00'))
+        i1 = OrderItem.objects.create(order=o, drink=d1, quantity=2)  # 4.00
+        i2 = OrderItem.objects.create(order=o, drink=d2, quantity=1)  # 3.00
+        o.refresh_from_db()
+        self.assertEqual(o.total_price, Decimal('7.00'))
+        i2.delete()
+        o.refresh_from_db()
+        self.assertEqual(o.total_price, Decimal('4.00'))

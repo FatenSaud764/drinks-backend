@@ -32,16 +32,17 @@ class OrderSerializer(serializers.ModelSerializer):
         read_only_fields = ['status', 'total_price', 'created_at', 'updated_at']
 
     def create(self, validated_data):
+        from decimal import Decimal
         items_data = validated_data.pop('items', [])
-        order = Order.objects.create(**validated_data)
-        total = 0
+        # Compute total before creating order to satisfy NOT NULL constraint
+        total = Decimal('0.00')
         for item_data in items_data:
             drink = item_data['drink']
             quantity = item_data['quantity']
-            OrderItem.objects.create(order=order, drink=drink, quantity=quantity)
             total += drink.price * quantity
-        order.total_price = total
-        order.save()
+        order = Order.objects.create(total_price=total, **validated_data)
+        for item_data in items_data:
+            OrderItem.objects.create(order=order, drink=item_data['drink'], quantity=item_data['quantity'])
         return order
 
 class CartItemSerializer(serializers.ModelSerializer):

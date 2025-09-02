@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
+import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -26,7 +27,7 @@ SECRET_KEY = 'django-insecure-*wyp7b&=ql&d79hk5l=swza4$tn^a-j&x2z+q75a3f@rp3#k2-
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', 'testserver']
 
 
 # Application definition
@@ -81,13 +82,20 @@ WSGI_APPLICATION = 'barbackend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'barapp_db',
-        'USER': 'baruser',
-        'PASSWORD': 'barpass',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv('POSTGRES_DB', 'barapp_db'),
+        'USER': os.getenv('POSTGRES_USER', 'baruser'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'barpass'),
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'PORT': os.getenv('POSTGRES_PORT', '5432'),
     }
 }
+
+# Use SQLite for tests to avoid external DB dependency/permissions
+if 'test' in sys.argv or os.getenv('USE_SQLITE_FOR_TESTS') == '1':
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'test_db.sqlite3',
+    }
 
 
 # Password validation
@@ -148,6 +156,11 @@ OTP_CODE_LENGTH = 6
 # Configure DRF
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ],
 }
 
 # drf-spectacular settings

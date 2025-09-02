@@ -19,5 +19,22 @@ services:
       timeout: 5s
       retries: 10
 
+  backend-tests:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_USER: baruser
+      POSTGRES_PASSWORD: barpass
+      POSTGRES_DB: barapp_db
+      POSTGRES_PORT: 5432
+      DJANGO_SETTINGS_MODULE: barbackend.settings
+    depends_on:
+      postgres:
+        condition: service_healthy
+    working_dir: /app
+    command: ["python", "manage.py", "test", "-v", "2"]
+
 volumes:
   pgdata: {}

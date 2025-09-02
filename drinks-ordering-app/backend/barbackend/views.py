@@ -119,7 +119,7 @@ class OrderViewset(viewsets.ViewSet):
         order_data = {
             'user': user.id,
             'note': cart.note,
-            'items': [{'drink': item.drink.id, 'quantity': item.quantity} for item in cart.items.all()]
+            'items': [{'drink_id': item.drink.id, 'quantity': item.quantity} for item in cart.items.all()]
         }
         serializer = self.serializer_class(data=order_data)
         if serializer.is_valid():
@@ -211,9 +211,10 @@ class OrderViewset(viewsets.ViewSet):
 
 
 
-class CartViewset(viewsets.ViewSet):
+class CartViewset(viewsets.GenericViewSet):
     permission_classes = [permissions.AllowAny]
     serializer_class = CartSerializer
+    queryset = Cart.objects.all()
 
     def get_cart(self, request):
         """
@@ -237,6 +238,16 @@ class CartViewset(viewsets.ViewSet):
         PATCH /api/cart/
         Update cart note or nested items partially.
         """
+        cart = self.get_cart(request)
+        serializer = CartSerializer(cart, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # Explicit collection-level PATCH endpoint at /api/cart/
+    @action(detail=False, methods=['patch'], url_path='')
+    def update_cart(self, request):
         cart = self.get_cart(request)
         serializer = CartSerializer(cart, data=request.data, partial=True)
         if serializer.is_valid():
@@ -276,30 +287,22 @@ class CartViewset(viewsets.ViewSet):
             return Response(CartSerializer(cart).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=True, methods=['put', 'patch'], url_path='items/(?P<item_id>[^/.]+)')
-    def update_item(self, request, item_id=None):
+    @action(detail=True, methods=['put', 'patch', 'delete'], url_path='items/(?P<item_id>[^/.]+)')
+    def update_item(self, request, pk=None, item_id=None):
         """
-        PUT/PATCH /api/cart/items/{item_id}/
-        Update quantity of a specific item in the cart.
+        PUT/PATCH /api/cart/{cart_id}/items/{item_id}/ -> update quantity of a specific item in the cart.
+        DELETE /api/cart/{cart_id}/items/{item_id}/ -> remove item from the cart.
         """
         cart = self.get_cart(request)
         item = get_object_or_404(CartItem, pk=item_id, cart=cart)
+        if request.method == 'DELETE':
+            item.delete()
+            return Response(CartSerializer(cart).data)
         serializer = CartItemSerializer(item, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(CartSerializer(cart).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(detail=True, methods=['delete'], url_path='items/(?P<item_id>[^/.]+)')
-    def remove_item(self, request, item_id=None):
-        """
-        DELETE /api/cart/items/{item_id}/
-        Remove a specific item from the cart.
-        """
-        cart = self.get_cart(request)
-        item = get_object_or_404(CartItem, pk=item_id, cart=cart)
-        item.delete()
-        return Response(CartSerializer(cart).data)
 
     @action(detail=False, methods=['delete'], url_path='clear')
     def clear_cart(self, request):

@@ -29,6 +29,8 @@ router.register('cart', CartViewset, basename='cart')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # Explicit collection-level mapping for CartViewset at /api/cart/
+    path('api/cart/', CartViewset.as_view({'get': 'list', 'patch': 'partial_update', 'delete': 'destroy'}), name='cart-root'),
     path('api/', include(router.urls)),
     # drf-spectacular schema and docs
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

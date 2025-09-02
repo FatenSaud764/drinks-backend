@@ -1,9 +1,7 @@
 from decimal import Decimal
-from datetime import timedelta
 from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
 from django.utils import timezone
-from django.conf import settings
 
 from .models import Drink, Order, OrderItem, OrderOTP
 from .otp_utils import generate_numeric_code
@@ -21,30 +19,19 @@ def recalc_order_total(order: Order) -> None:
         order.save(update_fields=['total_price', 'updated_at'])
 
 
-def ensure_order_otp(order: Order, *, force: bool = False) -> None:
-    """Create or refresh OTP for an order now in 'ready' state with cooldown.
+def ensure_order_otp(order: Order) -> None:
+    """Create or refresh OTP for an order now in 'ready' state.
 
-    Stores plaintext for owner retrieval, hashed for verification.
+    OTPs do not expire or track attempts; they remain valid until used.
     """
-    cooldown = getattr(settings, 'OTP_RESEND_COOLDOWN_SECONDS', 60)
-    ttl = getattr(settings, 'OTP_TTL_SECONDS', 600)
-
-    otp, created = OrderOTP.objects.get_or_create(order=order, defaults={
-        'expires_at': timezone.now(),
-        'max_attempts': getattr(settings, 'OTP_MAX_ATTEMPTS', 5),
-    })
-
-    # respect cooldown unless forced
-    if not created and not force and otp.last_sent_at and (timezone.now() - otp.last_sent_at).total_seconds() < cooldown:
-        return
-
-    code = generate_numeric_code(getattr(settings, 'OTP_CODE_LENGTH', 6))
+    otp, _ = OrderOTP.objects.get_or_create(order=order)
+    code = generate_numeric_code()
     otp.set_code(code)
-    otp.expires_at = timezone.now() + timedelta(seconds=ttl)
-    otp.attempts = 0
     otp.is_used = False
     otp.last_sent_at = timezone.now()
-    otp.save()
+    otp.save(update_fields=[
+        'code_hash', 'code_plain', 'is_used', 'last_sent_at', 'updated_at'
+    ])
 
 
 @receiver(pre_save, sender=Order)
@@ -70,7 +57,7 @@ def on_order_finalize_invalidate_otp(sender, instance: Order, **kwargs):
     except Order.DoesNotExist:
         return
     if prev.status != instance.status and instance.status in ('completed', 'cancelled'):
-        OrderOTP.objects.filter(order=instance, is_used=False).update(is_used=True, expires_at=timezone.now())
+        OrderOTP.objects.filter(order=instance, is_used=False).update(is_used=True, updated_at=timezone.now())
 
 
 @receiver(post_save, sender=Drink)
