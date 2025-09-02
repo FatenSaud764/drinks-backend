@@ -37,6 +37,10 @@ install-frontend:
 start-db:
 	docker-compose up -d postgres
 
+.PHONY: init-db
+init-db: start-db
+	cd $(BACKEND_DIR) && ${VENV_ACTIVATE} && ${PYTHON} manage.py migrate && ${PYTHON} manage.py create_dummy_data
+
 .PHONY: stop-db
 stop-db:
 	docker-compose down
