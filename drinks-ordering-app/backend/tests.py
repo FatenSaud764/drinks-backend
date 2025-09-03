@@ -39,7 +39,7 @@ def dummy_image(name='test.png'):
 
 class ModelBasicsTest(MediaRootTestCase):
     def test_user_creation(self):
-        user = User.objects.create(username='alice', email='alice@example.com', password_hash='pw', role='customer')
+        user = User.objects.create_user(username='alice', email='alice@example.com', password='pw', role='customer')
         self.assertEqual(user.username, 'alice')
         self.assertEqual(user.role, 'customer')
         self.assertTrue(User.objects.filter(email='alice@example.com').exists())
@@ -51,7 +51,7 @@ class ModelBasicsTest(MediaRootTestCase):
         self.assertEqual(Drink.objects.count(), 1)
 
     def test_order_and_items(self):
-        user = User.objects.create(username='carol', email='carol@example.com', password_hash='pw', role='customer')
+        user = User.objects.create_user(username='carol', email='carol@example.com', password='pw', role='customer')
         d1 = Drink.objects.create(name='Water', description='Still water', image=dummy_image('w.png'), price=Decimal('1.00'), available=True, stock=10)
         d2 = Drink.objects.create(name='Orange Juice', description='Freshly squeezed', image=dummy_image('o.png'), price=Decimal('2.00'), available=True, stock=10)
         order = Order.objects.create(user=user, status='pending', total_price=Decimal('0.00'))
@@ -64,8 +64,15 @@ class ModelBasicsTest(MediaRootTestCase):
 
 class PriceAndSerializerSignalsTest(MediaRootTestCase):
     def setUp(self):
-        self.user = User.objects.create(username='dave', email='dave@example.com', password_hash='pw', role='customer')
-        self.drink = Drink.objects.create(name='Lemonade', description='Fresh', image=dummy_image('l.png'), price=Decimal('2.50'), available=True, stock=10)
+        self.user = User.objects.create_user(username='dave', email='dave@example.com', password='pw', role='customer')
+        self.drink = Drink.objects.create(
+            name='Lemonade',
+            description='Fresh',
+            image=dummy_image('l.png'),
+            price=Decimal('2.50'),
+            available=True,
+            stock=10,
+        )
 
     def test_order_total_updates_when_drink_price_changes(self):
         order = Order.objects.create(user=self.user, status='pending', total_price=Decimal('0.00'))
@@ -97,7 +104,7 @@ class APITest(MediaRootTestCase):
     def setUp(self):
         self.client = APIClient()
         # Create a user and their cart
-        self.user = User.objects.create(username='eve', email='eve@example.com', password_hash='pw', role='customer')
+        self.user = User.objects.create_user(username='eve', email='eve@example.com', password='pw', role='customer')
         self.cart = Cart.objects.create(user=self.user)
         # Drinks
         self.drink1 = Drink.objects.create(name='Cola', description='Soda', image=dummy_image('c.png'), price=Decimal('1.25'), available=True, stock=20)
@@ -285,7 +292,7 @@ class ModelBehaviorTest(MediaRootTestCase):
         self.assertFalse(d.available)
 
     def test_order_total_recalculates_on_item_delete(self):
-        u = User.objects.create(username='tom', email='tom@example.com', password_hash='pw', role='customer')
+        u = User.objects.create_user(username='tom', email='tom@example.com', password='pw', role='customer')
         d1 = Drink.objects.create(name='D1', description='', image=dummy_image('d1.png'), price=Decimal('2.00'), available=True, stock=10)
         d2 = Drink.objects.create(name='D2', description='', image=dummy_image('d2.png'), price=Decimal('3.00'), available=True, stock=10)
         o = Order.objects.create(user=u, status='pending', total_price=Decimal('0.00'))

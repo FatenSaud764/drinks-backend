@@ -49,11 +49,12 @@ class Command(BaseCommand):
             ("eve", "eve@example.com", "eve123"),
         ]
         create_users = []
+        # Create users via manager to ensure proper password hashing
+        users = []
         for uname, email, pwd in customer_defs:
-            create_users.append(User(username=uname, email=email, password_hash=make_password(pwd), role='customer'))
+            users.append(User.objects.create_user(username=uname, email=email, password=pwd, role='customer'))
         for uname, email, pwd in staff_defs:
-            create_users.append(User(username=uname, email=email, password_hash=make_password(pwd), role='staff'))
-        User.objects.bulk_create(create_users)
+            users.append(User.objects.create_user(username=uname, email=email, password=pwd, role='staff'))
         users = list(User.objects.order_by('id'))
         customers = [u for u in users if u.role == 'customer']
 

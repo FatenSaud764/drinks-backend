@@ -170,3 +170,6 @@ SPECTACULAR_SETTINGS = {
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
 }
+
+# Use the custom user model defined in barbackend.models
+AUTH_USER_MODEL = 'barbackend.User'

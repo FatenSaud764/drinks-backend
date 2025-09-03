@@ -2,8 +2,46 @@ from django.db import models
 from django.db.models import Q
 from django.contrib.auth.hashers import make_password, check_password
 from django.utils import timezone
+from django.contrib.auth.models import (
+    AbstractBaseUser,
+    PermissionsMixin,
+    BaseUserManager,
+)
 
-class User(models.Model):
+class UserManager(BaseUserManager):
+    """Custom user manager for our User model."""
+
+    use_in_migrations = True
+
+    def create_user(self, username: str, email: str, password: str | None = None, **extra_fields):
+        if not username:
+            raise ValueError("The username must be set")
+        if not email:
+            raise ValueError("The email must be set")
+        email = self.normalize_email(email)
+        user = self.model(username=username, email=email, **extra_fields)
+        if password:
+            user.set_password(password)
+        else:
+            # Set an unusable password if none provided
+            user.set_unusable_password()
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, username: str, email: str, password: str | None = None, **extra_fields):
+        extra_fields.setdefault("is_staff", True)
+        extra_fields.setdefault("is_superuser", True)
+        # Keep domain role aligned
+        extra_fields.setdefault("role", "staff")
+
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+        if extra_fields.get("is_superuser") is not True:
+            raise ValueError("Superuser must have is_superuser=True.")
+        return self.create_user(username, email, password, **extra_fields)
+
+
+class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = [
         ('customer', 'Customer'),
         ('staff', 'Staff'),
@@ -11,9 +49,18 @@ class User(models.Model):
 
     username = models.CharField(max_length=50, unique=True)
     email = models.EmailField(unique=True)
-    password_hash = models.CharField(max_length=255)
     role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+
+    # Django auth flags
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    date_joined = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    objects = UserManager()
+
+    USERNAME_FIELD = 'username'
+    REQUIRED_FIELDS = ['email']
 
     def __str__(self):
         return self.username
