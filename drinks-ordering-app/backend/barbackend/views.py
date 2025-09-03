@@ -9,6 +9,8 @@ from datetime import timedelta
 
 
 class DrinkViewset(viewsets.ViewSet):
+    """Public drink catalogue endpoints (list/create/retrieve/update/delete)."""
+
     permission_classes = [permissions.AllowAny]
     queryset = Drink.objects.all()
     serializer_class = DrinkSerializer
@@ -77,6 +79,13 @@ class DrinkViewset(viewsets.ViewSet):
 
 
 class OrderViewset(viewsets.ViewSet):
+    """Order endpoints for customers and staff.
+
+    Notes:
+    - Currently uses AllowAny with a development fallback to the first user for unauthenticated requests.
+    - Contains owner-only OTP retrieval and staff OTP verification actions.
+    """
+
     permission_classes = [permissions.AllowAny]
     serializer_class = OrderSerializer
 
@@ -212,6 +221,8 @@ class OrderViewset(viewsets.ViewSet):
 
 
 class CartViewset(viewsets.GenericViewSet):
+    """Shopping cart endpoints for the current user (list/update/add items/clear)."""
+
     permission_classes = [permissions.AllowAny]
     serializer_class = CartSerializer
     queryset = Cart.objects.all()
@@ -317,57 +328,42 @@ class CartViewset(viewsets.GenericViewSet):
         return Response(CartSerializer(cart).data)
 
 
-class UserViewset(viewsets.ViewSet):
-    permission_classes = [permissions.AllowAny]
-    queryset = User.objects.all()
+class AuthViewset(viewsets.ViewSet):
+    """Authentication endpoints for registration and user profile.
+
+    Routes:
+    - POST /api/auth/register: Public user registration. Accepts username, email, password.
+      Non-staff callers are always created with role="customer".
+    - GET /api/auth/profile: Returns the authenticated user's profile.
+    - PATCH /api/auth/profile: Partially updates authenticated user's profile. Non-staff cannot change role.
+    """
+
     serializer_class = UserSerializer
-    
-    def list(self, request):
+
+    @action(detail=False, methods=['post'], url_path='register', permission_classes=[permissions.AllowAny])
+    def register(self, request):
+        """Register a new user.
+
+        Body: { username, email, password, [role] }
+        Returns: User data without password.
         """
-        GET /api/user/
-        Returns a list of all users
-        """
-        queryset = User.objects.all()
-        serializer = self.serializer_class(queryset, many=True)
-        return Response(serializer.data)
-    
-    def create(self, request):
-        """
-        POST /api/user/
-        Creates a new user
-        """
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.serializer_class(data=request.data, context={'request': request})
         if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            user = serializer.save()
+            return Response(self.serializer_class(user).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def retrieve(self, request, pk=None):
+
+    @action(detail=False, methods=['get', 'patch'], url_path='profile', permission_classes=[permissions.IsAuthenticated])
+    def profile(self, request):
+        """Retrieve or update the authenticated user's profile.
+
+        - GET: returns user data.
+        - PATCH: updates provided fields (role is ignored for non-staff).
         """
-        GET /api/user/{id}/
-        Returns a specific user by ID
-        """
-        user = get_object_or_404(User, pk=pk)
-        serializer = self.serializer_class(user)
-        return Response(serializer.data)
-    
-    def update(self, request, pk=None):
-        """
-        PUT /api/user/{id}/
-        Updates a specific user completely
-        """
-        user = get_object_or_404(User, pk=pk)
-        serializer = self.serializer_class(user, data=request.data)
+        if request.method.lower() == 'get':
+            return Response(self.serializer_class(request.user).data)
+        serializer = self.serializer_class(request.user, data=request.data, partial=True, context={'request': request})
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def destroy(self, request, pk=None):
-        """
-        DELETE /api/user/{id}/
-        Deletes a specific user
-        """
-        user = get_object_or_404(User, pk=pk)
-        user.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)

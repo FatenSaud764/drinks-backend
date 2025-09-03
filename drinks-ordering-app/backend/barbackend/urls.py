@@ -26,7 +26,7 @@ router = DefaultRouter()
 router.register('drink', DrinkViewset, basename='drink')
 router.register('orders', OrderViewset, basename='orders')
 router.register('cart', CartViewset, basename='cart')
-router.register('user', UserViewset, basename='user')
+router.register('auth', AuthViewset, basename='auth')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
