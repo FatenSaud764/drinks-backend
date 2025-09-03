@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.validators import UniqueValidator
+from django.contrib.auth.models import BaseUserManager
 from .models import *
 
 class DrinkSerializer(serializers.ModelSerializer):
@@ -98,24 +100,53 @@ class CartSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=False, allow_blank=False)
+    username = serializers.CharField(
+        max_length=50,
+        validators=[UniqueValidator(queryset=User.objects.all(), message="This username is already taken.")],
+    )
+    email = serializers.EmailField(
+        validators=[UniqueValidator(queryset=User.objects.all(), message="This email is already registered.")],
+    )
+    password = serializers.CharField(write_only=True, required=False, allow_blank=False, min_length=6)
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'role', 'is_active', 'is_staff', 'date_joined', 'created_at', 'password']
-        read_only_fields = ['id', 'is_active', 'is_staff', 'date_joined', 'created_at']
+        # Expose safe fields for "user info" and accept password for signup
+        fields = ['id', 'username', 'email', 'role', 'date_joined', 'created_at', 'password']
+        read_only_fields = ['id', 'date_joined', 'created_at']
 
     def create(self, validated_data):
+        # Require password for signup
         password = validated_data.pop('password', None)
-        user = User(**validated_data)
-        if password:
-            user.set_password(password)
-        else:
-            user.set_unusable_password()
-        user.save()
-        return user
+        if not password:
+            raise serializers.ValidationError({"password": "Password is required."})
+
+        # Normalize email
+        if 'email' in validated_data and validated_data['email']:
+            validated_data['email'] = BaseUserManager.normalize_email(validated_data['email'])
+
+        # Default role to customer for non-staff callers
+        request = self.context.get('request')
+        is_staff = bool(getattr(getattr(request, 'user', None), 'is_staff', False))
+        if not is_staff:
+            validated_data['role'] = 'customer'
+        elif 'role' not in validated_data:
+            validated_data['role'] = 'customer'
+
+        return User.objects.create_user(password=password, **validated_data)
 
     def update(self, instance, validated_data):
         password = validated_data.pop('password', None)
+
+        # Disallow role changes by non-staff
+        request = self.context.get('request')
+        is_staff = bool(getattr(getattr(request, 'user', None), 'is_staff', False))
+        if not is_staff and 'role' in validated_data:
+            validated_data.pop('role', None)
+
+        # Normalize email if present
+        if 'email' in validated_data and validated_data['email']:
+            validated_data['email'] = BaseUserManager.normalize_email(validated_data['email'])
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         if password:
