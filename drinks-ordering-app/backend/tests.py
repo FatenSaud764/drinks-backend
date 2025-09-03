@@ -303,3 +303,64 @@ class ModelBehaviorTest(MediaRootTestCase):
         i2.delete()
         o.refresh_from_db()
         self.assertEqual(o.total_price, Decimal('4.00'))
+
+
+class AuthFlowTest(MediaRootTestCase):
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_register_token_profile_flow(self):
+        # 1) Register a new user
+        payload = {
+            'username': 'jwt_alice',
+            'email': 'jwt_alice@example.com',
+            'password': 'Str0ngP@ss!',
+        }
+        r = self.client.post('/api/auth/register/', payload, format='json')
+        self.assertEqual(r.status_code, 201, r.content)
+        data = r.json()
+        self.assertEqual(data['username'], 'jwt_alice')
+        self.assertEqual(data['email'], 'jwt_alice@example.com')
+        self.assertEqual(data['role'], 'customer')
+        # Ensure password is not returned
+        self.assertNotIn('password', data)
+
+        # 2) Invalid credentials should fail
+        r = self.client.post('/api/auth/token/', {'username': 'jwt_alice', 'password': 'wrong'}, format='json')
+        self.assertEqual(r.status_code, 401)
+
+        # 3) Obtain JWT tokens
+        r = self.client.post('/api/auth/token/', {'username': 'jwt_alice', 'password': 'Str0ngP@ss!'}, format='json')
+        self.assertEqual(r.status_code, 200, r.content)
+        tokens = r.json()
+        self.assertIn('access', tokens)
+        self.assertIn('refresh', tokens)
+        access = tokens['access']
+        refresh = tokens['refresh']
+
+        # 4) Unauthenticated profile should be 401
+        r = self.client.get('/api/auth/profile/')
+        self.assertEqual(r.status_code, 401)
+
+        # 5) Authenticated profile GET
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {access}')
+        r = self.client.get('/api/auth/profile/')
+        self.assertEqual(r.status_code, 200)
+        prof = r.json()
+        self.assertEqual(prof['username'], 'jwt_alice')
+
+        # 6) Profile PATCH to update email
+        r = self.client.patch('/api/auth/profile/', {'email': 'new_alice@example.com'}, format='json')
+        self.assertEqual(r.status_code, 200, r.content)
+        self.assertEqual(r.json()['email'], 'new_alice@example.com')
+
+        # 7) Non-staff cannot escalate role
+        r = self.client.patch('/api/auth/profile/', {'role': 'staff'}, format='json')
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.json()['role'], 'customer')
+
+        # 8) Refresh token returns new access
+        self.client.credentials()  # clear auth for token calls
+        r = self.client.post('/api/auth/token/refresh/', {'refresh': refresh}, format='json')
+        self.assertEqual(r.status_code, 200, r.content)
+        self.assertIn('access', r.json())

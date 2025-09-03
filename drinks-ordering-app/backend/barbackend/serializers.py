@@ -113,6 +113,9 @@ class UserSerializer(serializers.ModelSerializer):
         # Expose safe fields for "user info" and accept password for signup
         fields = ['id', 'username', 'email', 'role', 'date_joined', 'created_at', 'password']
         read_only_fields = ['id', 'date_joined', 'created_at']
+        extra_kwargs = {
+            'role': {'required': False},
+        }
 
     def create(self, validated_data):
         # Require password for signup
