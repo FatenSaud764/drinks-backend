@@ -7,3 +7,6 @@ export const SelectedProduct = createContext({});
 export const Orders = createContext([{}]);
 export const AlcoholicFilter = createContext();
 export const DrinkCategory = createContext('');
+export const LoggedIn = createContext(false);
+export const UserCart = createContext([{}]);
+export const SignUpModal = createContext(false);

@@ -1,15 +1,16 @@
 import {Routes, Route} from 'react-router-dom'
-import Home from './routes/Home';
+import Login from './routes/Login';
 import Products from './routes/Products';
 import Cart from './routes/Cart';
 import './index.css';
 import { createContext, useEffect, useState } from 'react';
-import { LightDark, ProductList, Search, SelectedProduct, Orders, AlcoholicFilter, DrinkCategory} from './contexts/contexts';
+import { LightDark, ProductList, Search, SelectedProduct, Orders, AlcoholicFilter, DrinkCategory, LoggedIn, UserCart, SignUpModal} from './contexts/contexts';
 import AxiosInstance from './components/Axios';
 import DrinkInfo from './routes/DrinkInfo';
 
 const App = () => {
   const [products, setProducts] = useState([]);
+  const [cart, setCart] = useState([]);
   const [theme, setTheme] = useState(() => {return localStorage.getItem('theme') || 'dark';})
   const [alcoholicfilter, setAlcoholicFilter] = useState(() => {return localStorage.getItem('alcoholic filter') || "alcoholic";})
   const [search, setSearch] = useState('');
@@ -18,7 +19,10 @@ const App = () => {
   return stored ? JSON.parse(stored) : {};
 });
   const [category, setCategory] = useState('all');
+  const [loggedin, setLoggedIn] = useState(() => {const stored = localStorage.getItem('loggedin'); return stored ? stored : false})
+  const [signupmodal, setSignUpModal] = useState(false);
 
+  console.log('cart', cart);
 
 const [orders, setOrders] = useState([{}]);
 
@@ -26,6 +30,10 @@ const [orders, setOrders] = useState([{}]);
     AxiosInstance.get('api/drink/').then((res) => {
       setProducts(res.data);
     })
+  }
+
+  const GetCartData = async () => {
+    AxiosInstance.get('api/cart').then((res) => {setCart(res.data)});
   }
 
   const GetOrderData = async () => {
@@ -45,8 +53,12 @@ const [orders, setOrders] = useState([{}]);
 
   useEffect(() => {
     GetData();
-    GetOrderData();
+    GetCartData();
   }, [])
+
+  useEffect(()=>{
+    localStorage.setItem('loggedin', loggedin)
+  },[loggedin]);
 
 
 
@@ -61,6 +73,8 @@ const [orders, setOrders] = useState([{}]);
 
   return (
     <>
+    <SignUpModal.Provider value={{signupmodal, setSignUpModal}}>
+    <LoggedIn.Provider value={{loggedin, setLoggedIn}}>
     <DrinkCategory.Provider value={{category, setCategory}}>
     <AlcoholicFilter.Provider value={{alcoholicfilter, setAlcoholicFilter}}>
     <Orders.Provider value={{orders, setOrders}}>
@@ -68,12 +82,14 @@ const [orders, setOrders] = useState([{}]);
     <Search.Provider value={{search, setSearch}}>
     <LightDark.Provider value={{theme, setTheme}}>
     <ProductList.Provider value={{products, setProducts}}>
+    <UserCart.Provider values={{cart, setCart}}>
     <Routes>
-      <Route path='/' element={<Home />} />
+      <Route path='/' element={<Login />} />
       <Route path='/products' element={<Products />} />
       <Route path='/cart' element={<Cart />} />
       <Route path='/drinkinfo' element={<DrinkInfo />} />
     </Routes>
+    </UserCart.Provider>
     </ProductList.Provider>
     </LightDark.Provider>
     </Search.Provider>
@@ -81,6 +97,8 @@ const [orders, setOrders] = useState([{}]);
     </Orders.Provider>
     </AlcoholicFilter.Provider>
     </DrinkCategory.Provider>
+    </LoggedIn.Provider>
+    </SignUpModal.Provider>
     </>
   );
 }

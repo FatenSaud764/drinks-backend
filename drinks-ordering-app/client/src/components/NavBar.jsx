@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useEffect } from 'react'
-import { LightDark } from '../contexts/contexts'
+import { LightDark, LoggedIn } from '../contexts/contexts'
 import './NavBar.css'
 import ThemeButton from './ThemeButton'
 import { TiShoppingCart } from "react-icons/ti";
@@ -11,6 +11,10 @@ export default function NavBar() {
   const navigate = useNavigate();
   const menuRef = useRef(null)
   const navRef = useRef(null)
+
+  const {loggedin, setLoggedIn} = useContext(LoggedIn);
+  if(menuRef.current){
+  console.log('open', menuRef.current.open);}
   
   const { user, login, logout } = useAuth() || {}
 
@@ -39,7 +43,7 @@ export default function NavBar() {
       <div className="nav-left">
         <details className="hamburger" ref={menuRef} role="navigation">
           <summary aria-label="Menu" aria-expanded={menuRef.current?.open ? 'true' : 'false'} aria-controls="hamburger-sidebar" role="button">
-            <span className={`summary-hamburger ${menuRef.current?.open ? 'open' : ''}`}>
+            <span className={`summary-hamburger ${menuRef.current?.open ? 'open' : 'closed'}`}>
               <span></span>
               <span></span>
               <span></span>
@@ -50,19 +54,19 @@ export default function NavBar() {
             <div className="menu-pane">
               <h2 className="menu-title">Menu</h2>
               <nav className="menu-buttons">
-                <NavLink to="/" className="menu-btn" onClick={closeMenu}>Home</NavLink>
+                {loggedin && <div className="menu-user-info">Hey, {user?user.username:'Samus!'}</div>}
+                <NavLink to="/home" className="menu-btn" onClick={closeMenu}>Home</NavLink>
                 <NavLink to="/products" className="menu-btn" onClick={closeMenu}>Products</NavLink>
                 {user && <NavLink to="/cart" className="menu-btn" onClick={closeMenu}>Cart</NavLink>}
-                {user && <NavLink to="/orders" className="menu-btn" onClick={closeMenu}>Previous Orders</NavLink>}
+                {loggedin && <NavLink to="/orders" className="menu-btn" onClick={closeMenu}>Previous Orders</NavLink>}
 
                 <div className="menu-divider"></div>
-                {user ? (
+                {loggedin ? (
                   <>
-                    <div className="menu-user-info">Hi, {user.username}</div>
-                    <button className="menu-btn menu-logout" onClick={() => {logout(); closeMenu();}}>Logout</button>
+                    <button className="menu-btn menu-logout" onClick={() => {setLoggedIn(false);}}>Logout</button>
                   </>
                 ) : (
-                  <button className="menu-btn menu-login" onClick={() => {login('guest'); closeMenu();}}>Login</button>
+                  <button className="menu-btn menu-login" onClick={() => {navigate('/')}}>Login</button>
                 )}
               </nav>
             </div>
