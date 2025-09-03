@@ -21,6 +21,10 @@ from rest_framework.routers import DefaultRouter
 from django.conf import settings
 from django.conf.urls.static import static
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 router = DefaultRouter()
 router.register('drink', DrinkViewset, basename='drink')
@@ -33,6 +37,9 @@ urlpatterns = [
     # Explicit collection-level mapping for CartViewset at /api/cart/
     path('api/cart/', CartViewset.as_view({'get': 'list', 'patch': 'partial_update', 'delete': 'destroy'}), name='cart-root'),
     path('api/', include(router.urls)),
+    # JWT auth endpoints
+    path('api/auth/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/auth/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     # drf-spectacular schema and docs
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
