@@ -257,3 +257,59 @@ class CartViewset(viewsets.ViewSet):
         cart.note = ""
         cart.save()
         return Response(CartSerializer(cart).data)
+
+
+class UserViewset(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny]
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    
+    def list(self, request):
+        """
+        GET /api/user/
+        Returns a list of all users
+        """
+        queryset = User.objects.all()
+        serializer = self.serializer_class(queryset, many=True)
+        return Response(serializer.data)
+    
+    def create(self, request):
+        """
+        POST /api/user/
+        Creates a new user
+        """
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def retrieve(self, request, pk=None):
+        """
+        GET /api/user/{id}/
+        Returns a specific user by ID
+        """
+        user = get_object_or_404(User, pk=pk)
+        serializer = self.serializer_class(user)
+        return Response(serializer.data)
+    
+    def update(self, request, pk=None):
+        """
+        PUT /api/user/{id}/
+        Updates a specific user completely
+        """
+        user = get_object_or_404(User, pk=pk)
+        serializer = self.serializer_class(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def destroy(self, request, pk=None):
+        """
+        DELETE /api/user/{id}/
+        Deletes a specific user
+        """
+        user = get_object_or_404(User, pk=pk)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

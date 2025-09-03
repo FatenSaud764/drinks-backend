@@ -94,3 +94,9 @@ class CartSerializer(serializers.ModelSerializer):
                 item.quantity = item_data['quantity']
                 item.save()
         return instance
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'password_hash', 'created_at']

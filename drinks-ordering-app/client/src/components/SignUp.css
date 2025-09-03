@@ -1,0 +1,127 @@
+.signupwrapper{
+    display: grid;
+    grid-template-rows: 5vw auto;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 50%;
+    width: 85vw;
+    height: 55vh;
+    background: white !important;
+    z-index: 999;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    border: 3px solid #F59E0B;
+}
+
+.signupwrapper#dark{
+    background: #1F2937 !important;
+}
+
+.closesignup{
+    display: flex;
+    background:none;
+    border: none;
+    color: black;
+    font-family: 'Nunito';
+    font-weight: 600;
+    width: 7vw;
+    height: 7vw;
+    font-size: 7vw;
+    text-align: center;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
+    margin-left: 72vw;
+    margin-top: 7vw;
+    cursor: pointer;
+}
+
+#dark .closesignup{
+    color: white;
+}
+
+.signupform{
+    display: flex;
+    flex-direction: column;
+    gap: 2vw;
+    width: 76vw;
+    height: 48vh;
+    text-align: center;
+    align-items: center;
+    justify-items: start;
+}
+
+.signupform h2{
+    margin-top: 2vh;
+    font-size: 40px !important;
+    font-family: 'Nunito';
+    color: #F59E0B;
+}
+
+.signupform label{
+    font-family: 'Nunito';
+    color: black;
+    font-weight: 500;
+}
+
+#dark .signupform label{
+    color: white;
+}
+
+.signupsubmit{
+    margin-top: 7vw;
+    width: 20vw;
+    height: 4vh;
+    background-color: #F59E0B;
+    border: none;
+    color: white;
+    font-family: 'Lilita One';
+    font-size: 1.9vh;
+    font-weight: lighter;
+    border-radius: 10vh;
+}
+
+.inputrow{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 5vw;
+    width: 70vw;
+    height: 6vh;
+    gap: 7vw;
+    align-items: center;
+    align-content: center;
+}
+
+.usernamebox{
+    padding-left: 3vw;
+    width: 50vw;
+    height: 3vh;
+    border-radius: 2vw;
+    border: 2px solid #F59E0B;
+    box-shadow: none;
+    font-family: 'Nunito';
+}
+
+.emailbox{
+    padding-left: 3vw;
+    width: 50vw;
+    height: 3vh;
+    border-radius: 2vw;
+    border: 2px solid #F59E0B;
+    box-shadow: none;
+    font-family: 'Nunito';
+}
+
+.passwordbox{
+    padding-left: 3vw;
+    width: 50vw;
+    height: 3vh;
+    border-radius: 2vw;
+    border: 2px solid #F59E0B;
+    box-shadow: none;
+    font-family: 'Nunito';
+}
+
