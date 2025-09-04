@@ -74,16 +74,18 @@ class Drink(models.Model):
     category = models.CharField(max_length=50, blank=True)
     available = models.BooleanField(default=True)
     stock = models.PositiveIntegerField(default=0)
+    low_stock_threshold = models.PositiveIntegerField(default=5, help_text="Below this stock, the drink is unavailable.")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     # Added by @kirsten - to handle manual availability toggling if stock drops below threshold (5 units)
     def save(self, *args, **kwargs):
-        # Automatically set availability based on stock level
-        if self.stock < 5:
+        # Automatically set availability based on stock vs threshold
+        threshold = self.low_stock_threshold if self.low_stock_threshold is not None else 5
+        if self.stock < threshold:
             self.available = False
         # Only auto-enable if stock is sufficient and not manually disabled
-        elif self.stock >= 5 and not hasattr(self, '_manual_availability'):
+        elif self.stock >= threshold and not hasattr(self, '_manual_availability'):
             self.available = True
         super().save(*args, **kwargs)
 
