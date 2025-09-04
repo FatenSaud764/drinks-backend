@@ -6,6 +6,7 @@ from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
+from django.db.models import F, Case, When, Value, BooleanField
 
 
 class DrinkViewset(viewsets.ViewSet):
@@ -76,6 +77,52 @@ class DrinkViewset(viewsets.ViewSet):
         drink = get_object_or_404(Drink, pk=pk)
         drink.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=["patch"], url_path="threshold", permission_classes=[permissions.IsAdminUser])
+    def update_threshold(self, request, pk=None):
+        """PATCH /api/drink/{id}/threshold/
+
+        Admin-only: Update low_stock_threshold for a single drink and recompute availability.
+        Body: { "low_stock_threshold": <int>=5 }
+        """
+        drink = get_object_or_404(Drink, pk=pk)
+        try:
+            value = int(request.data.get("low_stock_threshold"))
+        except (TypeError, ValueError):
+            return Response({"detail": "low_stock_threshold must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+        if value < 0:
+            return Response({"detail": "low_stock_threshold must be >= 0."}, status=status.HTTP_400_BAD_REQUEST)
+        drink.low_stock_threshold = value
+        # Recompute availability via model logic
+        drink.save()
+        return Response(self.serializer_class(drink).data)
+
+    @action(detail=False, methods=["patch"], url_path="threshold", permission_classes=[permissions.IsAdminUser])
+    def update_all_thresholds(self, request):
+        """PATCH /api/drink/threshold/
+
+        Admin-only: Set low_stock_threshold for all drinks and recompute availability in a single DB update.
+        Body: { "low_stock_threshold": <int> }
+        Returns: { updated: <count> }
+        """
+        try:
+            value = int(request.data.get("low_stock_threshold"))
+        except (TypeError, ValueError):
+            return Response({"detail": "low_stock_threshold must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+        if value < 0:
+            return Response({"detail": "low_stock_threshold must be >= 0."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # First set the threshold for all drinks
+        Drink.objects.all().update(low_stock_threshold=value)
+        # Then recompute availability based on stock vs new threshold in bulk
+        updated = Drink.objects.all().update(
+            available=Case(
+                When(stock__lt=F('low_stock_threshold'), then=Value(False)),
+                default=Value(True),
+                output_field=BooleanField(),
+            )
+        )
+        return Response({"updated": updated})
 
 
 class OrderViewset(viewsets.ViewSet):
