@@ -10,3 +10,5 @@ export const DrinkCategory = createContext('');
 export const LoggedIn = createContext(false);
 export const UserCart = createContext([{}]);
 export const SignUpModal = createContext(false);
+export const AccessTokens = createContext(null);
+export const RefreshTokens = createContext(null);

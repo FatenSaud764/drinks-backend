@@ -4,13 +4,14 @@ import Products from './routes/Products';
 import Cart from './routes/Cart';
 import './index.css';
 import { createContext, useEffect, useState } from 'react';
-import { LightDark, ProductList, Search, SelectedProduct, Orders, AlcoholicFilter, DrinkCategory, LoggedIn, UserCart, SignUpModal} from './contexts/contexts';
+import { LightDark, ProductList, Search, SelectedProduct, Orders, AlcoholicFilter, DrinkCategory, LoggedIn, UserCart, SignUpModal, AccessTokens, RefreshTokens} from './contexts/contexts';
 import AxiosInstance from './components/Axios';
 import DrinkInfo from './routes/DrinkInfo';
 
 const App = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
+
   const [theme, setTheme] = useState(() => {return localStorage.getItem('theme') || 'dark';})
   const [alcoholicfilter, setAlcoholicFilter] = useState(() => {return localStorage.getItem('alcoholic filter') || "alcoholic";})
   const [search, setSearch] = useState('');
@@ -22,7 +23,9 @@ const App = () => {
   const [loggedin, setLoggedIn] = useState(() => {const stored = localStorage.getItem('loggedin'); return stored ? stored : false})
   const [signupmodal, setSignUpModal] = useState(false);
 
-  console.log('cart', cart);
+  const [accessToken, setAccessToken] = useState(() => {const stored = localStorage.getItem('access token'); return stored ? stored : null});
+  const [refreshToken, setRefreshToken] = useState(() => {const stored = localStorage.getItem('refresh token'); return stored ? stored : null});
+
 
 const [orders, setOrders] = useState([{}]);
 
@@ -52,6 +55,14 @@ const [orders, setOrders] = useState([{}]);
   }, [selecteddrink])
 
   useEffect(() => {
+    localStorage.setItem('access token', accessToken);
+  }, [accessToken])
+
+  useEffect(() => {
+    localStorage.setItem('refresh token', refreshToken);
+  }, [refreshToken])
+
+  useEffect(() => {
     GetData();
     GetCartData();
   }, [])
@@ -73,6 +84,8 @@ const [orders, setOrders] = useState([{}]);
 
   return (
     <>
+    <RefreshTokens.Provider value={{refreshToken, setRefreshToken}}>
+    <AccessTokens.Provider value={{accessToken, setAccessToken}}>
     <SignUpModal.Provider value={{signupmodal, setSignUpModal}}>
     <LoggedIn.Provider value={{loggedin, setLoggedIn}}>
     <DrinkCategory.Provider value={{category, setCategory}}>
@@ -82,7 +95,7 @@ const [orders, setOrders] = useState([{}]);
     <Search.Provider value={{search, setSearch}}>
     <LightDark.Provider value={{theme, setTheme}}>
     <ProductList.Provider value={{products, setProducts}}>
-    <UserCart.Provider values={{cart, setCart}}>
+    <UserCart.Provider value={{cart, setCart}}>
     <Routes>
       <Route path='/' element={<Login />} />
       <Route path='/products' element={<Products />} />
@@ -99,6 +112,8 @@ const [orders, setOrders] = useState([{}]);
     </DrinkCategory.Provider>
     </LoggedIn.Provider>
     </SignUpModal.Provider>
+    </AccessTokens.Provider>
+    </RefreshTokens.Provider>
     </>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useEffect } from 'react'
-import { LightDark, LoggedIn } from '../contexts/contexts'
+import { AccessTokens, LightDark, LoggedIn, RefreshTokens } from '../contexts/contexts'
 import './NavBar.css'
 import ThemeButton from './ThemeButton'
 import { TiShoppingCart } from "react-icons/ti";
@@ -13,6 +13,10 @@ export default function NavBar() {
   const navRef = useRef(null)
 
   const {loggedin, setLoggedIn} = useContext(LoggedIn);
+  const {accessToken, setAccessToken} = useContext(AccessTokens);
+  const {refreshToken, setRefreshToken} = useContext(RefreshTokens);
+
+
   if(menuRef.current){
   console.log('open', menuRef.current.open);}
   
@@ -61,9 +65,9 @@ export default function NavBar() {
                 {loggedin && <NavLink to="/orders" className="menu-btn" onClick={closeMenu}>Previous Orders</NavLink>}
 
                 <div className="menu-divider"></div>
-                {loggedin ? (
+                {accessToken && refreshToken && accessToken!='null' && refreshToken!='null' ? (
                   <>
-                    <button className="menu-btn menu-logout" onClick={() => {setLoggedIn(false);}}>Logout</button>
+                    <button className="menu-btn menu-logout" onClick={() => {setAccessToken(null); setRefreshToken(null);}}>Logout</button>
                   </>
                 ) : (
                   <button className="menu-btn menu-login" onClick={() => {navigate('/')}}>Login</button>

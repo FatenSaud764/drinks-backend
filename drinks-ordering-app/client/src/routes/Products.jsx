@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react'
 import './Products.css'
-import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct } from '../contexts/contexts';
+import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct, AccessTokens, RefreshTokens } from '../contexts/contexts';
 import ThemeButton from '../components/ThemeButton';
 import { TiShoppingCart } from "react-icons/ti";
 import { AiOutlineMenu } from "react-icons/ai";
@@ -27,6 +27,9 @@ const Products = () => {
   const [cartModal, setCartModal] = useState(false);
   const [drinkAdded, setDrinkAdded] = useState('');
 
+  const {accessToken, setAccessToken} = useContext(AccessTokens);
+  const {refreshToken, setRefreshToken} = useContext(RefreshTokens);
+
   const fuse = useMemo(() => {
   return new Fuse(products, {
     keys: keys,
@@ -34,7 +37,7 @@ const Products = () => {
   });
 }, [products, keys]);
 
-  console.log('search' , search);
+  console.log('access', accessToken);
 
   const filtered = search === '' ? products : fuse.search(search).map(result => result.item);
 
@@ -55,11 +58,11 @@ const Products = () => {
           
           return (
               <div key={product.id} className='productdisplay'>
-              <button className='productbutton' onClick={() => {if(product.available){setSelectedDrink(product); navigate('/drinkinfo');}}}><img src={product.available ? `http://127.0.0.1:8000${product.image}` : nostock} className='drinkcard'/></button>
+              <button className='productbutton' onClick={() => {if(product.available && accessToken && refreshToken && accessToken != 'null' && refreshToken != 'null'){setSelectedDrink(product); navigate('/drinkinfo');}}}><img src={product.available ? `http://127.0.0.1:8000${product.image}` : nostock} className='drinkcard'/></button>
               <div className='productdesc'>{product.name}</div>
               <div className='additemwrapper'>
               <div className='productprice'>R{product.price}</div>
-              {product.available && <button className='additem' onClick={() => {setCartModal(true); }}>+</button>}
+              {product.available && <button className='additem' onClick={() => {if(accessToken && refreshToken && accessToken!='null' && refreshToken!='null'){setCartModal(true);} else{alert('Log in to add to cart and place orders')}}}>+</button>}
               </div>
               </div>
        

@@ -1,28 +1,42 @@
-import React, { useContext } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import './SignUp.css'
 import { LightDark, SignUpModal } from '../contexts/contexts'
+import AxiosInstance from './Axios'
 
 const SignUp = () => {
 
   const {theme, setTheme} = useContext(LightDark);
   const {signupmodal, setSignUpModal} = useContext(SignUpModal);
-    
+  const user = useRef(null);
+  const mail = useRef(null);
+  const pass = useRef(null);
+
   return (
     <div className='signupwrapper' id={theme}>
         <button className='closesignup' onClick={() => {setSignUpModal(false)}}>x</button>
-        <form className='signupform' onSubmit={() => {setSignUpModal(false)}}>
+        <form className='signupform' onSubmit={() => {
+          if(user.current && mail.current && pass.current) {
+            try{
+              AxiosInstance.post('api/auth/register/', {"username": user.current.value.trim(), "email": mail.current.value.trim(), "role": "customer", "password": pass.current.value.trim()});
+              alert("User created successfully!");
+            }
+            catch(error){
+              alert("Failed to create user, please try again!");
+            }
+          }
+          setSignUpModal(false); }}>
            <h2>Sign Up</h2> 
            <div className='inputrow'>
             <label for='username'>Username</label>
-            <input type='text' name='username' className='usernamebox' required></input>
+            <input type='text' name='username' className='usernamebox' ref = {user} required></input>
            </div>
            <div className='inputrow'>
             <label for='email'>Email</label>
-            <input type='email' name='email' className='emailbox' required></input>
+            <input type='email' name='email' className='emailbox' ref = {mail} required></input>
            </div>
            <div className='inputrow'>
             <label for='password'>Password</label>
-            <input type='password' name='password' className='passwordbox' required></input>
+            <input type='password' name='password' className='passwordbox' ref = {pass} required></input>
            </div>
            <input type='submit' value='Signup' className='signupsubmit'></input>
         </form>
