@@ -75,6 +75,8 @@ export const useInventory = () => {
   const updateGlobalThreshold = async (threshold) => {
     try {
       const result = await inventoryAPI.updateGlobalThreshold(threshold);
+      // Refresh drinks after threshold change
+      await fetchDrinks();
       return result;
     } catch (err) {
       setError(err.message);
@@ -110,7 +112,7 @@ export const useInventory = () => {
   };
 };
 
-// !! I do not think this is being used anywhere anymore !!
+// I DO NOT THINK THIS IS BEING USED ANYMORE
 export const useDrink = (drinkId) => {
   const [drink, setDrink] = useState(null);
   const [loading, setLoading] = useState(false);
