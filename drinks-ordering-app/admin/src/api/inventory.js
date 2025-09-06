@@ -35,6 +35,7 @@ export const inventoryAPI = {
       formData.append('category', drinkData.category);
       formData.append('available', drinkData.available.toString());
       formData.append('stock', drinkData.stock.toString());
+      formData.append('low_stock_threshold', drinkData.low_stock_threshold.toString());
 
       // Only append image if it exists and is a File object
       if (drinkData.image && drinkData.image instanceof File) {
@@ -60,6 +61,7 @@ export const inventoryAPI = {
       formData.append('category', drinkData.category);
       formData.append('available', drinkData.available.toString());
       formData.append('stock', drinkData.stock.toString());
+      formData.append('low_stock_threshold', drinkData.low_stock_threshold.toString());
 
       // Only append image if it exists and is a File object
       if (drinkData.image && drinkData.image instanceof File) {
@@ -93,6 +95,30 @@ export const inventoryAPI = {
       return response.data;
     } catch (error) {
       throw new Error(error.response?.data?.message || "Failed to delete drink");
+    }
+  },
+
+  // Update threshold for ALL drinks
+  updateGlobalThreshold: async (threshold) => {
+    try {
+      const response = await api.patch("/api/drink/threshold/", {
+        low_stock_threshold: threshold
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Failed to update global threshold");
+    }
+  },
+
+  // Update threshold for a SINGLE drink
+  updateDrinkThreshold: async (drinkId, threshold) => {
+    try {
+      const response = await api.patch(`/api/drink/${drinkId}/threshold/`, {
+        low_stock_threshold: threshold
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Failed to update drink threshold");
     }
   }
 };
