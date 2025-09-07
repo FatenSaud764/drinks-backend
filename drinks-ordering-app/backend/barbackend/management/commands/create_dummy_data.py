@@ -54,7 +54,13 @@ class Command(BaseCommand):
         for uname, email, pwd in customer_defs:
             users.append(User.objects.create_user(username=uname, email=email, password=pwd, role='customer'))
         for uname, email, pwd in staff_defs:
-            users.append(User.objects.create_user(username=uname, email=email, password=pwd, role='staff'))
+            u = User.objects.create_user(username=uname, email=email, password=pwd, role='staff')
+            if uname == 'admin':
+                u.is_staff = True
+                u.is_admin = True
+                u.is_superuser = True
+                u.save(update_fields=["is_staff", "is_admin", "is_superuser"])
+            users.append(u)
         users = list(User.objects.order_by('id'))
         customers = [u for u in users if u.role == 'customer']
 
