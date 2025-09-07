@@ -187,35 +187,42 @@ const InventoryPage = () => {
           </div>
         ),
       },
-      // Only show actions column if authenticated
-      ...(isAuthenticated ? [{
+      // Always show actions column (availability toggle always available, edit/delete only for authenticated)
+      {
         id: 'actions',
         header: 'Actions',
         size: 200,
         enableSorting: false,
         Cell: ({ row }) => (
           <div className="actions-cell">
+            {/* Toggle availability - always available */}
             <button
               className={`action-btn toggle-btn ${row.original.available ? 'make-unavailable' : 'make-available'}`}
               onClick={() => handleToggleAvailability(row.original.id, row.original.available)}
             >
               {row.original.available ? 'Disable' : 'Enable'}
             </button>
-            <button
-              className="action-btn edit-btn"
-              onClick={() => handleEditDrink(row.original)}
-            >
-              Edit
-            </button>
-            <button
-              className="action-btn delete-btn"
-              onClick={() => handleDeleteDrink(row.original.id)}
-            >
-              Delete
-            </button>
+            
+            {/* Edit and Delete - only for authenticated users */}
+            {isAuthenticated && (
+              <>
+                <button
+                  className="action-btn edit-btn"
+                  onClick={() => handleEditDrink(row.original)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="action-btn delete-btn"
+                  onClick={() => handleDeleteDrink(row.original.id)}
+                >
+                  Delete
+                </button>
+              </>
+            )}
           </div>
         ),
-      }] : []),
+      },
     ],
     [isAuthenticated] // Add isAuthenticated as dependency
   );
@@ -314,15 +321,12 @@ const InventoryPage = () => {
   };
 
   const handleToggleAvailability = async (drinkId, currentAvailability) => {
-    // Check authentication before allowing toggle
-    if (!isAuthenticated) {
-      showSnackbar('Authentication required to modify availability', 'error');
-      return;
-    }
+    // Remove authentication check - allow all users to toggle availability
     try {
       const drink = drinks.find(d => d.id === drinkId);
       await toggleAvailability(drinkId, !currentAvailability);
       const status = currentAvailability ? 'disabled' : 'enabled';
+      showSnackbar(`"${drink?.name || 'Drink'}" ${status} successfully!`, 'success');
     } catch (err) {
       console.error('Failed to toggle availability:', err);
       showSnackbar(`Failed to toggle availability: ${err.message}`, 'error');
@@ -377,17 +381,10 @@ const InventoryPage = () => {
         <div className="page-header">
           <h1>Inventory Management</h1>
           <p>Track and manage your inventory levels</p>
-          {/* Show auth status for clarity */}
+          {/* Update auth notice to be more specific */}
           {!isAuthenticated && (
-            <div className="auth-notice" style={{ 
-              marginTop: '10px', 
-              padding: '8px 12px', 
-              backgroundColor: 'var(--warning-bg, #fff3cd)', 
-              color: 'var(--warning-text, #856404)',
-              borderRadius: '4px',
-              fontSize: '0.9em'
-            }}>
-              <strong>Note:</strong> Authentication required for inventory management operations
+            <div className="auth-notice">
+              <strong>Note:</strong> Authentication required for adding, editing, and deleting drinks.
             </div>
           )}
         </div>
