@@ -362,19 +362,6 @@ const InventoryPage = () => {
     }
   };
 
-  // Show loading state only for initial load
-  if (loading && drinks.length === 0) {
-    return (
-      <div className="page">
-        <div className="page-container">
-          <div className="loading-state">
-            <h3>Loading inventory...</h3>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="page">
       <div className="page-container">

@@ -2,6 +2,6 @@
 
 export default function UserManagement() {
     return (
-        <p>HI</p>
+        <p>User Management</p>
     );
 }

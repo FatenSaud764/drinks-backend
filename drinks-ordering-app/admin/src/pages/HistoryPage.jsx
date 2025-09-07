@@ -69,19 +69,6 @@ const HistoryPage = () => {
   ));
   const statusOptions = ['all', 'completed', 'cancelled'];
 
-  // Show loading state
-  if (loading && historyOrders.length === 0) {
-    return (
-      <div className="page">
-        <div className="page-container">
-          <div className="loading-state">
-            <h3>Loading order history...</h3>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="page">
       <div className="page-container">
