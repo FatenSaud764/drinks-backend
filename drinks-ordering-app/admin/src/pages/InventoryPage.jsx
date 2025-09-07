@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { MaterialReactTable } from 'material-react-table';
 import { useInventory } from '../hooks/useInventory';
+import { useAuth } from '../contexts/AuthContext'; // Add auth import
 import '../styles/Pages.css';
 import '../styles/InventoryPage.css';
 import '../styles/Modal.css';
@@ -23,6 +24,7 @@ const InventoryPage = () => {
     clearError
   } = useInventory();
 
+  const { isAuthenticated } = useAuth(); // Get auth state
   const { showSnackbar } = useSnackbar();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -185,7 +187,8 @@ const InventoryPage = () => {
           </div>
         ),
       },
-      {
+      // Only show actions column if authenticated
+      ...(isAuthenticated ? [{
         id: 'actions',
         header: 'Actions',
         size: 200,
@@ -212,9 +215,9 @@ const InventoryPage = () => {
             </button>
           </div>
         ),
-      },
+      }] : []),
     ],
-    []
+    [isAuthenticated] // Add isAuthenticated as dependency
   );
 
   const clearForm = () => {
@@ -236,12 +239,22 @@ const InventoryPage = () => {
   };
 
   const openAddModal = () => {
+    // Check authentication before allowing add
+    if (!isAuthenticated) {
+      showSnackbar('Authentication required to add drinks', 'error');
+      return;
+    }
     clearForm();
     setModalMode('add');
     setModalOpen(true);
   };
 
   const handleEditDrink = (drink) => {
+    // Check authentication before allowing edit
+    if (!isAuthenticated) {
+      showSnackbar('Authentication required to edit drinks', 'error');
+      return;
+    }
     setFormData({ 
       ...drink,
       imagePreview: drink.image // Use existing image as preview
@@ -258,6 +271,13 @@ const InventoryPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Double-check authentication before submitting
+    if (!isAuthenticated) {
+      showSnackbar('Authentication required', 'error');
+      closeModal();
+      return;
+    }
     
     // Validate form
     const errors = validateForm(formData);
@@ -294,6 +314,11 @@ const InventoryPage = () => {
   };
 
   const handleToggleAvailability = async (drinkId, currentAvailability) => {
+    // Check authentication before allowing toggle
+    if (!isAuthenticated) {
+      showSnackbar('Authentication required to modify availability', 'error');
+      return;
+    }
     try {
       const drink = drinks.find(d => d.id === drinkId);
       await toggleAvailability(drinkId, !currentAvailability);
@@ -305,6 +330,12 @@ const InventoryPage = () => {
   };
 
   const handleDeleteDrink = async (drinkId) => {
+    // Check authentication before allowing delete
+    if (!isAuthenticated) {
+      showSnackbar('Authentication required to delete drinks', 'error');
+      return;
+    }
+    
     const drink = drinks.find(d => d.id === drinkId);
     const drinkName = drink ? drink.name : `drink ID ${drinkId}`;
     
@@ -346,6 +377,19 @@ const InventoryPage = () => {
         <div className="page-header">
           <h1>Inventory Management</h1>
           <p>Track and manage your inventory levels</p>
+          {/* Show auth status for clarity */}
+          {!isAuthenticated && (
+            <div className="auth-notice" style={{ 
+              marginTop: '10px', 
+              padding: '8px 12px', 
+              backgroundColor: 'var(--warning-bg, #fff3cd)', 
+              color: 'var(--warning-text, #856404)',
+              borderRadius: '4px',
+              fontSize: '0.9em'
+            }}>
+              <strong>Note:</strong> Authentication required for inventory management operations
+            </div>
+          )}
         </div>
 
         {/* Error Display */}
@@ -390,12 +434,14 @@ const InventoryPage = () => {
           </div>
         </div>
 
-        {/* Add Button */}
-        <div className="orders-controls">
-          <button className="notify-button" onClick={openAddModal}>
-            Add New Drink
-          </button>
-        </div>
+        {/* Add Button - Only show if authenticated */}
+        {isAuthenticated && (
+          <div className="orders-controls">
+            <button className="notify-button" onClick={openAddModal}>
+              Add New Drink
+            </button>
+          </div>
+        )}
 
         {/* Loading indicator for updates */}
         {loading && drinks.length > 0 && (
@@ -446,8 +492,8 @@ const InventoryPage = () => {
           />
         </div>
 
-        {/* Add/Edit Modal */}
-        {modalOpen && (
+        {/* Add/Edit Modal - Only show if authenticated */}
+        {modalOpen && isAuthenticated && (
           <div className="modal-overlay" onClick={closeModal}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
