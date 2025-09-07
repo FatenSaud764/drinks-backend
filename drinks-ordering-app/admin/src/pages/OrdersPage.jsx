@@ -17,8 +17,6 @@ import { useActiveOrders } from '../hooks/useOrders';
 import { toast } from 'react-toastify'; // For client-side notifications
 import { useSnackbar } from '../contexts/SnackbarContext';
 
-import Loading from '../components/Loading';
-
 const OrdersPage = () => {
   const {
     orders,
@@ -119,10 +117,6 @@ const OrdersPage = () => {
   const statusCounts = getActiveOrderStatusCounts(orders);
   const statusOptions = ['all', 'pending', 'preparing', 'ready'];
   const readyOrdersCount = statusCounts.ready;
-
-  if (loading && orders.length === 0) {
-    return <Loading />;
-  }
 
   return (
     <div className="page">
