@@ -7,18 +7,19 @@ from .models import User
 @admin.register(User)
 class UserAdmin(BaseUserAdmin):
     ordering = ('id',)
-    list_display = ('id', 'username', 'email', 'role', 'is_staff', 'is_active')
+    list_display = ('id', 'username', 'email', 'role', 'is_staff', 'is_admin', 'is_active')
+    list_filter = ('is_staff', 'is_admin', 'is_active', 'role')
     search_fields = ('username', 'email')
     fieldsets = (
         (None, {'fields': ('username', 'email', 'password')}),
-        (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions')}),
+    (_('Permissions'), {'fields': ('is_active', 'is_staff', 'is_admin', 'is_superuser', 'groups', 'user_permissions')}),
         (_('Important dates'), {'fields': ('last_login', 'date_joined')}),
         (_('Profile'), {'fields': ('role',)}),
     )
     add_fieldsets = (
         (None, {
             'classes': ('wide',),
-            'fields': ('username', 'email', 'role', 'password1', 'password2', 'is_staff', 'is_superuser', 'is_active'),
+            'fields': ('username', 'email', 'role', 'password1', 'password2', 'is_staff', 'is_admin', 'is_superuser', 'is_active'),
         }),
     )
     readonly_fields = ('last_login', 'date_joined')

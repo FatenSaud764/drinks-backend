@@ -108,11 +108,13 @@ class UserSerializer(serializers.ModelSerializer):
         validators=[UniqueValidator(queryset=User.objects.all(), message="This email is already registered.")],
     )
     password = serializers.CharField(write_only=True, required=False, allow_blank=False, min_length=6)
+    is_staff = serializers.BooleanField(read_only=True)
+    is_admin = serializers.BooleanField(read_only=True)
     class Meta:
         model = User
         # Expose safe fields for "user info" and accept password for signup
-        fields = ['id', 'username', 'email', 'role', 'date_joined', 'created_at', 'password']
-        read_only_fields = ['id', 'date_joined', 'created_at']
+        fields = ['id', 'username', 'email', 'role', 'is_staff', 'is_admin', 'date_joined', 'created_at', 'password']
+        read_only_fields = ['id', 'is_staff', 'is_admin', 'date_joined', 'created_at']
         extra_kwargs = {
             'role': {'required': False},
         }

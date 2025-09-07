@@ -31,13 +31,16 @@ class UserManager(BaseUserManager):
     def create_superuser(self, username: str, email: str, password: str | None = None, **extra_fields):
         extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
-        # Keep domain role aligned
+        extra_fields.setdefault("is_admin", True)
+        # Keep domain role aligned (superusers are effectively staff in business domain)
         extra_fields.setdefault("role", "staff")
 
         if extra_fields.get("is_staff") is not True:
             raise ValueError("Superuser must have is_staff=True.")
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
+        if extra_fields.get("is_admin") is not True:
+            raise ValueError("Superuser must have is_admin=True.")
         return self.create_user(username, email, password, **extra_fields)
 
 
@@ -54,6 +57,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     # Django auth flags
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    # Elevated admin flag (higher than staff). If True it ALWAYS implies is_staff.
+    is_admin = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -64,6 +69,12 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.username
+
+    def save(self, *args, **kwargs):
+        # Ensure hierarchy: is_admin implies is_staff
+        if self.is_admin and not self.is_staff:
+            self.is_staff = True
+        super().save(*args, **kwargs)
 
 
 class Drink(models.Model):

@@ -406,3 +406,22 @@ class AuthFlowTest(MediaRootTestCase):
         r = self.client.post('/api/auth/token/refresh/', {'refresh': refresh}, format='json')
         self.assertEqual(r.status_code, 200, r.content)
         self.assertIn('access', r.json())
+
+
+class UserRoleHierarchyTest(MediaRootTestCase):
+    def test_is_admin_implies_is_staff(self):
+        u = User.objects.create_user(username='hadmin', email='hadmin@example.com', password='pw', role='staff', is_admin=True)
+        u.refresh_from_db()
+        self.assertTrue(u.is_admin)
+        self.assertTrue(u.is_staff)
+
+    def test_staff_not_admin_by_default(self):
+        u = User.objects.create_user(username='hstaff', email='hstaff@example.com', password='pw', role='staff')
+        self.assertFalse(u.is_admin)
+        self.assertFalse(u.is_staff)  # still not staff flag unless manually elevated
+
+    def test_create_superuser_sets_flags(self):
+        su = User.objects.create_superuser(username='superx', email='superx@example.com', password='pw')
+        self.assertTrue(su.is_superuser)
+        self.assertTrue(su.is_staff)
+        self.assertTrue(su.is_admin)
