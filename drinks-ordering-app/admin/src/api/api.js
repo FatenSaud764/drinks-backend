@@ -3,8 +3,7 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:8000/",
-  withCredentials: false, // send session cookies
-  // HAD TO CHANGE TO FALSE TO WORK WITH "CORS_ALLOW_ALL_ORIGINS = True" in setting.py
+  timeout: 10000,
   headers: {
     // "Content-Type": "application/json",
     accept: "application/json"

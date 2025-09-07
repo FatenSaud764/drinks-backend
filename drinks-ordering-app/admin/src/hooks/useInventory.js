@@ -71,6 +71,33 @@ export const useInventory = () => {
     }
   };
 
+  // Update threshold for ALL drinks
+  const updateGlobalThreshold = async (threshold) => {
+    try {
+      const result = await inventoryAPI.updateGlobalThreshold(threshold);
+      // Refresh drinks after threshold change
+      await fetchDrinks();
+      return result;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  // Update threshold for SINGLE drink
+  const updateDrinkThreshold = async (drinkId, threshold) => {
+    try {
+      const updatedDrink = await inventoryAPI.updateDrinkThreshold(drinkId, threshold);
+      setDrinks(prev => prev.map(drink => 
+        drink.id === drinkId ? { ...drink, ...updatedDrink } : drink
+      ));
+      return updatedDrink;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
   return {
     drinks,
     loading,
@@ -79,10 +106,13 @@ export const useInventory = () => {
     createDrink,
     updateDrink,
     toggleAvailability,
-    deleteDrink
+    deleteDrink,
+    updateGlobalThreshold,
+    updateDrinkThreshold
   };
 };
 
+// I DO NOT THINK THIS IS BEING USED ANYMORE
 export const useDrink = (drinkId) => {
   const [drink, setDrink] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -107,10 +137,24 @@ export const useDrink = (drinkId) => {
     fetchDrink();
   }, [fetchDrink]);
 
+  // Update threshold for this drink
+  const updateThreshold = async (threshold) => {
+    if (!drinkId) return;
+    try {
+      const updated = await inventoryAPI.updateDrinkThreshold(drinkId, threshold);
+      setDrink(updated);
+      return updated;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
   return {
     drink,
     loading,
     error,
-    refetch: fetchDrink
+    refetch: fetchDrink,
+    updateThreshold
   };
 };

@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react';
 import { MaterialReactTable } from 'material-react-table';
 import { useInventory } from '../hooks/useInventory';
+import { useAuth } from '../contexts/AuthContext'; // Add auth import
 import '../styles/Pages.css';
 import '../styles/InventoryPage.css';
 import '../styles/Modal.css';
@@ -23,6 +24,7 @@ const InventoryPage = () => {
     clearError
   } = useInventory();
 
+  const { isAuthenticated } = useAuth(); // Get auth state
   const { showSnackbar } = useSnackbar();
 
   const [modalOpen, setModalOpen] = useState(false);
@@ -185,6 +187,7 @@ const InventoryPage = () => {
           </div>
         ),
       },
+      // Always show actions column (availability toggle always available, edit/delete only for authenticated)
       {
         id: 'actions',
         header: 'Actions',
@@ -192,29 +195,36 @@ const InventoryPage = () => {
         enableSorting: false,
         Cell: ({ row }) => (
           <div className="actions-cell">
+            {/* Toggle availability - always available */}
             <button
               className={`action-btn toggle-btn ${row.original.available ? 'make-unavailable' : 'make-available'}`}
               onClick={() => handleToggleAvailability(row.original.id, row.original.available)}
             >
               {row.original.available ? 'Disable' : 'Enable'}
             </button>
-            <button
-              className="action-btn edit-btn"
-              onClick={() => handleEditDrink(row.original)}
-            >
-              Edit
-            </button>
-            <button
-              className="action-btn delete-btn"
-              onClick={() => handleDeleteDrink(row.original.id)}
-            >
-              Delete
-            </button>
+            
+            {/* Edit and Delete - only for authenticated users */}
+            {isAuthenticated && (
+              <>
+                <button
+                  className="action-btn edit-btn"
+                  onClick={() => handleEditDrink(row.original)}
+                >
+                  Edit
+                </button>
+                <button
+                  className="action-btn delete-btn"
+                  onClick={() => handleDeleteDrink(row.original.id)}
+                >
+                  Delete
+                </button>
+              </>
+            )}
           </div>
         ),
       },
     ],
-    []
+    [isAuthenticated] // Add isAuthenticated as dependency
   );
 
   const clearForm = () => {
@@ -236,12 +246,22 @@ const InventoryPage = () => {
   };
 
   const openAddModal = () => {
+    // Check authentication before allowing add
+    if (!isAuthenticated) {
+      showSnackbar('Authentication required to add drinks', 'error');
+      return;
+    }
     clearForm();
     setModalMode('add');
     setModalOpen(true);
   };
 
   const handleEditDrink = (drink) => {
+    // Check authentication before allowing edit
+    if (!isAuthenticated) {
+      showSnackbar('Authentication required to edit drinks', 'error');
+      return;
+    }
     setFormData({ 
       ...drink,
       imagePreview: drink.image // Use existing image as preview
@@ -258,6 +278,13 @@ const InventoryPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Double-check authentication before submitting
+    if (!isAuthenticated) {
+      showSnackbar('Authentication required', 'error');
+      closeModal();
+      return;
+    }
     
     // Validate form
     const errors = validateForm(formData);
@@ -294,10 +321,12 @@ const InventoryPage = () => {
   };
 
   const handleToggleAvailability = async (drinkId, currentAvailability) => {
+    // Remove authentication check - allow all users to toggle availability
     try {
       const drink = drinks.find(d => d.id === drinkId);
       await toggleAvailability(drinkId, !currentAvailability);
       const status = currentAvailability ? 'disabled' : 'enabled';
+      showSnackbar(`"${drink?.name || 'Drink'}" ${status} successfully!`, 'success');
     } catch (err) {
       console.error('Failed to toggle availability:', err);
       showSnackbar(`Failed to toggle availability: ${err.message}`, 'error');
@@ -305,6 +334,12 @@ const InventoryPage = () => {
   };
 
   const handleDeleteDrink = async (drinkId) => {
+    // Check authentication before allowing delete
+    if (!isAuthenticated) {
+      showSnackbar('Authentication required to delete drinks', 'error');
+      return;
+    }
+    
     const drink = drinks.find(d => d.id === drinkId);
     const drinkName = drink ? drink.name : `drink ID ${drinkId}`;
     
@@ -327,25 +362,18 @@ const InventoryPage = () => {
     }
   };
 
-  // Show loading state only for initial load
-  if (loading && drinks.length === 0) {
-    return (
-      <div className="page">
-        <div className="page-container">
-          <div className="loading-state">
-            <h3>Loading inventory...</h3>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="page">
       <div className="page-container">
         <div className="page-header">
           <h1>Inventory Management</h1>
           <p>Track and manage your inventory levels</p>
+          {/* Update auth notice to be more specific */}
+          {!isAuthenticated && (
+            <div className="auth-notice">
+              <strong>Note:</strong> Authentication required for adding, editing, and deleting drinks.
+            </div>
+          )}
         </div>
 
         {/* Error Display */}
@@ -390,12 +418,14 @@ const InventoryPage = () => {
           </div>
         </div>
 
-        {/* Add Button */}
-        <div className="orders-controls">
-          <button className="notify-button" onClick={openAddModal}>
-            Add New Drink
-          </button>
-        </div>
+        {/* Add Button - Only show if authenticated */}
+        {isAuthenticated && (
+          <div className="orders-controls">
+            <button className="notify-button" onClick={openAddModal}>
+              Add New Drink
+            </button>
+          </div>
+        )}
 
         {/* Loading indicator for updates */}
         {loading && drinks.length > 0 && (
@@ -446,8 +476,8 @@ const InventoryPage = () => {
           />
         </div>
 
-        {/* Add/Edit Modal */}
-        {modalOpen && (
+        {/* Add/Edit Modal - Only show if authenticated */}
+        {modalOpen && isAuthenticated && (
           <div className="modal-overlay" onClick={closeModal}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
