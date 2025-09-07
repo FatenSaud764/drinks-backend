@@ -7,8 +7,6 @@ export const AuthProvider = ({ children }) => {
   const [auth, setAuth] = useState({
     isAuthenticated: false,
     user: null,
-    isAdmin: false,
-    isStaff: false,
     loading: true
   });
 
@@ -20,48 +18,19 @@ export const AuthProvider = ({ children }) => {
     try {
       const hasToken = tokenManager.hasAccessToken();
       if (!hasToken) {
-        setAuth({ 
-          isAuthenticated: false, 
-          user: null, 
-          isAdmin: false,
-          isStaff: false,
-          loading: false 
-        });
+        setAuth({ isAuthenticated: false, user: null, loading: false });
         return;
       }
-      
       const profile = await authAPI.getProfile();
-      
-      // All authenticated users must be staff
-      if (profile.is_staff) {
-        setAuth({ 
-          isAuthenticated: true, 
-          user: profile, 
-          isAdmin: profile.is_superuser, // Only superusers can perform CRUD
-          isStaff: true,
-          loading: false 
-        });
+      // Only authenticate if user is admin
+      if (profile.is_staff && profile.is_superuser) {
+        setAuth({ isAuthenticated: true, user: profile, loading: false });
       } else {
-        // Not staff - shouldn't have access to admin panel at all
-        tokenManager.clearTokens();
-        setAuth({ 
-          isAuthenticated: false, 
-          user: null, 
-          isAdmin: false,
-          isStaff: false,
-          loading: false 
-        });
+        setAuth({ isAuthenticated: false, user: null, loading: false });
       }
-    } catch (error) {
-      console.error('Auth check failed:', error);
+    } catch {
       tokenManager.clearTokens();
-      setAuth({ 
-        isAuthenticated: false, 
-        user: null, 
-        isAdmin: false,
-        isStaff: false,
-        loading: false 
-      });
+      setAuth({ isAuthenticated: false, user: null, loading: false });
     }
   };
 
@@ -74,26 +43,14 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     tokenManager.clearTokens();
-    setAuth({ 
-      isAuthenticated: false, 
-      user: null, 
-      isAdmin: false,
-      isStaff: false,
-      loading: false 
-    });
+    setAuth({ isAuthenticated: false, user: null, loading: false });
   };
 
   return (
-    <AuthContext.Provider value={{ ...auth, login, logout, checkAuthStatus }}>
+    <AuthContext.Provider value={{ ...auth, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 };
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
