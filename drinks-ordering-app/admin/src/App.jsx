@@ -16,6 +16,11 @@ import { SnackbarProvider } from './contexts/SnackbarContext';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+import { setupAuthInterceptors } from './api/auth';
+// Initialize auth interceptors when app starts
+setupAuthInterceptors();
+import { AuthProvider } from './contexts/AuthContext';
+
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
@@ -59,6 +64,7 @@ function App() {
   };
 
   return (
+    <AuthProvider>
     <ThemeProvider>
       <SnackbarProvider> {/* Snackbar Notification Provider */}
         <Router>
@@ -97,6 +103,7 @@ function App() {
         </Router>
       </SnackbarProvider>
     </ThemeProvider>
+    </AuthProvider>
   );
 }
 
