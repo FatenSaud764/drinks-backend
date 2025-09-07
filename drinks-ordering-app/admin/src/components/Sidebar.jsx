@@ -92,13 +92,13 @@ const Sidebar = ({ isOpen, isMobile, onClose }) => {
                         : user?.username || user?.email}
                     </span>
                     <span className="user-role">
-                      {user?.is_staff ? 'Admin' : 'User'}
+                      {user?.is_admin ? 'Admin' : 'Staff'}
                     </span>
                   </div>
                 </div>
                 
                 {/* Logout button */}
-                <button 
+                <button
                   className="logout-button"
                   onClick={handleLogout}
                   title="Logout"

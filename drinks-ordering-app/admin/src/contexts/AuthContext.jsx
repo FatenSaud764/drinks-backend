@@ -23,9 +23,9 @@ export const AuthProvider = ({ children }) => {
       }
       const profile = await authAPI.getProfile();
       // Only authenticate if user is admin
-      if (profile.is_staff && profile.is_superuser) {
+      if (profile.is_admin) {
         setAuth({ isAuthenticated: true, user: profile, loading: false });
-      } else {
+      } else { // If something else (eg. staff) - keeping this for incase I want to make staff also login with global username
         setAuth({ isAuthenticated: false, user: null, loading: false });
       }
     } catch {
