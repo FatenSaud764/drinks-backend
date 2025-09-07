@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+// Routes
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+// Protected Routes
+import ProtectedRoute from './components/ProtectedRoute';
 // Main dashboard components
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
@@ -7,6 +10,7 @@ import Sidebar from './components/Sidebar';
 import OrdersPage from './pages/OrdersPage';
 import HistoryPage from './pages/HistoryPage';
 import InventoryPage from './pages/InventoryPage';
+import UserManagement from "./pages/UserManagement";
 // Styles
 import './styles/Global.css';
 // Contexts
@@ -15,11 +19,12 @@ import { SnackbarProvider } from './contexts/SnackbarContext';
 // Toastify for Toast Alerts (client-side only)
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-
+// Authentication
 import { setupAuthInterceptors } from './api/auth';
+import { AuthProvider } from './contexts/AuthContext';
+
 // Initialize auth interceptors when app starts
 setupAuthInterceptors();
-import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
@@ -93,10 +98,20 @@ function App() {
               <ToastContainer position="top-right" autoClose={5000} />
 
               <Routes>
-                <Route path="/" element={<OrdersPage />} />
                 <Route path="/orders" element={<OrdersPage />} />
                 <Route path="/history" element={<HistoryPage />} />
                 <Route path="/inventory" element={<InventoryPage />} />
+                <Route
+                  path="/user-management"
+                  element={
+                    <ProtectedRoute>
+                      <UserManagement />
+                    </ProtectedRoute>
+                  }
+                />
+
+                {/* Catch all routes not found */}
+                <Route path="*" element={<Navigate to="/orders" replace />} />
               </Routes>
             </div>
           </div>

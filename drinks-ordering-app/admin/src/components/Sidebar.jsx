@@ -12,16 +12,29 @@ import InventoryIcon from '@mui/icons-material/Inventory2Outlined';
 import LoginIcon from '@mui/icons-material/LoginOutlined';
 import LogoutIcon from '@mui/icons-material/LogoutOutlined';
 import PersonIcon from '@mui/icons-material/PersonOutlined';
+import ManageAccountsIcon from '@mui/icons-material/ManageAccountsOutlined';
 
 const Sidebar = ({ isOpen, isMobile, onClose }) => {
   const location = useLocation();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { user, isAuthenticated, login, logout, loading } = useAuth();
 
-  const navigationItems = [
+  // Base navigation items available to all users
+  const baseNavigationItems = [
     { to: '/orders', icon: <GlassIcon/>, label: 'Orders' },
     { to: '/history', icon: <HistoryIcon/>, label: 'History' },
     { to: '/inventory', icon: <InventoryIcon/>, label: 'Inventory' },
+  ];
+
+  // Admin-only navigation items
+  const adminNavigationItems = [
+    { to: '/user-management', icon: <ManageAccountsIcon/>, label: 'User Management' },
+  ];
+
+  // Combine navigation items based on authentication and admin status
+  const navigationItems = [
+    ...baseNavigationItems,
+    ...(isAuthenticated && user?.is_admin ? adminNavigationItems : [])
   ];
 
   const isActiveRoute = (path) => {
