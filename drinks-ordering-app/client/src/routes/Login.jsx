@@ -35,9 +35,6 @@ const Login = () => {
     const {access, refresh} = await request.data;
     setAccessToken(access);
     setRefreshToken(refresh);
-    console.log('access', accessToken);
-    console.log('refresh', refreshToken)
-    console.log('This is working!!!');
     if(accessToken && refreshToken && accessToken != 'null' && refreshToken != 'null') {
       navigate('/products');
     }

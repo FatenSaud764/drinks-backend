@@ -2,6 +2,7 @@ import React, { useContext, useRef, useState } from 'react'
 import './SignUp.css'
 import { LightDark, SignUpModal } from '../contexts/contexts'
 import AxiosInstance from './Axios'
+import CloseIcon from '@mui/icons-material/Close';
 
 const SignUp = () => {
 
@@ -13,7 +14,7 @@ const SignUp = () => {
 
   return (
     <div className='signupwrapper' id={theme}>
-        <button className='closesignup' onClick={() => {setSignUpModal(false)}}>x</button>
+        <button className='closesignup' onClick={() => {setSignUpModal(false)}}><CloseIcon /></button>
         <form className='signupform' onSubmit={() => {
           if(user.current && mail.current && pass.current) {
             try{
@@ -25,7 +26,7 @@ const SignUp = () => {
             }
           }
           setSignUpModal(false); }}>
-           <h2>Sign Up</h2> 
+           <h2>Create an account</h2> 
            <div className='inputrow'>
             <label for='username'>Username</label>
             <input type='text' name='username' className='usernamebox' ref = {user} required></input>
