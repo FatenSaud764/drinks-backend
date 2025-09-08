@@ -60,7 +60,7 @@ export const authAPI = {
       return {
         isAuthenticated: true,
         user: profile,
-        isAdmin: profile.is_staff,
+        isAdmin: profile.role === 'admin',
         isStaff: profile.role === 'staff',
         isCustomer: profile.role === 'customer'
       };
@@ -145,7 +145,7 @@ export const setupAuthInterceptors = () => {
         } catch (refreshError) {
           // Refresh failed, clear tokens and redirect to login if needed
           tokenManager.clearTokens();
-          // You might want to emit an event here for your app to handle
+          // Might want to emit an event here for app to handle
           window.dispatchEvent(new CustomEvent('auth:tokenExpired'));
         }
       }
@@ -154,3 +154,4 @@ export const setupAuthInterceptors = () => {
     }
   );
 };
+
