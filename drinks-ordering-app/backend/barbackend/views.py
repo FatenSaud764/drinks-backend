@@ -7,6 +7,11 @@ from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
 from django.db.models import F, Case, When, Value, BooleanField
+from rest_framework.exceptions import PermissionDenied
+
+def _require_platform_admin(user):
+    if not getattr(user, 'is_authenticated', False) or not getattr(user, 'is_admin', False):
+        raise PermissionDenied("Admin privileges required.")
 
 
 class DrinkViewset(viewsets.ViewSet):
@@ -197,7 +202,6 @@ class OrderViewset(viewsets.ViewSet):
         queryset = self.get_queryset(request)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
-
     def retrieve(self, request, pk=None):
         """
         GET /api/orders/{id}/
@@ -310,7 +314,6 @@ class OrderViewset(viewsets.ViewSet):
             return Response({"detail": "Only pending orders can be cancelled"}, status=status.HTTP_400_BAD_REQUEST)
         order.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 
 class CartViewset(viewsets.GenericViewSet):
@@ -460,3 +463,20 @@ class AuthViewset(viewsets.ViewSet):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class StaffUserViewset(viewsets.ViewSet):
+        """Admin-only staff management (list for now).
+
+        Routes:
+        - GET /api/staff-users/ : list all users where is_staff=True (includes admins since is_admin implies is_staff).
+            Access: request.user.is_admin must be True.
+        """
+
+        serializer_class = UserSerializer
+        permission_classes = [permissions.IsAuthenticated]
+
+        def list(self, request):
+                _require_platform_admin(request.user)
+                qs = User.objects.filter(is_staff=True).order_by('id')
+                data = self.serializer_class(qs, many=True).data
+                return Response(data)
