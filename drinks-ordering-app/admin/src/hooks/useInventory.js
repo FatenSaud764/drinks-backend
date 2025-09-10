@@ -71,10 +71,10 @@ export const useInventory = () => {
     }
   };
 
-  // Update threshold for ALL drinks
-  const updateGlobalThreshold = async (threshold) => {
+  // Update low stock threshold for ALL drinks
+  const updateGlobalLowStockThreshold = async (threshold) => {
     try {
-      const result = await inventoryAPI.updateGlobalThreshold(threshold);
+      const result = await inventoryAPI.updateGlobalLowStockLevel(threshold);
       // Refresh drinks after threshold change
       await fetchDrinks();
       return result;
@@ -84,10 +84,37 @@ export const useInventory = () => {
     }
   };
 
-  // Update threshold for SINGLE drink
-  const updateDrinkThreshold = async (drinkId, threshold) => {
+  // Update unavailable threshold for ALL drinks
+  const updateGlobalUnavailableThreshold = async (threshold) => {
     try {
-      const updatedDrink = await inventoryAPI.updateDrinkThreshold(drinkId, threshold);
+      const result = await inventoryAPI.updateGlobalUnavailableLevel(threshold);
+      // Refresh drinks after threshold change
+      await fetchDrinks();
+      return result;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  // Update low stock threshold for SINGLE drink
+  const updateDrinkLowStockThreshold = async (drinkId, threshold) => {
+    try {
+      const updatedDrink = await inventoryAPI.updateDrinkLowStockLevel(drinkId, threshold);
+      setDrinks(prev => prev.map(drink => 
+        drink.id === drinkId ? { ...drink, ...updatedDrink } : drink
+      ));
+      return updatedDrink;
+    } catch (err) {
+      setError(err.message);
+      throw err;
+    }
+  };
+
+  // Update unavailable threshold for SINGLE drink
+  const updateDrinkUnavailableThreshold = async (drinkId, threshold) => {
+    try {
+      const updatedDrink = await inventoryAPI.updateDrinkUnavailableLevel(drinkId, threshold);
       setDrinks(prev => prev.map(drink => 
         drink.id === drinkId ? { ...drink, ...updatedDrink } : drink
       ));
@@ -107,54 +134,70 @@ export const useInventory = () => {
     updateDrink,
     toggleAvailability,
     deleteDrink,
-    updateGlobalThreshold,
-    updateDrinkThreshold
+    updateGlobalLowStockThreshold,
+    updateGlobalUnavailableThreshold,
+    updateDrinkLowStockThreshold,
+    updateDrinkUnavailableThreshold
   };
 };
 
 // I DO NOT THINK THIS IS BEING USED ANYMORE
-export const useDrink = (drinkId) => {
-  const [drink, setDrink] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+// export const useDrink = (drinkId) => {
+//   const [drink, setDrink] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState(null);
 
-  const fetchDrink = useCallback(async () => {
-    if (!drinkId) return;
+//   const fetchDrink = useCallback(async () => {
+//     if (!drinkId) return;
     
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await inventoryAPI.fetchDrink(drinkId);
-      setDrink(data);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  }, [drinkId]);
+//     setLoading(true);
+//     setError(null);
+//     try {
+//       const data = await inventoryAPI.fetchDrink(drinkId);
+//       setDrink(data);
+//     } catch (err) {
+//       setError(err.message);
+//     } finally {
+//       setLoading(false);
+//     }
+//   }, [drinkId]);
 
-  useEffect(() => {
-    fetchDrink();
-  }, [fetchDrink]);
+//   useEffect(() => {
+//     fetchDrink();
+//   }, [fetchDrink]);
 
-  // Update threshold for this drink
-  const updateThreshold = async (threshold) => {
-    if (!drinkId) return;
-    try {
-      const updated = await inventoryAPI.updateDrinkThreshold(drinkId, threshold);
-      setDrink(updated);
-      return updated;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  };
+//   // Update low stock threshold for this drink
+//   const updateLowStockThreshold = async (threshold) => {
+//     if (!drinkId) return;
+//     try {
+//       const updated = await inventoryAPI.updateDrinkLowStockLevel(drinkId, threshold);
+//       setDrink(prev => ({ ...prev, ...updated }));
+//       return updated;
+//     } catch (err) {
+//       setError(err.message);
+//       throw err;
+//     }
+//   };
 
-  return {
-    drink,
-    loading,
-    error,
-    refetch: fetchDrink,
-    updateThreshold
-  };
-};
+//   // Update unavailable threshold for this drink
+//   const updateUnavailableThreshold = async (threshold) => {
+//     if (!drinkId) return;
+//     try {
+//       const updated = await inventoryAPI.updateDrinkUnavailableLevel(drinkId, threshold);
+//       setDrink(prev => ({ ...prev, ...updated }));
+//       return updated;
+//     } catch (err) {
+//       setError(err.message);
+//       throw err;
+//     }
+//   };
+
+//   return {
+//     drink,
+//     loading,
+//     error,
+//     refetch: fetchDrink,
+//     updateLowStockThreshold,
+//     updateUnavailableThreshold
+//   };
+// };
