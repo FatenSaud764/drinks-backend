@@ -125,6 +125,51 @@ class DrinkViewset(viewsets.ViewSet):
         )
         return Response({"updated": updated})
 
+    # --- New low stock (warning) threshold endpoints ---
+    @action(detail=True, methods=["patch"], url_path="low-stock-threshold", permission_classes=[permissions.IsAdminUser])
+    def update_low_stock_threshold(self, request, pk=None):
+        """PATCH /api/drink/{id}/low-stock-threshold/
+
+        Admin-only: Update low_stock_threshold (warning threshold) for a single drink.
+        This does NOT change availability directly. It is reserved for future notification logic.
+        Body: { "low_stock_threshold": <int> }
+        Returns: Updated drink representation.
+        """
+        drink = get_object_or_404(Drink, pk=pk)
+        try:
+            value = int(request.data.get("low_stock_threshold"))
+        except (TypeError, ValueError):
+            return Response({"detail": "low_stock_threshold must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+        if value < 0:
+            return Response({"detail": "low_stock_threshold must be >= 0."}, status=status.HTTP_400_BAD_REQUEST)
+        # (Optional) enforce that warning threshold is >= unavailability threshold to avoid confusion
+        if value < drink.unavailable_threshold:
+            return Response({"detail": "low_stock_threshold should be >= unavailable_threshold (current: %d)." % drink.unavailable_threshold}, status=status.HTTP_400_BAD_REQUEST)
+        drink.low_stock_threshold = value
+        drink.save(update_fields=["low_stock_threshold"])
+        return Response(self.serializer_class(drink).data)
+
+    @action(detail=False, methods=["patch"], url_path="low-stock-threshold", permission_classes=[permissions.IsAdminUser])
+    def update_all_low_stock_thresholds(self, request):
+        """PATCH /api/drink/low-stock-threshold/
+
+        Admin-only: Bulk update low_stock_threshold (warning threshold) for all drinks.
+        Body: { "low_stock_threshold": <int> }
+        Returns: { updated: <count> }
+        """
+        try:
+            value = int(request.data.get("low_stock_threshold"))
+        except (TypeError, ValueError):
+            return Response({"detail": "low_stock_threshold must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+        if value < 0:
+            return Response({"detail": "low_stock_threshold must be >= 0."}, status=status.HTTP_400_BAD_REQUEST)
+        # Ensure we do not set a warning threshold below any current unavailable_threshold to keep semantic ordering
+        min_unavailable = Drink.objects.all().aggregate(mn=models.Min('unavailable_threshold'))['mn'] or 0
+        if value < min_unavailable:
+            return Response({"detail": f"low_stock_threshold must be >= minimum unavailable_threshold ({min_unavailable})."}, status=status.HTTP_400_BAD_REQUEST)
+        updated = Drink.objects.all().update(low_stock_threshold=value)
+        return Response({"updated": updated})
+
 
 class OrderViewset(viewsets.ViewSet):
     """Order endpoints for customers and staff.
