@@ -321,15 +321,15 @@ class DrinkThresholdAPITest(MediaRootTestCase):
         d2 = Drink.objects.create(name='D2', description='', image=dummy_image('d2.png'), price=Decimal('3.00'), available=True, stock=7)
         d3 = Drink.objects.create(name='D3', description='', image=dummy_image('d3.png'), price=Decimal('4.00'), available=True, stock=10)
 
-        # 1) Update single drink threshold to 8 -> d1.stock(3) < 8 so available False
-        r = self.client.patch(f'/api/drink/{d1.id}/threshold/', {'low_stock_threshold': 8}, format='json')
+        # 1) Update single drink unavailable threshold to 8 -> d1.stock(3) < 8 so available False
+        r = self.client.patch(f'/api/drink/{d1.id}/threshold/', {'unavailable_threshold': 8}, format='json')
         self.assertEqual(r.status_code, 200, r.content)
         d1.refresh_from_db()
-        self.assertEqual(d1.low_stock_threshold, 8)
+        self.assertEqual(d1.unavailable_threshold, 8)
         self.assertFalse(d1.available)
 
-        # 2) Bulk update thresholds to 5 -> availability recomputed for all
-        r = self.client.patch('/api/drink/threshold/', {'low_stock_threshold': 5}, format='json')
+        # 2) Bulk update unavailable thresholds to 5 -> availability recomputed for all
+        r = self.client.patch('/api/drink/threshold/', {'unavailable_threshold': 5}, format='json')
         self.assertEqual(r.status_code, 200, r.content)
         # Validate availability: d1.stock=3 < 5 False, d2.stock=7 >=5 True, d3.stock=10 >=5 True
         d1.refresh_from_db(); d2.refresh_from_db(); d3.refresh_from_db()
@@ -341,9 +341,9 @@ class DrinkThresholdAPITest(MediaRootTestCase):
         user = User.objects.create_user(username='user1', email='user1@example.com', password='pw', role='customer')
         self.client.force_authenticate(user=user)
         d = Drink.objects.create(name='D1', description='', image=dummy_image('d1.png'), price=Decimal('2.00'), available=True, stock=3)
-        r = self.client.patch(f'/api/drink/{d.id}/threshold/', {'low_stock_threshold': 9}, format='json')
+        r = self.client.patch(f'/api/drink/{d.id}/threshold/', {'unavailable_threshold': 9}, format='json')
         self.assertEqual(r.status_code, 403)
-        r = self.client.patch('/api/drink/threshold/', {'low_stock_threshold': 9}, format='json')
+        r = self.client.patch('/api/drink/threshold/', {'unavailable_threshold': 9}, format='json')
         self.assertEqual(r.status_code, 403)
 
 

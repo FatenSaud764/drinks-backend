@@ -82,17 +82,18 @@ class DrinkViewset(viewsets.ViewSet):
     def update_threshold(self, request, pk=None):
         """PATCH /api/drink/{id}/threshold/
 
-        Admin-only: Update low_stock_threshold for a single drink and recompute availability.
-        Body: { "low_stock_threshold": <int>=5 }
+        Admin-only: Update unavailable_threshold for a single drink and recompute availability.
+        Body: { "unavailable_threshold": <int>=5 }
+        Note: low_stock_threshold (warning threshold) is unused currently and not set here.
         """
         drink = get_object_or_404(Drink, pk=pk)
         try:
-            value = int(request.data.get("low_stock_threshold"))
+            value = int(request.data.get("unavailable_threshold"))
         except (TypeError, ValueError):
-            return Response({"detail": "low_stock_threshold must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "unavailable_threshold must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
         if value < 0:
-            return Response({"detail": "low_stock_threshold must be >= 0."}, status=status.HTTP_400_BAD_REQUEST)
-        drink.low_stock_threshold = value
+            return Response({"detail": "unavailable_threshold must be >= 0."}, status=status.HTTP_400_BAD_REQUEST)
+        drink.unavailable_threshold = value
         # Recompute availability via model logic
         drink.save()
         return Response(self.serializer_class(drink).data)
@@ -101,23 +102,23 @@ class DrinkViewset(viewsets.ViewSet):
     def update_all_thresholds(self, request):
         """PATCH /api/drink/threshold/
 
-        Admin-only: Set low_stock_threshold for all drinks and recompute availability in a single DB update.
-        Body: { "low_stock_threshold": <int> }
+        Admin-only: Set unavailable_threshold for all drinks and recompute availability in a single DB update.
+        Body: { "unavailable_threshold": <int> }
         Returns: { updated: <count> }
         """
         try:
-            value = int(request.data.get("low_stock_threshold"))
+            value = int(request.data.get("unavailable_threshold"))
         except (TypeError, ValueError):
-            return Response({"detail": "low_stock_threshold must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "unavailable_threshold must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
         if value < 0:
-            return Response({"detail": "low_stock_threshold must be >= 0."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"detail": "unavailable_threshold must be >= 0."}, status=status.HTTP_400_BAD_REQUEST)
 
         # First set the threshold for all drinks
-        Drink.objects.all().update(low_stock_threshold=value)
+        Drink.objects.all().update(unavailable_threshold=value)
         # Then recompute availability based on stock vs new threshold in bulk
         updated = Drink.objects.all().update(
             available=Case(
-                When(stock__lt=F('low_stock_threshold'), then=Value(False)),
+                When(stock__lt=F('unavailable_threshold'), then=Value(False)),
                 default=Value(True),
                 output_field=BooleanField(),
             )
