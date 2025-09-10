@@ -125,6 +125,11 @@ export const useInventory = () => {
     }
   };
 
+  // Clear error function
+  const clearError = () => {
+    setError(null);
+  };
+
   return {
     drinks,
     loading,
@@ -137,7 +142,8 @@ export const useInventory = () => {
     updateGlobalLowStockThreshold,
     updateGlobalUnavailableThreshold,
     updateDrinkLowStockThreshold,
-    updateDrinkUnavailableThreshold
+    updateDrinkUnavailableThreshold,
+    clearError
   };
 };
 
