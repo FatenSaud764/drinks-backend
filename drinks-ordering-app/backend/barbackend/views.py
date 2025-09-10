@@ -469,8 +469,10 @@ class StaffUserViewset(viewsets.ViewSet):
     """Admin-only staff management.
 
     Routes:
-    - GET /api/staff-users/ : list all users where role='staff' OR is_admin=True.
-    - PATCH /api/staff-users/{id}/role/ : update a user's privilege level (staff <-> admin).
+    - GET /api/management/ : list all users where role='staff' OR is_admin=True.
+    - POST /api/management/ : (legacy) create a new staff-level (non-admin) user.
+    - POST /api/management/register/ : preferred endpoint to create a new staff-level (non-admin) user.
+    - PATCH /api/management/{id}/role/ : update a user's privilege level (staff <-> admin) using body {"level": "staff"|"admin"}.
       Access: request.user.is_admin must be True for all actions.
     """
 
@@ -478,23 +480,53 @@ class StaffUserViewset(viewsets.ViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
+        """GET /api/management/
+        
+        List staff and admin users.
+
+        Returns all users whose domain role is 'staff' or who have admin flag.
+        Requires: authenticated admin (request.user.is_admin True).
+        Response: 200 JSON array of user objects.
+        """
         _require_platform_admin(request.user)
         qs = User.objects.filter(Q(role='staff') | Q(is_admin=True)).order_by('id').distinct()
         data = self.serializer_class(qs, many=True).data
         return Response(data)
 
+    @action(detail=False, methods=['post'], url_path='register')
+    def register(self, request):
+        """POST /api/management/register/
+
+        Create a new staff-level (non-admin) user.
+        Body: { username, email, password }
+        Behavior:
+        - Forces domain role to 'staff'
+        - Ensures is_staff=True
+        - Leaves is_admin=False
+        Returns 201 with created user JSON on success.
+        """
+        _require_platform_admin(request.user)
+        payload = request.data.copy()
+        payload['role'] = 'staff'
+        serializer = self.serializer_class(data=payload, context={'request': request})
+        if serializer.is_valid():
+            user = serializer.save()
+            if not user.is_staff:
+                user.is_staff = True
+                user.save(update_fields=['is_staff'])
+            return Response(self.serializer_class(user).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def create(self, request):  # legacy path support
+        return self.register(request)
+
     @action(detail=True, methods=['patch'], url_path='role')
     def update_role(self, request, pk=None):
-        """PATCH /api/staff-users/{id}/role/
+        """PATCH /api/management/{id}/role/
 
-        Admin-only: Adjust a user's privilege level (NOT their domain role field) between staff and admin.
+        Admin-only: Adjust a user's privilege level between staff and admin.
         Body: { "level": "staff" | "admin" }
-        Behavior:
-        - level=admin => sets is_admin=True (which implies is_staff) and ensures user.role='staff'.
-        - level=staff => sets is_admin=False, leaves user as staff-level (role='staff', may keep is_staff=True).
-        Domain role switching to customer is out of scope for this endpoint.
-        Safeguards:
-        - Prevent self-demotion if this would remove last admin (simplified: disallow self downgrade to staff).
+        Safeguards: disallow an admin removing their own admin flag.
         """
         _require_platform_admin(request.user)
         target = get_object_or_404(User, pk=pk)
@@ -503,15 +535,13 @@ class StaffUserViewset(viewsets.ViewSet):
             return Response({'detail': 'Invalid level.'}, status=status.HTTP_400_BAD_REQUEST)
         if target.id == request.user.id and target.is_admin and level == 'staff':
             return Response({'detail': 'Cannot remove your own admin privileges.'}, status=status.HTTP_400_BAD_REQUEST)
-        # Always ensure domain role is 'staff' for managed users here
         if target.role != 'staff':
             target.role = 'staff'
         if level == 'admin':
             target.is_admin = True
             target.is_staff = True
-        else:  # staff level
+        else:
             target.is_admin = False
-            # keep is_staff True (do not forcibly drop staff flag)
             if not target.is_staff:
                 target.is_staff = True
         target.save(update_fields=['role', 'is_staff', 'is_admin'])
