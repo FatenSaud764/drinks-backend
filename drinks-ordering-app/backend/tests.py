@@ -346,6 +346,41 @@ class DrinkThresholdAPITest(MediaRootTestCase):
         r = self.client.patch('/api/drink/threshold/', {'unavailable_threshold': 9}, format='json')
         self.assertEqual(r.status_code, 403)
 
+    def test_admin_can_update_low_stock_thresholds(self):
+        admin = User.objects.create_user(username='admin2', email='admin2@example.com', password='pw', role='staff')
+        admin.is_staff = True
+        admin.save()
+        self.client.force_authenticate(user=admin)
+        d1 = Drink.objects.create(name='Warn1', description='', image=dummy_image('w1.png'), price=Decimal('2.00'), available=True, stock=12)
+        d2 = Drink.objects.create(name='Warn2', description='', image=dummy_image('w2.png'), price=Decimal('3.00'), available=True, stock=20)
+        # Single update
+        r = self.client.patch(f'/api/drink/{d1.id}/low-stock-threshold/', {'low_stock_threshold': 15}, format='json')
+        self.assertEqual(r.status_code, 200, r.content)
+        d1.refresh_from_db()
+        self.assertEqual(d1.low_stock_threshold, 15)
+        # Bulk update
+        r = self.client.patch('/api/drink/low-stock-threshold/', {'low_stock_threshold': 25}, format='json')
+        self.assertEqual(r.status_code, 200, r.content)
+        d1.refresh_from_db(); d2.refresh_from_db()
+        self.assertEqual(d1.low_stock_threshold, 25)
+        self.assertEqual(d2.low_stock_threshold, 25)
+
+    def test_low_stock_threshold_validation(self):
+        admin = User.objects.create_user(username='admin3', email='admin3@example.com', password='pw', role='staff')
+        admin.is_staff = True
+        admin.save()
+        self.client.force_authenticate(user=admin)
+        d = Drink.objects.create(name='WarnX', description='', image=dummy_image('wx.png'), price=Decimal('2.00'), available=True, stock=5)
+        # negative
+        r = self.client.patch(f'/api/drink/{d.id}/low-stock-threshold/', {'low_stock_threshold': -1}, format='json')
+        self.assertEqual(r.status_code, 400)
+        # below unavailable_threshold (default 5)
+        r = self.client.patch(f'/api/drink/{d.id}/low-stock-threshold/', {'low_stock_threshold': 3}, format='json')
+        self.assertEqual(r.status_code, 400)
+        # bulk below min unavailable
+        r = self.client.patch('/api/drink/low-stock-threshold/', {'low_stock_threshold': 2}, format='json')
+        self.assertEqual(r.status_code, 400)
+
 
 class AuthFlowTest(MediaRootTestCase):
     def setUp(self):
