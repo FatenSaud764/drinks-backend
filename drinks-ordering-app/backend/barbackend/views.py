@@ -6,7 +6,8 @@ from rest_framework.decorators import action
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from datetime import timedelta
-from django.db.models import F, Case, When, Value, BooleanField
+from django.db import models
+from django.db.models import F, Case, When, Value, BooleanField, Q
 from rest_framework.exceptions import PermissionDenied
 
 def _require_platform_admin(user):
@@ -468,8 +469,8 @@ class StaffUserViewset(viewsets.ViewSet):
     """Admin-only staff management.
 
     Routes:
-    - GET /api/staff-users/ : list all users where is_staff=True.
-    - PATCH /api/staff-users/{id}/role/ : update a user's role (customer<->staff) and adjust flags.
+    - GET /api/staff-users/ : list all users where role='staff' OR is_admin=True.
+    - PATCH /api/staff-users/{id}/role/ : update a user's privilege level (staff <-> admin).
       Access: request.user.is_admin must be True for all actions.
     """
 
@@ -478,7 +479,7 @@ class StaffUserViewset(viewsets.ViewSet):
 
     def list(self, request):
         _require_platform_admin(request.user)
-        qs = User.objects.filter(is_staff=True).order_by('id')
+        qs = User.objects.filter(Q(role='staff') | Q(is_admin=True)).order_by('id').distinct()
         data = self.serializer_class(qs, many=True).data
         return Response(data)
 
@@ -486,30 +487,32 @@ class StaffUserViewset(viewsets.ViewSet):
     def update_role(self, request, pk=None):
         """PATCH /api/staff-users/{id}/role/
 
-        Admin-only: Update the domain role of a user. Body: { "role": "staff" | "customer" }
+        Admin-only: Adjust a user's privilege level (NOT their domain role field) between staff and admin.
+        Body: { "level": "staff" | "admin" }
         Behavior:
-        - Setting role=staff => user.role='staff', user.is_staff=True (does NOT set is_admin).
-        - Setting role=customer => user.role='customer', user.is_staff=False and is_admin=False.
+        - level=admin => sets is_admin=True (which implies is_staff) and ensures user.role='staff'.
+        - level=staff => sets is_admin=False, leaves user as staff-level (role='staff', may keep is_staff=True).
+        Domain role switching to customer is out of scope for this endpoint.
         Safeguards:
-        - Cannot demote yourself from admin (prevents accidental lockout).
-        - Reject invalid roles.
-        Returns updated user representation.
+        - Prevent self-demotion if this would remove last admin (simplified: disallow self downgrade to staff).
         """
         _require_platform_admin(request.user)
         target = get_object_or_404(User, pk=pk)
-        new_role = request.data.get('role')
-        if new_role not in ['customer', 'staff']:
-            return Response({'detail': 'Invalid role.'}, status=status.HTTP_400_BAD_REQUEST)
-        # Prevent self lockout by demoting own admin if only admin (simple rule: block self role change if is_admin)
-        if target.id == request.user.id and target.is_admin and new_role != 'staff':
+        level = request.data.get('level')
+        if level not in ['staff', 'admin']:
+            return Response({'detail': 'Invalid level.'}, status=status.HTTP_400_BAD_REQUEST)
+        if target.id == request.user.id and target.is_admin and level == 'staff':
             return Response({'detail': 'Cannot remove your own admin privileges.'}, status=status.HTTP_400_BAD_REQUEST)
-        if new_role == 'staff':
+        # Always ensure domain role is 'staff' for managed users here
+        if target.role != 'staff':
             target.role = 'staff'
+        if level == 'admin':
+            target.is_admin = True
+            target.is_staff = True
+        else:  # staff level
+            target.is_admin = False
+            # keep is_staff True (do not forcibly drop staff flag)
             if not target.is_staff:
                 target.is_staff = True
-        else:  # customer
-            target.role = 'customer'
-            target.is_staff = False
-            target.is_admin = False
         target.save(update_fields=['role', 'is_staff', 'is_admin'])
         return Response(self.serializer_class(target).data)
