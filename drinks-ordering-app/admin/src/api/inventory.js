@@ -35,6 +35,7 @@ export const inventoryAPI = {
       formData.append('category', drinkData.category);
       formData.append('available', drinkData.available.toString());
       formData.append('stock', drinkData.stock.toString());
+      formData.append('unavailable_threshold', drinkData.unavailable_threshold.toString());
       formData.append('low_stock_threshold', drinkData.low_stock_threshold.toString());
 
       // Only append image if it exists and is a File object
@@ -61,6 +62,7 @@ export const inventoryAPI = {
       formData.append('category', drinkData.category);
       formData.append('available', drinkData.available.toString());
       formData.append('stock', drinkData.stock.toString());
+      formData.append('unavailable_threshold', drinkData.unavailable_threshold.toString());
       formData.append('low_stock_threshold', drinkData.low_stock_threshold.toString());
 
       // Only append image if it exists and is a File object
@@ -98,23 +100,47 @@ export const inventoryAPI = {
     }
   },
 
-  // Update threshold for ALL drinks
-  updateGlobalThreshold: async (threshold) => {
+  // Update low stock threshold for ALL drinks
+  updateGlobalLowStockLevel: async (threshold) => {
     try {
-      const response = await api.patch("/api/drink/threshold/", {
+      const response = await api.patch("/api/drink/low-stock-threshold/", {
         low_stock_threshold: threshold
       });
       return response.data;
     } catch (error) {
-      throw new Error(error.response?.data?.message || "Failed to update global threshold");
+      throw new Error(error.response?.data?.message || "Failed to update global low-stock threshold");
     }
   },
 
-  // Update threshold for a SINGLE drink
-  updateDrinkThreshold: async (drinkId, threshold) => {
+  // Update unavailable threshold for ALL drinks
+  updateGlobalUnavailableLevel: async (threshold) => {
+    try {
+      const response = await api.patch("/api/drink/threshold/", {
+        unavailable_threshold: threshold
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Failed to update global unavailable threshold");
+    }
+  },
+
+  // Update low stock threshold for specific drink
+  updateDrinkLowStockLevel: async (drinkId, threshold) => {
     try {
       const response = await api.patch(`/api/drink/${drinkId}/threshold/`, {
         low_stock_threshold: threshold
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Failed to update drink threshold");
+    }
+  },
+
+  // Update unavailable threshold for specific drink
+  updateDrinkUnavailableLevel: async (drinkId, threshold) => {
+    try {
+      const response = await api.patch(`/api/drink/${drinkId}/threshold/`, {
+        unavailable_threshold: threshold
       });
       return response.data;
     } catch (error) {
