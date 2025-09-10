@@ -465,18 +465,51 @@ class AuthViewset(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class StaffUserViewset(viewsets.ViewSet):
-        """Admin-only staff management (list for now).
+    """Admin-only staff management.
 
-        Routes:
-        - GET /api/staff-users/ : list all users where is_staff=True (includes admins since is_admin implies is_staff).
-            Access: request.user.is_admin must be True.
+    Routes:
+    - GET /api/staff-users/ : list all users where is_staff=True.
+    - PATCH /api/staff-users/{id}/role/ : update a user's role (customer<->staff) and adjust flags.
+      Access: request.user.is_admin must be True for all actions.
+    """
+
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request):
+        _require_platform_admin(request.user)
+        qs = User.objects.filter(is_staff=True).order_by('id')
+        data = self.serializer_class(qs, many=True).data
+        return Response(data)
+
+    @action(detail=True, methods=['patch'], url_path='role')
+    def update_role(self, request, pk=None):
+        """PATCH /api/staff-users/{id}/role/
+
+        Admin-only: Update the domain role of a user. Body: { "role": "staff" | "customer" }
+        Behavior:
+        - Setting role=staff => user.role='staff', user.is_staff=True (does NOT set is_admin).
+        - Setting role=customer => user.role='customer', user.is_staff=False and is_admin=False.
+        Safeguards:
+        - Cannot demote yourself from admin (prevents accidental lockout).
+        - Reject invalid roles.
+        Returns updated user representation.
         """
-
-        serializer_class = UserSerializer
-        permission_classes = [permissions.IsAuthenticated]
-
-        def list(self, request):
-                _require_platform_admin(request.user)
-                qs = User.objects.filter(is_staff=True).order_by('id')
-                data = self.serializer_class(qs, many=True).data
-                return Response(data)
+        _require_platform_admin(request.user)
+        target = get_object_or_404(User, pk=pk)
+        new_role = request.data.get('role')
+        if new_role not in ['customer', 'staff']:
+            return Response({'detail': 'Invalid role.'}, status=status.HTTP_400_BAD_REQUEST)
+        # Prevent self lockout by demoting own admin if only admin (simple rule: block self role change if is_admin)
+        if target.id == request.user.id and target.is_admin and new_role != 'staff':
+            return Response({'detail': 'Cannot remove your own admin privileges.'}, status=status.HTTP_400_BAD_REQUEST)
+        if new_role == 'staff':
+            target.role = 'staff'
+            if not target.is_staff:
+                target.is_staff = True
+        else:  # customer
+            target.role = 'customer'
+            target.is_staff = False
+            target.is_admin = False
+        target.save(update_fields=['role', 'is_staff', 'is_admin'])
+        return Response(self.serializer_class(target).data)
