@@ -1,85 +1,99 @@
 import React, { useContext, useEffect } from 'react'
 import NavBar from '../components/NavBar'
-import { LightDark, ProductList } from '../contexts/contexts'
+import { AccessTokens, LightDark, ProductList, UserCart } from '../contexts/contexts'
 import './Cart.css'
 import { useState } from 'react'
+import AxiosInstance from '../components/Axios'
 
 const Cart = () => {
-  const {theme, setTheme} = useContext(LightDark)
-  const {products, setProducts} = useContext(ProductList)
+  const { theme, setTheme } = useContext(LightDark)
+  const { products, setProducts } = useContext(ProductList)
+  const { accessToken, refreshToken } = useContext(AccessTokens);
+  const { cart, setCart } = useContext(UserCart);
+  console.log('cart', cart);
+  const [cartItems, setCartItems] = useState([]);
 
-  const [cartItems, setCartItems] = useState(() => {
-        try {
-            const stored = localStorage.getItem('cart')
-            if (stored && stored !== 'null') {
-                return JSON.parse(stored)
-            }
-            return products || []
-        } catch (error) {
-            console.warn('Failed to parse cart from localStorage:', error)
-            localStorage.removeItem('cart')
-            return products || []
-        }
-    })
-
-    // Save to localStorage whenever cartItems changes
-    useEffect(() => {
-          localStorage.setItem('cart', JSON.stringify(cartItems))
-    }, [cartItems])
+  const fetchdata = async () => {
+    try {
+      const res = await AxiosInstance.get('api/cart/', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setCartItems(res.data.items);
+    } catch (err) {
+      console.error(err);
+    }
+  }
 
 
-  const increment = (id) => {
-    setCartItems(
-      cartItems.map(item =>
-        item.id === id ? { ...item, stock: item.stock + 1 } : item
-      )
-    );
+  // Save to localStorage whenever cartItems changes
+  useEffect(() => {
+    fetchdata();
+  }, [])
+
+  const increment = (quantity, drink_id) => {
+    const new_quantity = quantity + 1;
+    const update = async () => {
+      try {
+        setCartItems(prevCartItems =>
+          prevCartItems.map(item =>
+            item.drink_id === drink_id ? { ...item, quantity: item.quantity + 1 } : item
+          )
+        );
+        const res = await AxiosInstance.patch(`/api/cart/`, { items: [{ "id": cart.id, "drink_id": drink_id, quantity: new_quantity }] }, { headers: { Authorization: `Bearer ${accessToken}` } });
+      }
+      catch (err) {
+        console.error(err);
+      }
+    }
+    update();
   };
 
-  const decrement = (id) => {
-    setCartItems(
-      cartItems.map(item => {
-        if (item.id === id) {
-          if (item.stock === 1) {
-            return null;
-          } else {
-            return { ...item, stock: item.stock - 1 };
-          }
-        }
-        return item;
-      }).filter(Boolean)
-    );
+  const decrement = (quantity, drink_id) => {
+    const new_quantity = quantity - 1;
+    const update = async () => {
+      try {
+        setCartItems(cartItems.map(item => item.drink_id === drink_id ? { ...item, quantity: item.quantity - 1 } : item));
+        const res = await AxiosInstance.patch(`/api/cart/`, { items: [{ "id": cart.id, "drink_id": drink_id, quantity: new_quantity }] }, { headers: { Authorization: `Bearer ${accessToken}` } });
+      }
+      catch (err) {
+        console.error(err);
+      }
+    }
+    update();
   };
 
   const removeItem = (id) => {
     setCartItems(cartItems.filter(item => item.id !== id));
   };
 
-  const totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.stock, 0);
+
+  const totalPrice = cartItems.reduce((sum, item) => sum + products.filter(product => { return product.id === item.drink_id }).map(product => product.price) * item.quantity, 0);
 
   return (
-      <div className="cartwrapper" id={theme}>
-        <NavBar />
+    <div className="cartwrapper" id={theme}>
+      <NavBar />
       <div className='cart-items'>
         <div className="cart-items-list">
           {cartItems.length === 0 ? (
-          <p className="empty-cart">Your cart is empty.</p>
+            <p className="empty-cart">Your cart is empty.</p>
           ) : (
-          <ul className='cart-items-list'>
-            {cartItems.map(item => (
-            <li key={item.id} className="cart-item">
-            <div className="item-info">
-              <span className="item-name">{item.name}</span>
-              <span className="item-price">R {item.price}</span>
-            </div>
-            <div className="item-controls">
-              <button onClick={() => decrement(item.id)}>-</button>
-              <span className="item-qty">{item.stock}</span>
-              <button onClick={() => increment(item.id)}>+</button>
-            </div>
-            </li>
-            ))}
-          </ul>
+            <ul className='cart-items-list'>
+              {cartItems.sort((a, b) => a.drink_id < b.drink_id).map((item, i) => (
+                <li key={item.id} className="cart-item">
+                  <div className="item-info">
+                    <span className="item-name">{products.filter(product => { return product.id === item.drink_id }).map(product => product.name)}</span>
+                    <span className="item-price">R {products.filter(product => { return product.id === item.drink_id }).map(product => product.price)}</span>
+                  </div>
+                  <div className="item-controls">
+                    <button onClick={() => decrement(item.quantity, item.drink_id)}>-</button>
+                    <span className="item-qty">{cartItems[i].quantity}</span>
+                    <button onClick={() => increment(item.quantity, item.drink_id)}>+</button>
+                  </div>
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </div>

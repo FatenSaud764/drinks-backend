@@ -49,12 +49,6 @@ const GetCartData = async () => {
 }
 
 
-  const GetOrderData = async () => {
-    AxiosInstance.get('api/orders/').then((res) => {
-      setOrders(res.data);
-    })
-  }
-
 
   useEffect( () => {
     localStorage.setItem('selected', JSON.stringify(selecteddrink));
@@ -74,11 +68,8 @@ const GetCartData = async () => {
   }, [refreshToken])
 
   useEffect(() => {
+    GetCartData();
     GetData();
-  }, [])
-
-  useEffect(() => {
-  GetCartData();
   }, [])
 
   console.log('cart', cart);
