@@ -17,7 +17,7 @@ const CartModal = () => {
       return () => {
         clearInterval(timerId);
       };
-    }, [setCartModal(true)]);
+    }, [cartModal]);
 
   return (
     <div className='cartmodalwrapper'>

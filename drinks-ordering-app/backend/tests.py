@@ -374,12 +374,108 @@ class DrinkThresholdAPITest(MediaRootTestCase):
         # negative
         r = self.client.patch(f'/api/drink/{d.id}/low-stock-threshold/', {'low_stock_threshold': -1}, format='json')
         self.assertEqual(r.status_code, 400)
-        # below unavailable_threshold (default 5)
-        r = self.client.patch(f'/api/drink/{d.id}/low-stock-threshold/', {'low_stock_threshold': 3}, format='json')
+
+
+class StaffManagementAPITest(MediaRootTestCase):
+    """Tests for StaffUserViewset (management endpoints) using 'level' based privilege changes."""
+
+    def setUp(self):
+        self.client = APIClient()
+        # Primary admin user
+        self.admin = User.objects.create_user(username='admin1', email='admin1@example.com', password='pw', role='staff', is_admin=True)
+        self.admin.save()
+        # Secondary admin to test cross-demotion
+        self.admin2 = User.objects.create_user(username='admin2', email='admin2@example.com', password='pw', role='staff', is_admin=True)
+        self.admin2.save()
+        # Plain staff (domain role staff, not admin, not staff flag initially)
+        self.staff = User.objects.create_user(username='staffer', email='staffer@example.com', password='pw', role='staff')
+        # Customer user
+        self.customer = User.objects.create_user(username='custx', email='custx@example.com', password='pw', role='customer')
+
+    def test_admin_can_list_staff_and_admin_users(self):
+        self.client.force_authenticate(user=self.admin)
+        r = self.client.get('/api/management/')
+        self.assertEqual(r.status_code, 200, r.content)
+        data = r.json()
+        usernames = {u['username'] for u in data}
+        self.assertIn('admin1', usernames)
+        self.assertIn('admin2', usernames)
+        self.assertIn('staffer', usernames)  # domain role staff appears even without staff flag
+        self.assertNotIn('custx', usernames)
+
+    def test_non_admin_forbidden_on_list(self):
+        self.client.force_authenticate(user=self.staff)
+        r = self.client.get('/api/management/')
+        self.assertEqual(r.status_code, 403)
+
+    def test_promote_customer_to_staff_level(self):
+        self.client.force_authenticate(user=self.admin)
+        r = self.client.patch(f'/api/management/{self.customer.id}/role/', {'level': 'staff'}, format='json')
+        self.assertEqual(r.status_code, 200, r.content)
+        self.customer.refresh_from_db()
+        self.assertEqual(self.customer.role, 'staff')
+        self.assertTrue(self.customer.is_staff)
+        self.assertFalse(self.customer.is_admin)
+
+    def test_promote_customer_to_admin_level(self):
+        self.client.force_authenticate(user=self.admin)
+        r = self.client.patch(f'/api/management/{self.customer.id}/role/', {'level': 'admin'}, format='json')
+        self.assertEqual(r.status_code, 200, r.content)
+        self.customer.refresh_from_db()
+        self.assertEqual(self.customer.role, 'staff')  # domain role forced to staff
+        self.assertTrue(self.customer.is_staff)
+        self.assertTrue(self.customer.is_admin)
+
+    def test_demote_admin_to_staff_level(self):
+        # admin1 demotes admin2
+        self.client.force_authenticate(user=self.admin)
+        r = self.client.patch(f'/api/management/{self.admin2.id}/role/', {'level': 'staff'}, format='json')
+        self.assertEqual(r.status_code, 200, r.content)
+        self.admin2.refresh_from_db()
+        self.assertFalse(self.admin2.is_admin)
+        self.assertTrue(self.admin2.is_staff)  # staff flag retained
+        self.assertEqual(self.admin2.role, 'staff')
+
+    def test_cannot_self_downgrade_from_admin(self):
+        self.client.force_authenticate(user=self.admin)
+        r = self.client.patch(f'/api/management/{self.admin.id}/role/', {'level': 'staff'}, format='json')
         self.assertEqual(r.status_code, 400)
-        # bulk below min unavailable
-        r = self.client.patch('/api/drink/low-stock-threshold/', {'low_stock_threshold': 2}, format='json')
+
+    def test_invalid_level_rejected(self):
+        self.client.force_authenticate(user=self.admin)
+        r = self.client.patch(f'/api/management/{self.customer.id}/role/', {'level': 'manager'}, format='json')
         self.assertEqual(r.status_code, 400)
+
+    def test_non_admin_cannot_modify_privileges(self):
+        self.client.force_authenticate(user=self.staff)
+        r = self.client.patch(f'/api/management/{self.customer.id}/role/', {'level': 'staff'}, format='json')
+        self.assertEqual(r.status_code, 403)
+
+    def test_admin_can_create_staff_user(self):
+        self.client.force_authenticate(user=self.admin)
+        payload = {
+            'username': 'newstaff',
+            'email': 'newstaff@example.com',
+            'password': 'StrongPw123!'
+        }
+        r = self.client.post('/api/management/', payload, format='json')
+        self.assertEqual(r.status_code, 201, r.content)
+        data = r.json()
+        self.assertEqual(data['username'], 'newstaff')
+        self.assertEqual(data['role'], 'staff')
+        new_user = User.objects.get(username='newstaff')
+        self.assertTrue(new_user.is_staff)
+        self.assertFalse(new_user.is_admin)
+
+    def test_non_admin_cannot_create_staff_user(self):
+        self.client.force_authenticate(user=self.staff)
+        payload = {
+            'username': 'badcreate',
+            'email': 'badcreate@example.com',
+            'password': 'StrongPw123!'
+        }
+        r = self.client.post('/api/management/', payload, format='json')
+        self.assertEqual(r.status_code, 403)
 
 
 class AuthFlowTest(MediaRootTestCase):

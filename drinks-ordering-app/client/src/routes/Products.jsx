@@ -14,6 +14,7 @@ import AddItems from '../components/AddItems.jsx';
 import CartModal from '../components/CartModal.jsx';
 export const CartModalBoolean = createContext(false);
 import NavBar from '../components/NavBar'
+import AxiosInstance from '../components/Axios.jsx';
 
 const Products = () => {
   const {products, setProducts} = useContext(ProductList);
@@ -45,6 +46,15 @@ const Products = () => {
   return (a.available === b.available) ? 0 : a.available ? -1 : 1;
 }).sort((a,b) => {if(a.available && b.available) {return a.name.localeCompare(b.name)}}).filter((a) => {return category==="alcoholic" ? a.category==="Alcoholic" : category==="nonalcoholic" ? a.category==="Non-Alcoholic" : a});
 
+
+  const addToCart = (e) => {
+    if(accessToken && refreshToken && accessToken!='null' && refreshToken!='null'){
+      const request = async () => {await AxiosInstance.post('/api/cart/items/', {"drink_id": e, "quantity": 1}, {headers:{Authorization: `Bearer ${accessToken}`}})}
+      request();
+      setCartModal(true)
+    } else{alert('Log in to add to cart and place orders')}
+  }
+
   return (
     <div className='prodwrapper' id={theme}>
       <NavBar />
@@ -62,7 +72,7 @@ const Products = () => {
               <div className='productdesc'>{product.name}</div>
               <div className='additemwrapper'>
               <div className='productprice'>R{product.price}</div>
-              {product.available && <button className='additem' onClick={() => {if(accessToken && refreshToken && accessToken!='null' && refreshToken!='null'){setCartModal(true);} else{alert('Log in to add to cart and place orders')}}}>+</button>}
+              {product.available && <button className='additem' onClick={() => {addToCart(product.id)}}>+</button>}
               </div>
               </div>
        
