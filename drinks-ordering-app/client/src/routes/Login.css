@@ -37,13 +37,13 @@
     text-align: center;
     justify-content: center;
     justify-items: center;
-    width: 20vw;
+    width: 40vw;
     height: 4vh;
     background: #F59E0B;
     color: white;
     box-shadow: none !important;
     border: none;
-    border-radius: 10vh;
+    border-radius: 2vh;
     cursor: pointer;
     font-size: 1.9vh;
     font-weight:lighter;
