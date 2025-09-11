@@ -18,7 +18,8 @@ const SignUp = () => {
         <form className='signupform' onSubmit={() => {
           if(user.current && mail.current && pass.current) {
             try{
-              AxiosInstance.post('api/auth/register/', {"username": user.current.value.trim(), "email": mail.current.value.trim(), "role": "customer", "password": pass.current.value.trim()});
+              const signup = async () => {await AxiosInstance.post('api/auth/register/', {"username": user.current.value.trim(), "email": mail.current.value.trim(), "role": "customer", "password": pass.current.value.trim()});}
+              signup();
               alert("User created successfully!");
             }
             catch(error){
@@ -28,15 +29,15 @@ const SignUp = () => {
           setSignUpModal(false); }}>
            <h2>Create an account</h2> 
            <div className='inputrow'>
-            <label for='username'>Username</label>
+            <label htmlFor='username'>Username</label>
             <input type='text' name='username' className='usernamebox' ref = {user} required></input>
            </div>
            <div className='inputrow'>
-            <label for='email'>Email</label>
+            <label htmlFor='email'>Email</label>
             <input type='email' name='email' className='emailbox' ref = {mail} required></input>
            </div>
            <div className='inputrow'>
-            <label for='password'>Password</label>
+            <label htmlFor='password'>Password</label>
             <input type='password' name='password' className='passwordbox' ref = {pass} required></input>
            </div>
            <input type='submit' value='Signup' className='signupsubmit'></input>

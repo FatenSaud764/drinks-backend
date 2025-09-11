@@ -35,15 +35,26 @@ const [orders, setOrders] = useState([{}]);
     })
   }
 
-  const GetCartData = async () => {
-    AxiosInstance.get('api/cart').then((res) => {setCart(res.data)});
+const GetCartData = async () => {
+  try {
+    const res = await AxiosInstance.get('api/cart/', {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+    setCart(res.data);
+  } catch (err) {
+    console.error(err);
   }
+}
+
 
   const GetOrderData = async () => {
     AxiosInstance.get('api/orders/').then((res) => {
       setOrders(res.data);
     })
   }
+
 
   useEffect( () => {
     localStorage.setItem('selected', JSON.stringify(selecteddrink));
@@ -64,8 +75,13 @@ const [orders, setOrders] = useState([{}]);
 
   useEffect(() => {
     GetData();
-    GetCartData();
   }, [])
+
+  useEffect(() => {
+  GetCartData();
+  }, [])
+
+  console.log('cart', cart);
 
   useEffect(()=>{
     localStorage.setItem('loggedin', loggedin)
