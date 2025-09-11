@@ -30,8 +30,8 @@
 }
 
 .toggle.toggled .thumb{
-    left: 23px;
+    left: 24px;
     background-color: #F59E0B;
-    width: 2.5vh;         
-    height: 2.5vh;  
+    width: 18px;         
+    height: 18px;  
 }
