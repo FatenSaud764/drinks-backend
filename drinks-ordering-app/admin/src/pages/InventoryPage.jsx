@@ -1,16 +1,13 @@
 import { useState, useMemo } from 'react';
 import { MaterialReactTable } from 'material-react-table';
 import { useInventory } from '../hooks/useInventory';
-import { useAuth } from '../contexts/AuthContext'; // Add auth import
+import { useAuth } from '../contexts/AuthContext';
 import '../styles/Pages.css';
 import '../styles/InventoryPage.css';
 import '../styles/Modal.css';
 import { DRINK_CATEGORIES } from 'shared/types';
 // Notifications
 import { useSnackbar } from '../contexts/SnackbarContext';
-
-const LOW_STOCK_THRESHOLD = 10;
-const UNAVAILABLE_THRESHOLD = 5;
 
 const InventoryPage = () => {
   const { 
@@ -21,13 +18,16 @@ const InventoryPage = () => {
     toggleAvailability, 
     deleteDrink,
     updateDrink,
+    updateGlobalLowStockThreshold,
+    updateGlobalUnavailableThreshold,
     clearError
   } = useInventory();
 
-  const { isAuthenticated } = useAuth(); // Get auth state
+  const { isAuthenticated } = useAuth();
   const { showSnackbar } = useSnackbar();
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [thresholdModalOpen, setThresholdModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
   const [validationErrors, setValidationErrors] = useState({});
   const [formData, setFormData] = useState({
@@ -38,13 +38,19 @@ const InventoryPage = () => {
     stock: '',
     description: '',
     image: null,
-    imagePreview: null
+    imagePreview: null,
+    low_stock_threshold: 10,
+    unavailable_threshold: 5
+  });
+
+  const [thresholdData, setThresholdData] = useState({
+    low_stock_threshold: 10,
+    unavailable_threshold: 5
   });
 
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      // Clear any image validation errors
       setValidationErrors(prev => ({
         ...prev,
         image: null
@@ -77,6 +83,18 @@ const InventoryPage = () => {
       errors.stock = 'Valid stock quantity is required';
     }
 
+    if (!data.low_stock_threshold || parseInt(data.low_stock_threshold) < 0) {
+      errors.low_stock_threshold = 'Valid low stock threshold is required';
+    }
+
+    if (!data.unavailable_threshold || parseInt(data.unavailable_threshold) < 0) {
+      errors.unavailable_threshold = 'Valid unavailable threshold is required';
+    }
+
+    if (parseInt(data.unavailable_threshold) >= parseInt(data.low_stock_threshold)) {
+      errors.unavailable_threshold = 'Unavailable threshold must be less than low stock threshold';
+    }
+
     // Image validation
     if (modalMode === 'add') {
       if (!data.image) {
@@ -89,6 +107,30 @@ const InventoryPage = () => {
     }
 
     return errors;
+  };
+
+  const validateThresholds = (data) => {
+    const errors = {};
+
+    if (!data.low_stock_threshold || parseInt(data.low_stock_threshold) < 0) {
+      errors.low_stock_threshold = 'Valid low stock threshold is required';
+    }
+
+    if (!data.unavailable_threshold || parseInt(data.unavailable_threshold) < 0) {
+      errors.unavailable_threshold = 'Valid unavailable threshold is required';
+    }
+
+    if (parseInt(data.unavailable_threshold) >= parseInt(data.low_stock_threshold)) {
+      errors.unavailable_threshold = 'Unavailable threshold must be less than low stock threshold';
+    }
+
+    return errors;
+  };
+
+  const getStockStatus = (stock, lowThreshold, unavailableThreshold) => {
+    if (stock < unavailableThreshold) return 'unavailable';
+    if (stock < lowThreshold) return 'low-stock';
+    return '';
   };
 
   const columns = useMemo(
@@ -158,12 +200,21 @@ const InventoryPage = () => {
         accessorKey: 'stock',
         header: 'Stock',
         size: 100,
-        Cell: ({ cell }) => {
-          const stock = cell.getValue() || 0;
+        Cell: ({ row }) => {
+          const stock = row.original.stock || 0;
+          const lowThreshold = row.original.low_stock_threshold || 10;
+          const unavailableThreshold = row.original.unavailable_threshold || 5;
+          const statusClass = getStockStatus(stock, lowThreshold, unavailableThreshold);
+          
           return (
-            <span className={`stock-cell ${stock < UNAVAILABLE_THRESHOLD ? 'unavailable' : stock < LOW_STOCK_THRESHOLD ? 'low-stock' : ''}`}>
-              {stock} units
-            </span>
+            <div className="stock-info">
+              <span className={`stock-cell ${statusClass}`}>
+                {stock} units
+              </span>
+              <div className="threshold-info">
+                <small>Low: {lowThreshold} | Unavail: {unavailableThreshold}</small>
+              </div>
+            </div>
           );
         },
       },
@@ -187,7 +238,6 @@ const InventoryPage = () => {
           </div>
         ),
       },
-      // Always show actions column (availability toggle always available, edit/delete only for authenticated)
       {
         id: 'actions',
         header: 'Actions',
@@ -195,7 +245,6 @@ const InventoryPage = () => {
         enableSorting: false,
         Cell: ({ row }) => (
           <div className="actions-cell">
-            {/* Toggle availability - always available */}
             <button
               className={`action-btn toggle-btn ${row.original.available ? 'make-unavailable' : 'make-available'}`}
               onClick={() => handleToggleAvailability(row.original.id, row.original.available)}
@@ -203,7 +252,6 @@ const InventoryPage = () => {
               {row.original.available ? 'Disable' : 'Enable'}
             </button>
             
-            {/* Edit and Delete - only for authenticated users */}
             {isAuthenticated && (
               <>
                 <button
@@ -224,7 +272,7 @@ const InventoryPage = () => {
         ),
       },
     ],
-    [isAuthenticated] // Add isAuthenticated as dependency
+    [isAuthenticated]
   );
 
   const clearForm = () => {
@@ -240,13 +288,14 @@ const InventoryPage = () => {
       stock: '',
       description: '',
       image: null,
-      imagePreview: null
+      imagePreview: null,
+      low_stock_threshold: 10,
+      unavailable_threshold: 5
     });
     setValidationErrors({});
   };
 
   const openAddModal = () => {
-    // Check authentication before allowing add
     if (!isAuthenticated) {
       showSnackbar('Authentication required to add drinks', 'error');
       return;
@@ -256,15 +305,24 @@ const InventoryPage = () => {
     setModalOpen(true);
   };
 
+  const openThresholdModal = () => {
+    if (!isAuthenticated) {
+      showSnackbar('Authentication required to update global thresholds', 'error');
+      return;
+    }
+    setThresholdModalOpen(true);
+  };
+
   const handleEditDrink = (drink) => {
-    // Check authentication before allowing edit
     if (!isAuthenticated) {
       showSnackbar('Authentication required to edit drinks', 'error');
       return;
     }
     setFormData({ 
       ...drink,
-      imagePreview: drink.image // Use existing image as preview
+      imagePreview: drink.image,
+      low_stock_threshold: drink.low_stock_threshold || 10,
+      unavailable_threshold: drink.unavailable_threshold || 5
     });
     setModalMode('edit');
     setModalOpen(true);
@@ -276,17 +334,20 @@ const InventoryPage = () => {
     clearForm();
   };
 
+  const closeThresholdModal = () => {
+    setThresholdModalOpen(false);
+    setValidationErrors({});
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Double-check authentication before submitting
     if (!isAuthenticated) {
       showSnackbar('Authentication required', 'error');
       closeModal();
       return;
     }
     
-    // Validate form
     const errors = validateForm(formData);
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
@@ -295,14 +356,18 @@ const InventoryPage = () => {
 
     try {
       const stockValue = parseInt(formData.stock);
+      const unavailableThreshold = parseInt(formData.unavailable_threshold);
+      
       const drinkData = {
         name: formData.name.trim(),
         description: formData.description.trim(),
         image: formData.image,
         price: parseFloat(formData.price),
         category: formData.category.trim(),
-        available: stockValue >= 5,
+        available: stockValue >= unavailableThreshold,
         stock: stockValue,
+        low_stock_threshold: parseInt(formData.low_stock_threshold),
+        unavailable_threshold: unavailableThreshold
       };
 
       if (modalMode === 'add') {
@@ -320,8 +385,33 @@ const InventoryPage = () => {
     }
   };
 
+  const handleThresholdSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!isAuthenticated) {
+      showSnackbar('Authentication required', 'error');
+      closeThresholdModal();
+      return;
+    }
+
+    const errors = validateThresholds(thresholdData);
+    if (Object.keys(errors).length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+
+    try {
+      await updateGlobalLowStockThreshold(parseInt(thresholdData.low_stock_threshold));
+      await updateGlobalUnavailableThreshold(parseInt(thresholdData.unavailable_threshold));
+      showSnackbar('Global thresholds updated successfully!', 'success');
+      closeThresholdModal();
+    } catch (err) {
+      console.error('Failed to update global thresholds:', err);
+      showSnackbar(`Failed to update thresholds: ${err.message}`, 'error');
+    }
+  };
+
   const handleToggleAvailability = async (drinkId, currentAvailability) => {
-    // Remove authentication check - allow all users to toggle availability
     try {
       const drink = drinks.find(d => d.id === drinkId);
       await toggleAvailability(drinkId, !currentAvailability);
@@ -334,7 +424,6 @@ const InventoryPage = () => {
   };
 
   const handleDeleteDrink = async (drinkId) => {
-    // Check authentication before allowing delete
     if (!isAuthenticated) {
       showSnackbar('Authentication required to delete drinks', 'error');
       return;
@@ -356,11 +445,31 @@ const InventoryPage = () => {
 
   const handleInputChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    // Clear validation error when user starts typing
     if (validationErrors[field]) {
       setValidationErrors(prev => ({ ...prev, [field]: null }));
     }
   };
+
+  const handleThresholdChange = (field, value) => {
+    setThresholdData(prev => ({ ...prev, [field]: value }));
+    if (validationErrors[field]) {
+      setValidationErrors(prev => ({ ...prev, [field]: null }));
+    }
+  };
+
+  // Calculate stats using dynamic thresholds
+  const stats = useMemo(() => {
+    return {
+      total: drinks.length,
+      available: drinks.filter(d => d.available).length,
+      unavailable: drinks.filter(d => !d.available).length,
+      lowStock: drinks.filter(d => {
+        const stock = d.stock || 0;
+        const threshold = d.low_stock_threshold || 10;
+        return stock < threshold;
+      }).length
+    };
+  }, [drinks]);
 
   return (
     <div className="page">
@@ -368,7 +477,6 @@ const InventoryPage = () => {
         <div className="page-header">
           <h1>Inventory Management</h1>
           <p>Track and manage your inventory levels</p>
-          {/* Update auth notice to be more specific */}
           {!isAuthenticated && (
             <div className="auth-notice">
               <strong>Note:</strong> Authentication required for adding, editing, and deleting drinks.
@@ -401,28 +509,31 @@ const InventoryPage = () => {
         {/* Summary Stats */}
         <div className="inventory-stats">
           <div className="stat-card">
-            <div className="stat-value total">{drinks.length}</div>
+            <div className="stat-value total">{stats.total}</div>
             <div className="stat-label">Total Items</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value available">{drinks.filter(d => d.available).length}</div>
+            <div className="stat-value available">{stats.available}</div>
             <div className="stat-label">Available</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value unavailable">{drinks.filter(d => !d.available).length}</div>
+            <div className="stat-value unavailable">{stats.unavailable}</div>
             <div className="stat-label">Unavailable</div>
           </div>
           <div className="stat-card">
-            <div className="stat-value low-stock">{drinks.filter(d => (d.stock || 0) < LOW_STOCK_THRESHOLD).length}</div>
+            <div className="stat-value low-stock">{stats.lowStock}</div>
             <div className="stat-label">Low Stock</div>
           </div>
         </div>
 
-        {/* Add Button - Only show if authenticated */}
+        {/* Control Buttons */}
         {isAuthenticated && (
-          <div className="orders-controls">
+          <div className="orders-controls drink-controls">
             <button className="notify-button" onClick={openAddModal}>
               Add New Drink
+            </button>
+            <button className="nav-button" onClick={openThresholdModal}>
+              Global Thresholds
             </button>
           </div>
         )}
@@ -476,7 +587,7 @@ const InventoryPage = () => {
           />
         </div>
 
-        {/* Add/Edit Modal - Only show if authenticated */}
+        {/* Add/Edit Modal */}
         {modalOpen && isAuthenticated && (
           <div className="modal-overlay" onClick={closeModal}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -559,6 +670,40 @@ const InventoryPage = () => {
                         <div className="error-message">{validationErrors.stock}</div>
                       )}
                     </div>
+
+                    <div className="form-field">
+                      <label htmlFor="low-stock-threshold" className="form-label">Low Stock Threshold</label>
+                      <input
+                        id="low-stock-threshold"
+                        type="number"
+                        min="1"
+                        placeholder="10"
+                        className={`search-input ${validationErrors.low_stock_threshold ? 'error' : ''}`}
+                        value={formData.low_stock_threshold}
+                        onChange={(e) => handleInputChange('low_stock_threshold', e.target.value)}
+                        required
+                      />
+                      {validationErrors.low_stock_threshold && (
+                        <div className="error-message">{validationErrors.low_stock_threshold}</div>
+                      )}
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="unavailable-threshold" className="form-label">Unavailable Threshold</label>
+                      <input
+                        id="unavailable-threshold"
+                        type="number"
+                        min="0"
+                        placeholder="5"
+                        className={`search-input ${validationErrors.unavailable_threshold ? 'error' : ''}`}
+                        value={formData.unavailable_threshold}
+                        onChange={(e) => handleInputChange('unavailable_threshold', e.target.value)}
+                        required
+                      />
+                      {validationErrors.unavailable_threshold && (
+                        <div className="error-message">{validationErrors.unavailable_threshold}</div>
+                      )}
+                    </div>
                   </div>
                   
                   <div className="form-field">
@@ -630,6 +775,71 @@ const InventoryPage = () => {
                   </button>
                   <button type="submit" className="notify-button">
                     {modalMode === 'add' ? 'Add Drink' : 'Update Drink'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Global Threshold Modal */}
+        {thresholdModalOpen && isAuthenticated && (
+          <div className="modal-overlay" onClick={closeThresholdModal}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h3 className="modal-title">Global Threshold Settings</h3>
+                <button className="modal-close" onClick={closeThresholdModal}>×</button>
+              </div>
+
+              <form onSubmit={handleThresholdSubmit} className="modal-form">
+                <div className="modal-body">
+                  <div className="threshold-description">
+                    <p>These settings will update the default thresholds for all drinks.</p>
+                  </div>
+                  
+                  <div className="form-grid">
+                    <div className="form-field">
+                      <label htmlFor="global-low-stock" className="form-label">Global Low Stock Threshold</label>
+                      <input
+                        id="global-low-stock"
+                        type="number"
+                        min="1"
+                        placeholder="10"
+                        className={`search-input ${validationErrors.low_stock_threshold ? 'error' : ''}`}
+                        value={thresholdData.low_stock_threshold}
+                        onChange={(e) => handleThresholdChange('low_stock_threshold', e.target.value)}
+                        required
+                      />
+                      {validationErrors.low_stock_threshold && (
+                        <div className="error-message">{validationErrors.low_stock_threshold}</div>
+                      )}
+                    </div>
+
+                    <div className="form-field">
+                      <label htmlFor="global-unavailable" className="form-label">Global Unavailable Threshold</label>
+                      <input
+                        id="global-unavailable"
+                        type="number"
+                        min="0"
+                        placeholder="5"
+                        className={`search-input ${validationErrors.unavailable_threshold ? 'error' : ''}`}
+                        value={thresholdData.unavailable_threshold}
+                        onChange={(e) => handleThresholdChange('unavailable_threshold', e.target.value)}
+                        required
+                      />
+                      {validationErrors.unavailable_threshold && (
+                        <div className="error-message">{validationErrors.unavailable_threshold}</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="modal-footer">
+                  <button type="button" className="nav-button" onClick={closeThresholdModal}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="notify-button">
+                    Update Global Thresholds
                   </button>
                 </div>
               </form>
