@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { managementAPI } from '../services/management';
+import { managementAPI } from '../api/management';
 
 export const useManagement = () => {
   const [users, setUsers] = useState([]);
@@ -71,7 +71,6 @@ export const useManagement = () => {
     loading,
     error,
     fetchUsers,
-    createUser,
     updateUserRole,
     registerUser,
     clearError
