@@ -1,12 +1,34 @@
-import React, { useContext } from 'react'
-import { LightDark, SelectedProduct } from '../contexts/contexts'
+import React, { useContext, useState } from 'react'
+import { LightDark, SelectedProduct, AccessTokens, RefreshTokens, CartModalBoolean } from '../contexts/contexts'
 import NavBar from '../components/NavBar';
 import './DrinkInfo.css'
 import AddItems from '../components/AddItems';
+import AxiosInstance from '../components/Axios.jsx';
+import CartModal from '../components/CartModal.jsx';
 
 const DrinkInfo = () => {
-    const {selecteddrink, setSelectedDrink} = useContext(SelectedProduct);
-    const {theme, setTheme} = useContext(LightDark);
+  const {selecteddrink, setSelectedDrink} = useContext(SelectedProduct);
+  const {theme, setTheme} = useContext(LightDark);
+  const [num, setNum] = useState(0);
+
+  const {accessToken, setAccessTokens} = useContext(AccessTokens);
+  const {refreshToken, setRefreshToken} = useContext(RefreshTokens);
+  const [cartModal, setCartModal] = useState(false);
+
+  const addToCart = (e, num) => {
+    if (accessToken && refreshToken && accessToken != 'null' && refreshToken != 'null') {
+      const request = async () => {
+        await AxiosInstance.post(
+          '/api/cart/items/',
+          {"drink_id": e, "quantity": num},
+          {headers:{Authorization: `Bearer ${accessToken}`}})
+      }
+      request();
+      setCartModal(true);
+    } else {
+      alert('Log in to add to cart and place orders');
+    }
+  }
 
   return (
     <div className='drinkinfowrapper' id={theme}>
@@ -18,7 +40,13 @@ const DrinkInfo = () => {
         <div className='drinkprice'>
           R{selecteddrink.price}
         </div>
-        <AddItems prod={selecteddrink}  />
+        <AddItems prod={selecteddrink} num={num} setNum={setNum} />
+        <button className='addtocart' onClick={() => {addToCart(selecteddrink.id, num)}}>Add to cart</button>
+        <div className="drink-info-cartmodal-wrapper">
+          <CartModalBoolean.Provider value={{cartModal, setCartModal}}>
+            {cartModal && <CartModal/>}
+          </CartModalBoolean.Provider>
+        </div>
     </div>
   )
 }

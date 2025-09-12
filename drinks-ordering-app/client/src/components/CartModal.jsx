@@ -1,12 +1,11 @@
 import React, { useContext, useEffect } from 'react'
 import './CartModal.css'
-import { CartModalBoolean } from '../routes/Products'
+import { CartModalBoolean } from '../contexts/contexts.jsx'
 import { SiTicktick } from "react-icons/si";
 
 const CartModal = () => {
   const {cartModal, setCartModal} = useContext(CartModalBoolean);
 
-  
   useEffect(() => {
       let timerId;
       if (cartModal) {
@@ -22,7 +21,7 @@ const CartModal = () => {
   return (
     <div className='cartmodalwrapper'>
         <SiTicktick />
-      <div className='addednotif'>Successfully added drink to cart!</div>
+      <div className='addednotif'>Successfully added drink(s) to cart!</div>
     </div>
   )
 }

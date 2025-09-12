@@ -116,7 +116,7 @@
     align-items: center;
 }
 
-.additem{
+.additem {
     display: flex;
     margin-top: -2vw;
     height: 7vw;
@@ -131,6 +131,10 @@
     align-content: center;
     cursor: pointer;
     justify-content: center;
+}
+
+.additem:hover {
+    background: #4c7eed;
 }
 
 @media (max-width: 400px) {

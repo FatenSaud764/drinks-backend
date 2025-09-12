@@ -48,8 +48,6 @@ const GetCartData = async () => {
   }
 }
 
-
-
   useEffect( () => {
     localStorage.setItem('selected', JSON.stringify(selecteddrink));
     window.scrollTo({
@@ -78,12 +76,9 @@ const GetCartData = async () => {
     localStorage.setItem('loggedin', loggedin)
   },[loggedin]);
 
-
-
   useEffect(() => {
         localStorage.setItem('theme', theme);
       }, [theme]);
-
   
   useEffect(() => {
         localStorage.setItem('alcoholic filter', alcoholicfilter);

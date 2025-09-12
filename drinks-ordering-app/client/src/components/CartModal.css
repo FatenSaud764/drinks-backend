@@ -27,3 +27,9 @@
     height: 4vh;
     font-size: 2vh;
 }
+
+@media (max-width: 768px) {
+  .addednotif {
+    font-size: 0.8rem;
+  }
+}
