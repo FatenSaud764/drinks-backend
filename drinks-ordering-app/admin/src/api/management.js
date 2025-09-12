@@ -1,8 +1,7 @@
-// Managing users, roles, and permissions - admin users only
 import api from "./api";
 
 export const managementAPI = {
-  // Fetch all users
+  // Fetch all staff and admin users
   fetchAllUsers: async () => {
     try {
       const response = await api.get("/api/management/");
@@ -12,14 +11,11 @@ export const managementAPI = {
     }
   },
 
-  // Update user role (PATCH)
+  // Update user role (PATCH) - Updated to send level instead of is_admin
   updateUserRole: async (userId, roleData) => {
     try {
       const response = await api.patch(`/api/management/${userId}/role/`, {
-        username: roleData.username,
-        email: roleData.email,
-        role: roleData.role,
-        password: roleData.password
+        level: roleData.level  // Send "staff" or "admin"
       });
       return response.data;
     } catch (error) {
@@ -27,14 +23,15 @@ export const managementAPI = {
     }
   },
 
-  // Register new user
+  // Register new staff user - Updated to only send required fields
   registerUser: async (userData) => {
     try {
       const response = await api.post("/api/management/register/", {
         username: userData.username,
         email: userData.email,
-        role: userData.role,
         password: userData.password
+        // Note: role is automatically set to 'staff' by backend
+        // Note: is_admin is automatically set to false by backend
       });
       return response.data;
     } catch (error) {

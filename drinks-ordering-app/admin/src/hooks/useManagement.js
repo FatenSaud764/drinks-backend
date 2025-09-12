@@ -6,7 +6,7 @@ export const useManagement = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch all users
+  // Fetch all staff and admin users
   const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -20,41 +20,59 @@ export const useManagement = () => {
     }
   }, []);
 
-  // Update user role (PATCH)
+  // Update user role (PATCH) - Updated to handle level parameter
   const updateUserRole = useCallback(async (userId, roleData) => {
-    setLoading(true);
     setError(null);
     try {
-      const updatedUser = await managementAPI.updateUserRole(userId, roleData);
+      // Convert is_admin boolean to level string if needed for backwards compatibility
+      const levelData = roleData.level ? 
+        { level: roleData.level } : 
+        { level: roleData.is_admin ? "admin" : "staff" };
+      
+      const updatedUser = await managementAPI.updateUserRole(userId, levelData);
+      
+      // Update the user in the local state
       setUsers(prevUsers => 
         prevUsers.map(user => 
-          user.id === userId ? updatedUser : user
+          user.id === userId ? { ...user, ...updatedUser } : user
         )
       );
       return updatedUser;
     } catch (err) {
       setError(err.message);
-      throw err;
-    } finally {
-      setLoading(false);
+      throw err; // Re-throw so the component can handle it
     }
   }, []);
 
-  // Register user
+  // Register staff user - Updated to handle simplified registration
   const registerUser = useCallback(async (userData) => {
-    setLoading(true);
     setError(null);
     try {
-      const newUser = await managementAPI.registerUser(userData);
+      // Only send the required fields that the backend accepts
+      const registrationData = {
+        username: userData.username,
+        email: userData.email,
+        password: userData.password
+      };
+      
+      const newUser = await managementAPI.registerUser(registrationData);
       setUsers(prevUsers => [...prevUsers, newUser]);
       return newUser;
     } catch (err) {
       setError(err.message);
-      throw err;
-    } finally {
-      setLoading(false);
+      throw err; // Re-throw so the component can handle it
     }
   }, []);
+
+  // Helper function to promote user to admin
+  const promoteToAdmin = useCallback(async (userId) => {
+    return updateUserRole(userId, { level: "admin" });
+  }, [updateUserRole]);
+
+  // Helper function to demote user to staff
+  const demoteToStaff = useCallback(async (userId) => {
+    return updateUserRole(userId, { level: "staff" });
+  }, [updateUserRole]);
 
   // Clear error
   const clearError = useCallback(() => {
@@ -73,6 +91,8 @@ export const useManagement = () => {
     fetchUsers,
     updateUserRole,
     registerUser,
+    promoteToAdmin,
+    demoteToStaff,
     clearError
   };
 };
