@@ -104,7 +104,7 @@ const UserManagementPage = () => {
       },
       {
         accessorKey: 'is_admin',
-        header: 'Role',
+        header: 'Level',
         size: 150,
         Cell: ({ row }) => (
           <select
