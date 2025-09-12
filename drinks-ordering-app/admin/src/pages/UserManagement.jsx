@@ -8,12 +8,6 @@ import '../styles/Modal.css';
 // Notifications
 import { useSnackbar } from '../contexts/SnackbarContext';
 
-// Mock user roles
-const USER_ROLES = {
-  ADMIN: 'Admin',
-  STAFF: 'Staff'
-};
-
 const UserManagementPage = () => {
   const { isAuthenticated } = useAuth();
   const { showSnackbar } = useSnackbar();
@@ -24,7 +18,6 @@ const UserManagementPage = () => {
   const [formData, setFormData] = useState({
     username: '',
     email: '',
-    role: '',
     password: '',
     confirmPassword: '',
   });
@@ -40,10 +33,6 @@ const UserManagementPage = () => {
       errors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
       errors.email = 'Valid email is required';
-    }
-
-    if (!data.role?.trim()) {
-      errors.role = 'Role is required';
     }
 
     // Password validation for new users
@@ -85,10 +74,10 @@ const UserManagementPage = () => {
     });
   };
 
-  const handleRoleChange = async (userId, newRole) => {
+  const handleRoleChange = async (userId, newLevel) => {
     try {
-      await updateUserRole(userId, { role: newRole });
-      showSnackbar(`User role updated to ${newRole} successfully!`, 'success');
+      await updateUserRole(userId, { level: newLevel });
+      showSnackbar(`User role updated to ${newLevel} successfully!`, 'success');
     } catch (err) {
       console.error('Failed to update user role:', err);
       showSnackbar(`Failed to update user role: ${err.message}`, 'error');
@@ -114,19 +103,18 @@ const UserManagementPage = () => {
         ),
       },
       {
-        accessorKey: 'role',
+        accessorKey: 'is_admin',
         header: 'Role',
         size: 150,
         Cell: ({ row }) => (
           <select
-            className={`role-badge ${row.original.role?.toLowerCase()}`}
-            value={row.original.role}
+            className={`role-badge ${row.original.is_admin ? 'admin' : 'staff'}`}
+            value={row.original.is_admin ? 'admin' : 'staff'}
             onChange={(e) => handleRoleChange(row.original.id, e.target.value)}
             disabled={!isAuthenticated}
           >
-            {Object.values(USER_ROLES).map(role => (
-              <option key={role} value={role}>{role}</option>
-            ))}
+            <option value="staff">Staff</option>
+            <option value="admin">Admin</option>
           </select>
         ),
       },
@@ -166,7 +154,6 @@ const UserManagementPage = () => {
     setFormData({
       username: '',
       email: '',
-      role: '',
       password: '',
       confirmPassword: '',
     });
@@ -206,12 +193,11 @@ const UserManagementPage = () => {
       const userData = {
         username: formData.username.trim(),
         email: formData.email.trim(),
-        role: formData.role,
         password: formData.password,
       };
 
       await registerUser(userData);
-      showSnackbar(`User "${userData.username}" added successfully!`, 'success');
+      showSnackbar(`Staff user "${userData.username}" added successfully!`, 'success');
       closeModal();
     } catch (err) {
       console.error('Failed to add user:', err);
@@ -235,8 +221,8 @@ const UserManagementPage = () => {
   const stats = useMemo(() => {
     return {
       total: users.length,
-      admins: users.filter(u => u.role === 'Admin').length,
-      staff: users.filter(u => u.role === 'Staff').length
+      admins: users.filter(u => u.is_admin).length,
+      staff: users.filter(u => !u.is_admin).length
     };
   }, [users]);
 
@@ -285,7 +271,7 @@ const UserManagementPage = () => {
         {isAuthenticated && (
           <div className="orders-controls drink-controls">
             <button className="notify-button" onClick={openAddModal}>
-              Add New User
+              Add New Staff User
             </button>
           </div>
         )}
@@ -344,7 +330,7 @@ const UserManagementPage = () => {
           <div className="modal-overlay" onClick={closeModal}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
               <div className="modal-header">
-                <h3 className="modal-title">Add New User</h3>
+                <h3 className="modal-title">Add New Staff User</h3>
                 <button className="modal-close" onClick={closeModal}>×</button>
               </div>
 
@@ -382,25 +368,6 @@ const UserManagementPage = () => {
                         <div className="error-message">{validationErrors.email}</div>
                       )}
                     </div>
-
-                    <div className="form-field">
-                      <label htmlFor="user-role" className="form-label">Role</label>
-                      <select
-                        id="user-role"
-                        className={`search-input ${validationErrors.role ? 'error' : ''}`}
-                        value={formData.role}
-                        onChange={(e) => handleInputChange('role', e.target.value)}
-                        required
-                      >
-                        <option value="">Select Role</option>
-                        {Object.values(USER_ROLES).map(role => (
-                          <option key={role} value={role}>{role}</option>
-                        ))}
-                      </select>
-                      {validationErrors.role && (
-                        <div className="error-message">{validationErrors.role}</div>
-                      )}
-                    </div>
                   </div>
 
                   <div className="form-grid">
@@ -436,6 +403,10 @@ const UserManagementPage = () => {
                       )}
                     </div>
                   </div>
+
+                  <div className="form-note">
+                    <p><strong>Note:</strong> New users are automatically created as Staff. You can promote them to Admin using the role dropdown after creation.</p>
+                  </div>
                 </div>
                 
                 <div className="modal-footer">
@@ -443,7 +414,7 @@ const UserManagementPage = () => {
                     Cancel
                   </button>
                   <button type="submit" className="notify-button" disabled={loading}>
-                    {loading ? 'Saving...' : 'Add User'}
+                    {loading ? 'Creating...' : 'Create Staff User'}
                   </button>
                 </div>
               </form>
