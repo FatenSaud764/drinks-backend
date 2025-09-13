@@ -34,11 +34,11 @@
 }
 
 .addtocart{
-    margin-top: 10vh;
+    margin-top: -5vh;
     width: 15vh;
     height: 6vh;
-    background: #F59E0B;
-    color: white;
+    background: #2563EB;
+    color: black;
     border-radius: 20px;
     box-shadow: none;
     border: none;
@@ -46,7 +46,16 @@
     cursor: pointer;
 }
 
-.addtocart:hover{
+.addtocart:hover {
+    background: #4c7eed;
+}
+
+#dark .addtocart {
+    background: #F59E0B;
+    color: white;
+}
+
+#dark .addtocart:hover{
     background:#e29b1f;
 }
 
@@ -58,4 +67,10 @@
     background: white;
     border: 3px solid #F59E0B;
     object-fit: cover;
+}
+
+.drink-info-cartmodal-wrapper {
+  position: relative;
+  bottom: 8vh;
+  right: 47vw;
 }

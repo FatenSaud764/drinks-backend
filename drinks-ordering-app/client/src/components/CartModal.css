@@ -3,19 +3,18 @@
     grid-template-columns: 3vh 70vw;
     column-gap: 0.1vh;
     position: fixed;
-    width: 80vw;
-    height: 4vh;
+    width: 88vw;
+    height: 3.5vh;
     background: #2563EB;
     align-items: center;
     text-align: center;
     color: white;
     border: 2px solid white;
-    border-radius: 4vw;
+    border-radius: 1vw;
     margin-top: 3vh;
     align-content: center;
     align-items: center;
     padding-left: 2.4vh;
-    opacity: 88%;
 }
 
 .addednotif{
@@ -27,4 +26,10 @@
     width: 70vw;
     height: 4vh;
     font-size: 2vh;
+}
+
+@media (max-width: 768px) {
+  .addednotif {
+    font-size: 0.8rem;
+  }
 }

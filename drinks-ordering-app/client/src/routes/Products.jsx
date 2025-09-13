@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState } from 'react'
 import './Products.css'
-import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct, AccessTokens, RefreshTokens } from '../contexts/contexts';
+import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct, AccessTokens, RefreshTokens, CartModalBoolean } from '../contexts/contexts';
 import ThemeButton from '../components/ThemeButton';
 import { TiShoppingCart } from "react-icons/ti";
 import { AiOutlineMenu } from "react-icons/ai";
@@ -12,7 +12,6 @@ import Fuse from 'fuse.js'
 import { useMemo } from 'react';
 import AddItems from '../components/AddItems.jsx';
 import CartModal from '../components/CartModal.jsx';
-export const CartModalBoolean = createContext(false);
 import NavBar from '../components/NavBar'
 import AxiosInstance from '../components/Axios.jsx';
 
@@ -75,7 +74,6 @@ const Products = () => {
               {product.available && <button className='additem' onClick={() => {addToCart(product.id)}}>+</button>}
               </div>
               </div>
-       
           )
         })}
         </div>

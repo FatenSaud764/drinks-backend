@@ -1,19 +1,25 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { LightDark } from '../contexts/contexts';
 import './AddItems.css'
 
-const AddItems = ({prod}) => {
-  const [num, setNum] = useState(0);
+const AddItems = ({prod, num, setNum}) => {
   const {theme, setTheme} = useContext(LightDark);
 
   console.log('stock', parseInt(prod))
 
+  const updateCount = (num, plus) => {
+    if (!plus && num > 0) {
+      setNum(num - 1);
+    } else if (plus && num < parseInt(prod.stock)) {
+      setNum(num + 1);
+    }
+  }
 
   return (
     <div className='additemswrapper' id={theme}>
-      <button className='additembutton' onClick={() => {if(num>0){setNum(num-1);}}}>-</button>
+      <button className='additembutton' onClick={() => {updateCount(num, false)}}>-</button>
       <p className='itemquantity'>{num}</p>
-      <button className='additembutton' onClick={() => {if(num<parseInt(prod.stock)){setNum(num+1);}}}>+</button>
+      <button className='additembutton' onClick={() => {updateCount(num, true)}}>+</button>
     </div>
   )
 }

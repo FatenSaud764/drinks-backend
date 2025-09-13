@@ -11,20 +11,26 @@ const SignUp = () => {
   const user = useRef(null);
   const mail = useRef(null);
   const pass = useRef(null);
+  const confirmpass = useRef(null);
 
   return (
     <div className='signupwrapper' id={theme}>
         <button className='closesignup' onClick={() => {setSignUpModal(false)}}><CloseIcon /></button>
         <form className='signupform' onSubmit={() => {
-          if(user.current && mail.current && pass.current) {
+          if(user.current && mail.current && pass.current && confirmpass.current) {
+            if(pass.current.value===confirmpass.current.value) {
             try{
-              const signup = async () => {await AxiosInstance.post('api/auth/register/', {"username": user.current.value.trim(), "email": mail.current.value.trim(), "role": "customer", "password": pass.current.value.trim()});}
+              const signup = async () => {
+              await AxiosInstance.post('api/auth/register/', {"username": user.current.value.trim(), "email": mail.current.value.trim(), "role": "customer", "password": pass.current.value.trim()});}
               signup();
               alert("User created successfully!");
             }
+          
             catch(error){
               alert("Failed to create user, please try again!");
             }
+          }
+          else{alert("Passwords do not match!")}
           }
           setSignUpModal(false); }}>
            <h2>Create an account</h2> 
@@ -39,6 +45,10 @@ const SignUp = () => {
            <div className='inputrow'>
             <label htmlFor='password'>Password</label>
             <input type='password' name='password' className='passwordbox' ref = {pass} required></input>
+           </div>
+           <div className='inputrow'>
+            <label htmlFor='confirmpassword'>Confirm password</label>
+            <input type='password' name='password' className='passwordbox' ref = {confirmpass} required></input>
            </div>
            <input type='submit' value='Signup' className='signupsubmit'></input>
         </form>
