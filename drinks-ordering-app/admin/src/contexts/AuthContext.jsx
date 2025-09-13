@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI, tokenManager } from '../api/auth';
+import { authAPI } from '../api/auth';
+import { tokenManager } from '../api/auth';
 
 const AuthContext = createContext();
 

@@ -1,0 +1,151 @@
+/* Role Badge/Dropdown Styling */
+.role-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+  min-width: 80px;
+  text-align: center;
+  outline: none;
+  appearance: none;
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px;
+  padding-right: 28px;
+}
+
+.role-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.role-badge:focus {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+  border-color: #3b82f6;
+}
+
+/* Admin role styling */
+.role-badge.admin {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border-color: #dc2626;
+}
+
+.role-badge.admin:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+/* Staff role styling */
+.role-badge.staff {
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border-color: #059669;
+}
+
+.role-badge.staff:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+}
+
+/* Option styling (limited support across browsers) */
+.role-badge option {
+  background: white;
+  color: #374151;
+  padding: 8px 12px;
+  font-weight: normal;
+}
+
+/* Alternative: Custom dropdown styling for better cross-browser support */
+.custom-dropdown-container {
+  position: relative;
+  display: inline-block;
+}
+
+.custom-dropdown-toggle {
+  padding: 6px 28px 6px 12px;
+  border-radius: 20px;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+  min-width: 80px;
+  text-align: center;
+  outline: none;
+  position: relative;
+}
+
+.custom-dropdown-toggle::after {
+  content: '';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #666;
+}
+
+.custom-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.custom-dropdown-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-size: 0.875rem;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+}
+
+.custom-dropdown-item:hover {
+  background-color: #f3f4f6;
+}
+
+.custom-dropdown-item.selected {
+  background-color: #eff6ff;
+  color: #2563eb;
+  font-weight: 500;
+}
+
+.admin {
+    color: var(--danger-color);
+}
+
+.staff {
+    color: var(--success-color);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .role-badge {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    padding-right: 24px;
+    min-width: 70px;
+  }
+  
+  .role-badge {
+    background-size: 10px;
+    background-position: right 6px center;
+  }
+}
