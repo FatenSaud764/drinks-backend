@@ -1,21 +1,13 @@
 /* Role Badge/Dropdown Styling */
 .role-badge {
   padding: 6px 12px;
-  border-radius: 20px;
+  border-radius: 10px;
   border: 1px solid transparent;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  background: white;
   min-width: 80px;
-  text-align: center;
-  outline: none;
-  appearance: none;
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-  background-size: 12px;
-  padding-right: 28px;
 }
 
 .role-badge:hover {
