@@ -1,7 +1,14 @@
+/**
+ * @author Kirsten Sanders
+ * @description This is a hook that manages orders 
+*/
+
 import { useState, useEffect, useCallback } from 'react';
 import { ordersAPI } from '../api/orders';
 
+// ===================================================
 // Main orders hook with comprehensive functionality
+// ===================================================
 export const useOrders = (filters = {}) => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -71,7 +78,9 @@ export const useOrders = (filters = {}) => {
   };
 };
 
+// ===================================================
 // Hook for single order details
+// ===================================================
 export const useOrder = (orderId) => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -123,7 +132,9 @@ export const useOrder = (orderId) => {
   };
 };
 
-// Hook for active orders (pending, preparing, ready)
+// ===================================================
+// Hook for ACTIVE orders (pending, preparing, ready)
+// ===================================================
 export const useActiveOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -179,7 +190,9 @@ export const useActiveOrders = () => {
   };
 };
 
-// Hook for order history (completed/cancelled orders)
+// ===================================================
+// Hook for HISTORY orders (completed/cancelled orders)
+// ===================================================
 export const useOrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -227,7 +240,9 @@ export const useOrderHistory = () => {
   };
 };
 
+// ===================================================
 // Hook for OTP verification
+// ===================================================
 export const useOrderOTP = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
