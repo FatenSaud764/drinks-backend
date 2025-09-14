@@ -1,7 +1,6 @@
 /**
  * @author Kirsten Sanders
  * @description This component handles the theme context for light/dark mode
- *
 */
 
 import React, { createContext, useContext, useState, useEffect } from 'react';

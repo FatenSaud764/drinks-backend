@@ -1,8 +1,8 @@
 /**
  * @author Kirsten Sanders
  * @description This component handles the theme toggle for light/dark mode
- *
 */
+
 import { useTheme } from '../contexts/ThemeContext';
 
 // MUI Icons

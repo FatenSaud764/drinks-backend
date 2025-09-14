@@ -1,4 +1,9 @@
-import React, { useState } from 'react';
+/**
+ * @author Kirsten Sanders
+ * @description This component renders a login modal for admin authentication.
+*/
+
+import { useState } from 'react';
 import '../styles/LoginModal.css';
 // Icons
 import CloseIcon from '@mui/icons-material/CloseOutlined';

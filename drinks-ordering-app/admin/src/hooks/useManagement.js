@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description This is a hook that manages user roles and registrations (admin only access).
+*/
+
 import { useState, useEffect, useCallback } from 'react';
 import { managementAPI } from '../api/management';
 

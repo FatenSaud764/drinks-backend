@@ -1,4 +1,7 @@
-import React from 'react';
+/**
+ * @author Kirsten Sanders
+ * @description This component renders filter controls for the orders list: search, status tabs, date filter.
+*/
 
 const FilterControls = ({
   searchTerm,
@@ -10,8 +13,6 @@ const FilterControls = ({
   dateFilter,
   setDateFilter,
   showDateFilter = false,
-  onClearHistory,
-  showClearHistory = false
 }) => {
   return (
     <div className="orders-controls">
@@ -54,16 +55,6 @@ const FilterControls = ({
               <option value="week">Past Week</option>
             </select>
           </div>
-        )}
-
-        {showClearHistory && (
-          <button 
-            className="clear-history-button"
-            onClick={onClearHistory}
-            title="Clear all order history"
-          >
-            Clear History
-          </button>
         )}
       </div>
     </div>

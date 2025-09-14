@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description This is the authentication API module
+*/
+
 import api from "./api";
 
 export const authAPI = {
@@ -108,7 +113,7 @@ export const tokenManager = {
   }
 };
 
-// Enhanced API interceptor for automatic token handling
+// API interceptor for automatic token handling
 export const setupAuthInterceptors = () => {
   // Request interceptor to add auth header
   api.interceptors.request.use(

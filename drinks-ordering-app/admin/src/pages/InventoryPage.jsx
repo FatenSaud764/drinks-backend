@@ -1,3 +1,10 @@
+/**
+ * @author Kirsten Sanders
+ * @description This is the InventoryPage component for the admin interface.
+ * It allows viewing and managing the drink inventory with options to add, edit,
+ * delete drinks, and update global stock thresholds.
+*/
+
 import { useState, useMemo } from 'react';
 import { MaterialReactTable } from 'material-react-table';
 import { useInventory } from '../hooks/useInventory';

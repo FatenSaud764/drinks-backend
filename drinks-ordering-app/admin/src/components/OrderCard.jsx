@@ -1,6 +1,11 @@
-import React from 'react';
+/**
+ * @author Kirsten Sanders
+ * @description This component displays an order card with details and status management.
+*/
+
 import {
   formatTime,
+  formatDate,
   formatCurrency,
   canMoveToPrevious,
   canMoveToNext,
@@ -12,6 +17,9 @@ import {
 import { useInventory } from '../hooks/useInventory';
 import '../styles/OrderCard.css';
 
+// ===================================================
+// Main OrderCard component - displays order details
+// ===================================================
 const OrderCard = ({ 
   order, 
   onUpdateStatus, 
@@ -79,6 +87,7 @@ const OrderCard = ({
         )}
       </div>
 
+      {/* Conditional rendering of action buttons based on order type */}
       {!isHistory ? (
         <ActiveOrderActions order={order} onUpdateStatus={onUpdateStatus} />
       ) : (
@@ -88,6 +97,9 @@ const OrderCard = ({
   );
 };
 
+// ===================================================
+// ACTIVE order actions
+// ===================================================
 const ActiveOrderActions = ({ order, onUpdateStatus }) => {
   return (
     <div className="order-actions">
@@ -149,15 +161,10 @@ const ActiveOrderActions = ({ order, onUpdateStatus }) => {
   );
 };
 
+// ===================================================
+// HISTORY order actions (restore cancelled orders)
+// ===================================================
 const HistoryOrderActions = ({ order, onUpdateStatus }) => {
-  const formatDate = (date) => {
-    return new Date(date).toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric'
-    });
-  };
-
   return (
     <div className="history-actions">
       <div className="order-date">

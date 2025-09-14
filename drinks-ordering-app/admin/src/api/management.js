@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description This is the API service for user management (admin only can access these endpoints)
+*/
+
 import api from "./api";
 
 export const managementAPI = {
@@ -11,7 +16,7 @@ export const managementAPI = {
     }
   },
 
-  // Update user role (PATCH) - Updated to send level instead of is_admin
+  // Update user level (stadd/admin)
   updateUserRole: async (userId, roleData) => {
     try {
       const response = await api.patch(`/api/management/${userId}/role/`, {
@@ -23,7 +28,7 @@ export const managementAPI = {
     }
   },
 
-  // Register new staff user - Updated to only send required fields
+  // Register new staff user
   registerUser: async (userData) => {
     try {
       const response = await api.post("/api/management/register/", {

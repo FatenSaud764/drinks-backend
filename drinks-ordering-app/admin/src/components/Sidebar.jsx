@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description This component renders the sidebar navigation for the admin interface.
+*/
+
 import { Link, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import '../styles/Sidebar.css';

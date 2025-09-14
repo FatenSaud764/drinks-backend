@@ -1,8 +1,9 @@
-// View and update orders
-import api from "./api";
+/**
+ * @author Kirsten Sanders
+ * @description This is the API service for orders
+*/
 
-// I will add try-catches for error handling (as I followed this approach in my internship API calls for better error management)
-// OTP verification - will need an extra endpoint ?
+import api from "./api";
 
 export const ordersAPI = {
   // Fetch all orders (staff can see all)

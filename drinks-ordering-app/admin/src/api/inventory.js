@@ -1,5 +1,8 @@
-// CRUD (create, read, update, delete) operations for drinks
-// Mainly for managing inventory and drink details
+/**
+ * @author Kirsten Sanders
+ * @description This is the API service for inventory management (drinks)
+*/
+
 import api from "./api";
 
 export const inventoryAPI = {

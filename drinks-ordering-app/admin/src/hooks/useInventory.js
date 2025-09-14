@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description This is a hook that manages the inventory of drinks.
+*/
+
 import { useState, useEffect, useCallback } from 'react';
 import { inventoryAPI } from '../api/inventory';
 
@@ -146,64 +151,3 @@ export const useInventory = () => {
     clearError
   };
 };
-
-// I DO NOT THINK THIS IS BEING USED ANYMORE
-// export const useDrink = (drinkId) => {
-//   const [drink, setDrink] = useState(null);
-//   const [loading, setLoading] = useState(false);
-//   const [error, setError] = useState(null);
-
-//   const fetchDrink = useCallback(async () => {
-//     if (!drinkId) return;
-    
-//     setLoading(true);
-//     setError(null);
-//     try {
-//       const data = await inventoryAPI.fetchDrink(drinkId);
-//       setDrink(data);
-//     } catch (err) {
-//       setError(err.message);
-//     } finally {
-//       setLoading(false);
-//     }
-//   }, [drinkId]);
-
-//   useEffect(() => {
-//     fetchDrink();
-//   }, [fetchDrink]);
-
-//   // Update low stock threshold for this drink
-//   const updateLowStockThreshold = async (threshold) => {
-//     if (!drinkId) return;
-//     try {
-//       const updated = await inventoryAPI.updateDrinkLowStockLevel(drinkId, threshold);
-//       setDrink(prev => ({ ...prev, ...updated }));
-//       return updated;
-//     } catch (err) {
-//       setError(err.message);
-//       throw err;
-//     }
-//   };
-
-//   // Update unavailable threshold for this drink
-//   const updateUnavailableThreshold = async (threshold) => {
-//     if (!drinkId) return;
-//     try {
-//       const updated = await inventoryAPI.updateDrinkUnavailableLevel(drinkId, threshold);
-//       setDrink(prev => ({ ...prev, ...updated }));
-//       return updated;
-//     } catch (err) {
-//       setError(err.message);
-//       throw err;
-//     }
-//   };
-
-//   return {
-//     drink,
-//     loading,
-//     error,
-//     refetch: fetchDrink,
-//     updateLowStockThreshold,
-//     updateUnavailableThreshold
-//   };
-// };

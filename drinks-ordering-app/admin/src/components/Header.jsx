@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description This component renders the header for the admin dashboard: themetoggle, sidebar toggle, and title.
+*/
+
 import ThemeToggle from './ThemeToggle';
 import '../styles/Header.css';
 
@@ -17,7 +22,7 @@ const Header = ({ toggleSidebar, isSidebarOpen }) => {
         <span className="toggle-text">Menu</span>
       </button>
       
-      <h1 className="header-title">Admin</h1>
+      <h1 className="header-title">SwiftServe Staff</h1>
       
       <div className="header-actions">
         <ThemeToggle/>
