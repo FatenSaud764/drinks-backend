@@ -1,5 +1,4 @@
-// CRUD (create, read, update, delete) operations for drinks
-// Mainly for managing inventory and drink details
+// CRUD (create, read, update, delete) operations for drinks for inventory management
 import api from "./api";
 
 export const inventoryAPI = {

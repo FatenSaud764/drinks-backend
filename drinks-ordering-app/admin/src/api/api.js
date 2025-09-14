@@ -1,11 +1,10 @@
-// axios instance for API requests - session-based authentication for now
+// axios instance for API requests
 import axios from "axios";
 
 const api = axios.create({
   baseURL: "http://localhost:8000/",
   timeout: 10000,
   headers: {
-    // "Content-Type": "application/json",
     accept: "application/json"
   },
 });
