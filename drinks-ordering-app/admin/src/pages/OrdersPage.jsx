@@ -1,4 +1,10 @@
-import React, { useState, useEffect } from 'react';
+/**
+ * @author Kirsten Sanders
+ * @description This is the main page for managing active orders in the admin interface.
+ * It allows staff to view, filter, search, and update the status of orders in real-time.
+*/
+
+import { useState, useEffect } from 'react';
 import '../styles/Pages.css';
 import OrderCard from '../components/OrderCard';
 import FilterControls from '../components/FilterControls';
@@ -14,8 +20,8 @@ import { ORDER_STATUSES } from 'shared/types';
 import { normaliseOrder } from '../utils/normaliseOrder';
 import { useActiveOrders } from '../hooks/useOrders';
 // Notifications
-import { toast } from 'react-toastify'; // For client-side notifications
 import { useSnackbar } from '../contexts/SnackbarContext';
+import { toast } from 'react-toastify'; // For client-side notifications
 
 const OrdersPage = () => {
   const {

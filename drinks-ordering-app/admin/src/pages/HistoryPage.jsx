@@ -1,4 +1,10 @@
-import React, { useState, useEffect } from 'react';
+/**
+ * @author Kirsten Sanders
+ * @description This is the HistoryPage component for the admin interface.
+ * It displays completed and cancelled orders with filtering options.
+*/
+
+import { useState, useEffect } from 'react';
 import '../styles/Pages.css';
 import OrderCard from '../components/OrderCard';
 import FilterControls from '../components/FilterControls';

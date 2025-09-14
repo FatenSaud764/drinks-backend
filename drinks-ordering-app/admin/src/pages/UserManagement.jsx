@@ -1,3 +1,9 @@
+/**
+ * @author Kirsten Sanders
+ * @description This is the UserManagementPage component for the admin interface.
+ * It allows viewing, adding, and managing staff and admin user accounts.
+*/
+
 import { useState, useMemo } from 'react';
 import { MaterialReactTable } from 'material-react-table';
 import { useAuth } from '../contexts/AuthContext';

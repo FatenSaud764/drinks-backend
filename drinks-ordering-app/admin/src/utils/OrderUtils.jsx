@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description This file contains utility functions for managing and manipulating order data.
+*/
+
 import { toast } from 'react-toastify';
 import { ORDER_STATUSES } from 'shared/types';
 
