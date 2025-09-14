@@ -1,4 +1,8 @@
-// axios instance for API requests
+/**
+ * @author Kirsten Sanders
+ * @description This is the axios instance for API requests
+*/
+
 import axios from "axios";
 
 const api = axios.create({

@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description This is the API service for user management (admin only can access these endpoints)
+*/
+
 import api from "./api";
 
 export const managementAPI = {

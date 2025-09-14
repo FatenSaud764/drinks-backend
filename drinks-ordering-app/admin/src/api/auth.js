@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description This is the authentication API module
+*/
+
 import api from "./api";
 
 export const authAPI = {
