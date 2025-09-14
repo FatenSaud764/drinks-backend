@@ -1,0 +1,101 @@
+/* OTP Pin Modal (MUI) */
+
+/* Dialog Paper Styling */
+.otp-modal .MuiDialog-paper {
+  border-radius: 8px;
+  min-height: 300px;
+}
+
+/* Dialog Title */
+.otp-modal-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+}
+
+.otp-modal-title.find-mode,
+.otp-modal-title.complete-mode {
+  background-color: var(--accent-secondary);
+  color: white;
+}
+
+.otp-modal-title-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.otp-modal-close-button {
+  color: inherit;
+}
+
+/* Dialog Content */
+.otp-modal-content {
+  padding-top: 16px;
+}
+
+.otp-modal-message {
+  margin-bottom: 16px;
+}
+
+/* PIN Input */
+.otp-modal-pin-input {
+  margin-bottom: 16px;
+}
+
+.otp-modal-pin-input .MuiInputBase-input {
+  font-size: 1.2rem;
+  text-align: center;
+  letter-spacing: 0.2rem;
+}
+
+/* Order Details */
+.otp-modal-order-details {
+  background-color: #fafafa;
+  padding: 16px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  border: 1px solid #e0e0e0;
+}
+
+.otp-modal-order-title {
+  margin-bottom: 8px;
+  color: var(--accent-color);
+  font-weight: 600;
+}
+
+.otp-modal-order-item {
+  margin-bottom: 4px;
+}
+
+.otp-modal-items-list {
+  margin-left: 16px;
+}
+
+/* Error Alert */
+.otp-modal-error {
+  margin-bottom: 16px;
+}
+
+/* Dialog Actions */
+.otp-modal-actions {
+  padding: 0 24px 24px 24px;
+}
+
+.otp-modal-submit-button {
+  min-width: 120px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .otp-modal .MuiDialog-paper {
+    margin: 16px;
+    width: calc(100% - 32px);
+  }
+  
+  .otp-modal-pin-input .MuiInputBase-input {
+    font-size: 1.1rem;
+    letter-spacing: 0.1rem;
+  }
+}

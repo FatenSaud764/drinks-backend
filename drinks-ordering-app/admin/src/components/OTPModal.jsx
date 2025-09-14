@@ -1,4 +1,9 @@
-import React, { useState, useEffect } from 'react';
+/**
+ * @author Kirsten Sanders
+ * @description This component provides a modal dialog for OTP (One-Time Password) verification.
+*/
+
+import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -15,6 +20,7 @@ import { Close as CloseIcon, Lock as LockIcon, Search as SearchIcon } from '@mui
 import { useOrderOTP } from '../hooks/useOrders';
 import { useInventory } from '../hooks/useInventory';
 import { normaliseOrder } from '../utils/normaliseOrder';
+import '../styles/OTPModal.css';
 
 const OTPModal = ({ 
   open, 
@@ -73,17 +79,14 @@ const OTPModal = ({
   const findOrderByPin = async (pinValue) => {
     if (!pinValue || !pinValue.trim()) return null;
     
-    // Ensure PIN is always treated as a string
     const pinString = pinValue.trim().toString();
     
-    // Try to verify PIN against each ready order
     for (const availableOrder of availableOrders) {
       try {
         const normalisedOrder = normaliseOrder(availableOrder);
         await verifyOTP(normalisedOrder.id, pinString);
         return normalisedOrder;
       } catch (err) {
-        // Continue to next order if PIN doesn't match this one
         continue;
       }
     }
@@ -100,7 +103,6 @@ const OTPModal = ({
       return;
     }
 
-    // Ensure PIN is always sent as a string
     const pinString = pin.trim().toString();
 
     try {
@@ -112,7 +114,6 @@ const OTPModal = ({
           return;
         }
 
-        // Set the found order to display its details
         setFoundOrder(targetOrder);
         onConfirm(true, targetOrder);
         handleClose();
@@ -149,12 +150,10 @@ const OTPModal = ({
     setPin(e.target.value);
     setLocalError('');
     clearOtpError();
-    setFoundOrder(null); // Clear any previously found order when typing
+    setFoundOrder(null);
   };
 
   const displayError = otpError || localError;
-
-  // Display the order (either the passed order or the found order)
   const displayOrder = order ? normaliseOrder(order) : foundOrder;
 
   return (
@@ -163,44 +162,31 @@ const OTPModal = ({
       onClose={handleClose}
       maxWidth="sm"
       fullWidth
-      sx={{
-        '& .MuiDialog-paper': {
-          borderRadius: 2,
-          minHeight: 350
-        }
-      }}
+      className="otp-modal"
     >
-      <DialogTitle sx={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        justifyContent: 'space-between',
-        pb: 1,
-        bgcolor: mode === 'find' ? 'info.light' : 'warning.light',
-        color: mode === 'find' ? 'info.contrastText' : 'warning.contrastText'
-      }}>
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+      <DialogTitle className={`otp-modal-title ${mode === 'find' ? 'find-mode' : 'complete-mode'}`}>
+        <div className="otp-modal-title-content">
           {mode === 'find' ? <SearchIcon /> : <LockIcon />}
           <Typography variant="h6" component="span">
             {getTitle()}
           </Typography>
-        </Box>
+        </div>
         <IconButton 
           onClick={handleClose} 
           size="small"
           disabled={otpLoading}
-          sx={{ color: 'inherit' }}
+          className="otp-modal-close-button"
         >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
 
       <form onSubmit={handleSubmit}>
-        <DialogContent sx={{ pt: 2 }}>
-          <Typography variant="body1" sx={{ mb: 2 }}>
+        <DialogContent className="otp-modal-content">
+          <Typography variant="body1" className="otp-modal-message">
             {getMessage()}
           </Typography>
 
-          {/* PIN Input */}
           <TextField
             autoFocus
             fullWidth
@@ -210,42 +196,26 @@ const OTPModal = ({
             value={pin}
             onChange={handlePinChange}
             disabled={otpLoading}
-            inputProps={{
-              maxLength: 10,
-              style: { 
-                fontSize: '1.2rem', 
-                textAlign: 'center',
-                letterSpacing: '0.2rem'
-              }
-            }}
-            sx={{ mb: 2 }}
+            className="otp-modal-pin-input"
             placeholder="Enter PIN"
             helperText="Enter the PIN from your order receipt"
           />
 
-          {/* Order Details - Show after order is found or if order is pre-selected */}
           {displayOrder && (
-            <Box sx={{ 
-              bgcolor: 'grey.50', 
-              p: 2, 
-              borderRadius: 1, 
-              mb: 2,
-              border: '1px solid',
-              borderColor: 'grey.200'
-            }}>
-              <Typography variant="subtitle2" color="primary" sx={{ mb: 1 }}>
+            <div className="otp-modal-order-details">
+              <Typography variant="subtitle2" className="otp-modal-order-title">
                 Order Details:
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" className="otp-modal-order-item">
                 <strong>Order:</strong> {displayOrder.orderNumber}
               </Typography>
-              <Typography variant="body2">
+              <Typography variant="body2" className="otp-modal-order-item">
                 <strong>Total:</strong> R{displayOrder.totalAmount.toFixed(2)}
               </Typography>
-              <Typography variant="body2" sx={{ mb: 1 }}>
+              <Typography variant="body2" className="otp-modal-order-item">
                 <strong>Items:</strong>
               </Typography>
-              <Box sx={{ ml: 2 }}>
+              <div className="otp-modal-items-list">
                 {displayOrder.items?.map((item, index) => {
                   const drink = getDrinkById(item.drink_id);
                   const itemName = drink?.name || 'Unknown Item';
@@ -260,18 +230,18 @@ const OTPModal = ({
                     No items listed
                   </Typography>
                 )}
-              </Box>
-            </Box>
+              </div>
+            </div>
           )}
 
           {displayError && (
-            <Alert severity="error" sx={{ mb: 2 }}>
+            <Alert severity="error" className="otp-modal-error">
               {displayError}
             </Alert>
           )}
         </DialogContent>
 
-        <DialogActions sx={{ px: 3, pb: 3 }}>
+        <DialogActions className="otp-modal-actions">
           <Button 
             onClick={handleCancel}
             disabled={otpLoading}
@@ -284,6 +254,7 @@ const OTPModal = ({
             variant="contained"
             disabled={otpLoading || !pin.trim()}
             color={mode === 'find' ? 'info' : 'warning'}
+            className="otp-modal-submit-button"
           >
             {otpLoading ? 'Verifying...' : mode === 'find' ? 'Find & Complete' : 'Confirm Completion'}
           </Button>

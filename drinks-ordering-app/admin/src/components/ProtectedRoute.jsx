@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description This component protects routes by checking authentication status.
+*/
+
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect } from "react";
