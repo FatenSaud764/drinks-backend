@@ -178,6 +178,14 @@ SPECTACULAR_SETTINGS = {
     'SECURITY': [
         {'BearerAuth': []},
     ],
+    'SECURITY_SCHEMES': {
+        'BearerAuth': {
+            'type': 'http',
+            'scheme': 'bearer',
+            'bearerFormat': 'JWT',
+            'description': 'Send the access token in the Authorization header as: Bearer <token>'
+        }
+    },
     'AUTHENTICATION_WHITELIST': [
         'rest_framework.authentication.SessionAuthentication',
     ],

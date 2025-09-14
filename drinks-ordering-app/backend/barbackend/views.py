@@ -1,4 +1,5 @@
 from rest_framework import viewsets, permissions, status
+from rest_framework import serializers as drf_serializers
 from .serializers import *
 from .models import *
 from rest_framework.response import Response
@@ -9,6 +10,14 @@ from datetime import timedelta
 from django.db import models
 from django.db.models import F, Case, When, Value, BooleanField, Q
 from rest_framework.exceptions import PermissionDenied
+from drf_spectacular.utils import (
+    extend_schema,
+    OpenApiParameter,
+    OpenApiResponse,
+    OpenApiExample,
+    inline_serializer,
+)
+from drf_spectacular.types import OpenApiTypes
 
 def _require_platform_admin(user):
     if not getattr(user, 'is_authenticated', False) or not getattr(user, 'is_admin', False):
@@ -22,6 +31,12 @@ class DrinkViewset(viewsets.ViewSet):
     queryset = Drink.objects.all()
     serializer_class = DrinkSerializer
     
+    @extend_schema(
+        tags=["Drinks"],
+        summary="List drinks",
+        responses={200: DrinkSerializer(many=True)},
+        description="Returns all drinks. Authorization: Bearer JWT required.",
+    )
     def list(self, request):
         """
         GET /api/drink/
@@ -31,6 +46,27 @@ class DrinkViewset(viewsets.ViewSet):
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
     
+    @extend_schema(
+        tags=["Drinks"],
+        summary="Create drink",
+        request=DrinkSerializer,
+        responses={201: DrinkSerializer, 400: OpenApiResponse(description="Validation error")},
+        examples=[
+            OpenApiExample(
+                "Create drink (multipart)",
+                value={
+                    "name": "Cola",
+                    "description": "Soda",
+                    "price": "1.25",
+                    "category": "soft",
+                    "available": True,
+                    "stock": 10
+                },
+                request_only=True,
+            )
+        ],
+        description="Create a drink. Use multipart/form-data for image uploads. Authorization: Bearer JWT required.",
+    )
     def create(self, request):
         """
         POST /api/drink/
@@ -42,6 +78,13 @@ class DrinkViewset(viewsets.ViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    @extend_schema(
+        tags=["Drinks"],
+        summary="Retrieve drink",
+        responses={200: DrinkSerializer, 404: OpenApiResponse(description="Not found")},
+        parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
+        description="Get a drink by ID. Authorization: Bearer JWT required.",
+    )
     def retrieve(self, request, pk=None):
         """
         GET /api/drink/{id}/
@@ -51,6 +94,14 @@ class DrinkViewset(viewsets.ViewSet):
         serializer = self.serializer_class(drink)
         return Response(serializer.data)
     
+    @extend_schema(
+        tags=["Drinks"],
+        summary="Update drink (PUT)",
+        request=DrinkSerializer,
+        responses={200: DrinkSerializer, 400: OpenApiResponse(description="Validation error")},
+        parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
+        description="Replace a drink. Use multipart/form-data for image. Authorization: Bearer JWT required.",
+    )
     def update(self, request, pk=None):
         """
         PUT /api/drink/{id}/
@@ -63,6 +114,14 @@ class DrinkViewset(viewsets.ViewSet):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    @extend_schema(
+        tags=["Drinks"],
+        summary="Update drink (PATCH)",
+        request=DrinkSerializer(partial=True),
+        responses={200: DrinkSerializer, 400: OpenApiResponse(description="Validation error")},
+        parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
+        description="Partially update a drink. Authorization: Bearer JWT required.",
+    )
     def partial_update(self, request, pk=None):
         """
         PATCH /api/drink/{id}/
@@ -75,6 +134,13 @@ class DrinkViewset(viewsets.ViewSet):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    @extend_schema(
+        tags=["Drinks"],
+        summary="Delete drink",
+        responses={204: OpenApiResponse(description="Deleted"), 404: OpenApiResponse(description="Not found")},
+        parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
+        description="Delete a drink. Authorization: Bearer JWT required.",
+    )
     def destroy(self, request, pk=None):
         """
         DELETE /api/drink/{id}/
@@ -194,6 +260,12 @@ class OrderViewset(viewsets.ViewSet):
         """
         return Order.objects.all()
 
+    @extend_schema(
+        tags=["Orders"],
+        summary="List orders",
+        responses={200: OrderSerializer(many=True)},
+        description="List orders (all for admin or own for customer). Authorization: Bearer JWT required.",
+    )
     def list(self, request):
         """
         GET /api/orders/
@@ -203,6 +275,13 @@ class OrderViewset(viewsets.ViewSet):
         queryset = self.get_queryset(request)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
+    @extend_schema(
+        tags=["Orders"],
+        summary="Retrieve order",
+        responses={200: OrderSerializer, 404: OpenApiResponse(description="Not found")},
+        parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
+        description="Get order by ID. Authorization: Bearer JWT required.",
+    )
     def retrieve(self, request, pk=None):
         """
         GET /api/orders/{id}/
@@ -213,6 +292,13 @@ class OrderViewset(viewsets.ViewSet):
         serializer = self.serializer_class(order)
         return Response(serializer.data)
 
+    @extend_schema(
+        tags=["Orders"],
+        summary="Create order from cart",
+        request=None,
+        responses={201: OrderSerializer, 400: OpenApiResponse(description="Validation error")},
+        description="Create a new order from the current user's cart. Authorization: Bearer JWT required.",
+    )
     def create(self, request):
         """
         POST /api/orders/
@@ -239,6 +325,19 @@ class OrderViewset(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['patch'], url_path='status')
+    @extend_schema(
+        tags=["Orders"],
+        summary="Change order status",
+        request=inline_serializer(
+            name="OrderStatusPatch",
+            fields={
+                'status': drf_serializers.ChoiceField(choices=[c[0] for c in Order.STATUS_CHOICES])
+            }
+        ),
+        responses={200: OrderSerializer, 400: OpenApiResponse(description="Invalid status")},
+        parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
+        description="Set status to one of: pending, preparing, ready, completed, cancelled. Authorization: Bearer JWT required.",
+    )
     def change_status(self, request, pk=None):
         """
         PATCH /api/orders/{id}/status/
@@ -258,6 +357,18 @@ class OrderViewset(viewsets.ViewSet):
 
     # Owner-only: fetch current OTP (plaintext) if order is ready and not completed/cancelled
     @action(detail=True, methods=['get'], url_path='otp')
+    @extend_schema(
+        tags=["Orders"],
+        summary="Get OTP (owner only)",
+        responses={
+            200: inline_serializer(name='OTPCode', fields={'code': drf_serializers.CharField()}),
+            400: OpenApiResponse(description="Not ready or already used"),
+            403: OpenApiResponse(description="Forbidden"),
+            404: OpenApiResponse(description="No OTP"),
+        },
+        parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
+        description="Returns the plaintext OTP for the order if owner and status=ready. Authorization: Bearer JWT required.",
+    )
     def get_otp(self, request, pk=None):
         """
         GET /api/orders/{id}/otp/
@@ -281,6 +392,18 @@ class OrderViewset(viewsets.ViewSet):
 
     # Staff action: verify OTP and complete the order
     @action(detail=True, methods=['post'], url_path='otp/verify')
+    @extend_schema(
+        tags=["Orders"],
+        summary="Verify OTP and complete order",
+        request=inline_serializer(name='VerifyOTPRequest', fields={'code': drf_serializers.CharField()}),
+        responses={
+            200: inline_serializer(name='VerifyOTPResponse', fields={'detail': drf_serializers.CharField()}),
+            400: OpenApiResponse(description="Invalid code or already used"),
+            404: OpenApiResponse(description="No OTP"),
+        },
+        parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
+        description="Verify the OTP using JSON body { code: '123456' }. Authorization: Bearer JWT required.",
+    )
     def verify_otp(self, request, pk=None):
         """
         POST /api/orders/{id}/otp/verify/
@@ -305,6 +428,13 @@ class OrderViewset(viewsets.ViewSet):
         order.save(update_fields=['status'])
         return Response({'detail': 'OTP verified. Order completed.'})
 
+    @extend_schema(
+        tags=["Orders"],
+        summary="Cancel pending order",
+        responses={204: OpenApiResponse(description="Cancelled"), 400: OpenApiResponse(description="Only pending can be cancelled")},
+        parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
+        description="Delete an order only if it is pending. Authorization: Bearer JWT required.",
+    )
     def destroy(self, request, pk=None):
         """
         DELETE /api/orders/{id}/
@@ -332,6 +462,12 @@ class CartViewset(viewsets.GenericViewSet):
         cart, _ = Cart.objects.get_or_create(user=user)
         return cart
 
+    @extend_schema(
+        tags=["Cart"],
+        summary="Get current cart",
+        responses={200: CartSerializer},
+        description="Return current user's cart with items. Authorization: Bearer JWT required.",
+    )
     def list(self, request):
         """
         GET /api/cart/
@@ -341,6 +477,13 @@ class CartViewset(viewsets.GenericViewSet):
         serializer = CartSerializer(cart)
         return Response(serializer.data)
 
+    @extend_schema(
+        tags=["Cart"],
+        summary="Update cart (PATCH)",
+        request=CartSerializer(partial=True),
+        responses={200: CartSerializer, 400: OpenApiResponse(description="Validation error")},
+        description="Update cart note or items. Authorization: Bearer JWT required.",
+    )
     def partial_update(self, request, pk=None):
         """
         PATCH /api/cart/
@@ -363,6 +506,12 @@ class CartViewset(viewsets.GenericViewSet):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(
+        tags=["Cart"],
+        summary="Clear cart",
+        responses={200: CartSerializer},
+        description="Clear all items and reset note. Authorization: Bearer JWT required.",
+    )
     def destroy(self, request, pk=None):
         """
         DELETE /api/cart/
@@ -375,6 +524,16 @@ class CartViewset(viewsets.GenericViewSet):
         return Response(CartSerializer(cart).data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'], url_path='items')
+    @extend_schema(
+        tags=["Cart"],
+        summary="Add item to cart",
+        request=inline_serializer(name='AddCartItemRequest', fields={
+            'drink_id': drf_serializers.IntegerField(),
+            'quantity': drf_serializers.IntegerField(min_value=1),
+        }),
+        responses={200: CartSerializer, 400: OpenApiResponse(description="Validation error")},
+        description="Add a drink to cart or increment quantity if exists. Authorization: Bearer JWT required.",
+    )
     def add_item(self, request):
         """
         POST /api/cart/items/
@@ -396,6 +555,17 @@ class CartViewset(viewsets.GenericViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['put', 'patch', 'delete'], url_path='items/(?P<item_id>[^/.]+)')
+    @extend_schema(
+        tags=["Cart"],
+        summary="Update/remove cart item",
+        parameters=[
+            OpenApiParameter(name="pk", type=OpenApiTypes.INT, location=OpenApiParameter.PATH, description="Ignored. Kept only for routing."),
+            OpenApiParameter(name="item_id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH, description="CartItem ID"),
+        ],
+        request=inline_serializer(name='UpdateCartItemRequest', fields={'quantity': drf_serializers.IntegerField(min_value=1, required=False)}),
+        responses={200: CartSerializer, 400: OpenApiResponse(description="Validation error")},
+        description="PUT/PATCH to change quantity; DELETE to remove item. Authorization: Bearer JWT required.",
+    )
     def update_item(self, request, pk=None, item_id=None):
         """
         PUT/PATCH /api/cart/{cart_id}/items/{item_id}/ -> update quantity of a specific item in the cart.
@@ -413,6 +583,12 @@ class CartViewset(viewsets.GenericViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['delete'], url_path='clear')
+    @extend_schema(
+        tags=["Cart"],
+        summary="Clear cart (alias)",
+        responses={200: CartSerializer},
+        description="DELETE /api/cart/clear/ clears all items. Authorization: Bearer JWT required.",
+    )
     def clear_cart(self, request):
         """
         DELETE /api/cart/clear/
