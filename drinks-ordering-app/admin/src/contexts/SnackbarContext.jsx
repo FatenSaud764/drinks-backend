@@ -1,4 +1,9 @@
-import React, { createContext, useContext, useState } from 'react';
+/**
+ * @author Kirsten Sanders
+ * @description This component handles the global snackbar notifications.
+*/
+
+import { createContext, useContext, useState } from 'react';
 import { Snackbar, Alert } from '@mui/material';
 
 const SnackbarContext = createContext();

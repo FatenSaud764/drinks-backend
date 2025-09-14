@@ -1,4 +1,9 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+/**
+ * @author Kirsten Sanders
+ * @description This component handles authentication state
+*/
+
+import { createContext, useContext, useState, useEffect } from 'react';
 import { authAPI } from '../api/auth';
 import { tokenManager } from '../api/auth';
 
