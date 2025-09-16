@@ -254,11 +254,28 @@ class OrderViewset(viewsets.ViewSet):
     permission_classes = [permissions.AllowAny]
     serializer_class = OrderSerializer
 
+    
     def get_queryset(self, request):
         """
-        Returns a queryset of all orders. (TEMP: does not filter by user)
+        Returns a queryset filtered by user permissions:
+        - Admin users: see all orders  
+        - Regular users: see only their own orders
         """
-        return Order.objects.all()
+        # Get the authenticated user (with fallback for development)
+        user = request.user if request.user.is_authenticated else User.objects.first()
+        
+        if not user:
+            # If no user found, return empty queryset
+            return Order.objects.none()
+        
+        # Check if user has admin privileges
+        if hasattr(user, 'is_admin') and user.is_admin:
+            return Order.objects.all()
+        elif hasattr(user, 'is_staff') and user.is_staff:
+            return Order.objects.all()
+        
+        # For regular users, filter by their orders only
+        return Order.objects.filter(user=user)
 
     @extend_schema(
         tags=["Orders"],
