@@ -58,7 +58,7 @@ export default function NavBar() {
             <div className="menu-pane">
               <h2 className="menu-title">Menu</h2>
               <nav className="menu-buttons">
-                {loggedin && <div className="menu-user-info">Hey, {user?user.username:'Samus!'}</div>}
+                {loggedin && <div className="menu-user-info">Hey, {user?user.username:''}</div>}
                 <NavLink to="/home" className="menu-btn" onClick={closeMenu}>Home</NavLink>
                 <NavLink to="/products" className="menu-btn" onClick={closeMenu}>Products</NavLink>
                 {user && <NavLink to="/cart" className="menu-btn" onClick={closeMenu}>Cart</NavLink>}
