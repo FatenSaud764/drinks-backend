@@ -21,6 +21,7 @@ const Cart = () => {
         },
       });
       setCartItems(res.data.items);
+      console.log('my cart', cartItems);
     } catch (err) {
       console.error(err);
     }
@@ -28,7 +29,8 @@ const Cart = () => {
 
   const PlaceOrder = async() => {
     try {
-    await AxiosInstance.post('/api/orders/', {headers : {Authorization: `Bearer ${accessToken}`}})
+    const result = await AxiosInstance.post('/api/orders/', cartItems, {headers : {Authorization: `Bearer ${accessToken}`}})
+    console.log('order', result.data)
     alert("Placed order!")
     window.location.reload()
   } catch (err) {
