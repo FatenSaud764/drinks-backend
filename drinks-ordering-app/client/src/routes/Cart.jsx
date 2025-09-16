@@ -4,6 +4,7 @@ import { AccessTokens, LightDark, ProductList, UserCart } from '../contexts/cont
 import './Cart.css'
 import { useState } from 'react'
 import AxiosInstance from '../components/Axios'
+import { FaRegTrashCan } from "react-icons/fa6";
 
 const Cart = () => {
   const { theme, setTheme } = useContext(LightDark)
@@ -32,10 +33,20 @@ const Cart = () => {
     const result = await AxiosInstance.post('/api/orders/', cartItems, {headers : {Authorization: `Bearer ${accessToken}`}})
     console.log('order', result.data)
     alert("Placed order!")
-    window.location.reload()
+    fetchdata()
   } catch (err) {
     console.error(err);
   }
+  }
+
+  const ClearCart = async() => {
+    try{
+      await AxiosInstance.delete('/api/cart/', {headers: {Authorization: `Bearer ${accessToken}`}})
+      fetchdata();
+    }
+    catch(err) {
+      console.error(err);
+    }
   }
 
 
@@ -123,7 +134,14 @@ const Cart = () => {
             </ul>
           )}
         </div>
+        {cartItems.length>0 && 
+      <div className='clearcart'>
+        <span className='clearcarttext'>Clear Cart</span>
+        <button className='clearcartbutton' onClick={() => {ClearCart()}}><FaRegTrashCan className='clearicon'/></button>
       </div>
+        }
+      </div>
+      
       {cartItems.length > 0 && (
         <div className="cart-footer">
           <span>Total: R {totalPrice}</span>
