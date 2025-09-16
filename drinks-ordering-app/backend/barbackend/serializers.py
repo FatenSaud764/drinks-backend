@@ -81,27 +81,27 @@ class CartSerializer(serializers.ModelSerializer):
         return cart
 
     def update(self, instance, validated_data):
-    items_data = validated_data.pop('items', [])
-    # Update cart note if present
-    instance.note = validated_data.get('note', instance.note)
-    instance.save()
+        items_data = validated_data.pop('items', [])
+        # Update cart note if present
+        instance.note = validated_data.get('note', instance.note)
+        instance.save()
 
-    # Update/create CartItems
-    for item_data in items_data:
-        item, created = CartItem.objects.get_or_create(
-            cart=instance,
-            drink=item_data['drink'],
-            defaults={'quantity': item_data['quantity']}
-        )
-        if not created:
-            if item_data['quantity'] <= 0:
-                # Delete item if quantity is 0 or less
-                item.delete()
-            else:
-                # Update quantity if greater than 0
-                item.quantity = item_data['quantity']
-                item.save()
-    return instance
+        # Update/create CartItems
+        for item_data in items_data:
+            item, created = CartItem.objects.get_or_create(
+                cart=instance,
+                drink=item_data['drink'],
+                defaults={'quantity': item_data['quantity']}
+            )
+            if not created:
+                if item_data['quantity'] <= 0:
+                    # Delete item if quantity is 0 or less
+                    item.delete()
+                else:
+                    # Update quantity if greater than 0
+                    item.quantity = item_data['quantity']
+                    item.save()
+        return instance
 
 
 class UserSerializer(serializers.ModelSerializer):
