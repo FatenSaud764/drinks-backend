@@ -26,6 +26,16 @@ const Cart = () => {
     }
   }
 
+  const PlaceOrder = async() => {
+    try {
+    await AxiosInstance.post('/api/orders/', {headers : {Authorization: `Bearer ${accessToken}`}})
+    alert("Placed order!")
+    window.location.reload()
+  } catch (err) {
+    console.error(err);
+  }
+  }
+
 
   // Save to localStorage whenever cartItems changes
   useEffect(() => {
@@ -115,7 +125,7 @@ const Cart = () => {
       {cartItems.length > 0 && (
         <div className="cart-footer">
           <span>Total: R {totalPrice}</span>
-          <button className="checkout-btn">Checkout</button>
+          <button className="checkout-btn" onClick={() => {PlaceOrder()}}>Checkout</button>
         </div>
       )}
     </div>

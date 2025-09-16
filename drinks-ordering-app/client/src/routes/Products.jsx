@@ -91,7 +91,7 @@ const Products = () => {
               <div className='productdesc'>{product.name}</div>
               <div className='additemwrapper'>
               <div className='productprice'>R{product.price}</div>
-              {product.available && <button className='additem' onClick={() => {if(cartItems.find(item => item.drink_id===product.id).quantity<product.stock){addToCart(product.id)}}}>+</button>}
+              {product.available && <button className='additem' onClick={() => {if(cartItems || cartItems.find(item => item.drink_id===product.id).quantity<product.stock){addToCart(product.id)}}}>+</button>}
               </div>
               </div>
           )
