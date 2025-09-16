@@ -31,10 +31,20 @@ const Cart = () => {
     try {
     await AxiosInstance.post('/api/orders/', {headers : {Authorization: `Bearer ${accessToken}`}})
     alert("Placed order!")
-    window.location.reload()
+    fetchdata()
   } catch (err) {
     console.error(err);
   }
+  }
+
+  const ClearCart = async() => {
+    try{
+      await AxiosInstance.delete('/api/cart/', {headers: {Authorization: `Bearer ${accessToken}`}})
+      fetchdata();
+    }
+    catch(err) {
+      console.error(err);
+    }
   }
 
 
@@ -125,7 +135,7 @@ const Cart = () => {
         {cartItems.length>0 && 
       <div className='clearcart'>
         <span className='clearcarttext'>Clear Cart</span>
-        <button className='clearcartbutton'><FaRegTrashCan className='clearicon'/></button>
+        <button className='clearcartbutton' onClick={() => {ClearCart()}}><FaRegTrashCan className='clearicon'/></button>
       </div>
         }
       </div>
