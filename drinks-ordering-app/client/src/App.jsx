@@ -99,7 +99,7 @@ const GetCartData = async () => {
     <ProductList.Provider value={{products, setProducts}}>
     <UserCart.Provider value={{cart, setCart}}>
     <Routes>
-      <Route path='/' element={<Login />} />
+      <Route path='/' element={!accessToken||accessToken=='null' ? <Login /> : <Products />} />
       <Route path='/products' element={<Products />} />
       <Route path='/cart' element={<Cart />} />
       <Route path='/drinkinfo' element={<DrinkInfo />} />

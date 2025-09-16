@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import './Products.css'
-import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct, AccessTokens, RefreshTokens, CartModalBoolean } from '../contexts/contexts';
+import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct, AccessTokens, RefreshTokens, CartModalBoolean, UserCart } from '../contexts/contexts';
 import ThemeButton from '../components/ThemeButton';
 import { TiShoppingCart } from "react-icons/ti";
 import { AiOutlineMenu } from "react-icons/ai";
@@ -26,6 +26,7 @@ const Products = () => {
   const keys = ['name'];
   const [cartModal, setCartModal] = useState(false);
   const [drinkAdded, setDrinkAdded] = useState('');
+  const [cartItems, setCartItems] = useState([]);
 
   const {accessToken, setAccessToken} = useContext(AccessTokens);
   const {refreshToken, setRefreshToken} = useContext(RefreshTokens);
@@ -54,6 +55,25 @@ const Products = () => {
     } else{alert('Log in to add to cart and place orders')}
   }
 
+  const fetchdata = async () => {
+    try {
+      const res = await AxiosInstance.get('api/cart/', {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      setCartItems(res.data.items);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+
+  // Save to localStorage whenever cartItems changes
+  useEffect(() => {
+    fetchdata();
+  }, [])
+
   return (
     <div className='prodwrapper' id={theme}>
       <NavBar />
@@ -71,7 +91,7 @@ const Products = () => {
               <div className='productdesc'>{product.name}</div>
               <div className='additemwrapper'>
               <div className='productprice'>R{product.price}</div>
-              {product.available && <button className='additem' onClick={() => {addToCart(product.id)}}>+</button>}
+              {product.available && <button className='additem' onClick={() => {if(cartItems.find(item => item.drink_id===product.id).quantity<product.stock){addToCart(product.id)}}}>+</button>}
               </div>
               </div>
           )

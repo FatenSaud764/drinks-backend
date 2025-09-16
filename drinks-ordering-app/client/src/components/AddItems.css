@@ -2,7 +2,7 @@
     display: grid;
     grid-template-rows: 1fr;
     grid-template-columns: auto auto auto;
-    column-gap: 1vw;
+    column-gap: 3vw;
     width: auto;
     min-width: 17vw;
     overflow-x: auto;
@@ -16,8 +16,8 @@
 .additembutton {
     color: white;
     background: #2563EB;
-    width: 5vw;
-    height: 5vw;
+    width: 4vw;
+    height: 4vw;
     border-radius: 100%;
     border: none;
     align-items: center;
@@ -39,9 +39,10 @@
     color: white;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 800px) {
   .additembutton {
-    width: 12vw;
-    height: 12vw;
+    width: 8vw;
+    height: 8vw;
+    font-size: 20px;
   }
 }

@@ -136,11 +136,11 @@
   margin-top: 91vh;
   width: 100vw;
   height: 9vh;
-  background: none;
+  background: #2563EB;
   display: flex;
   justify-content: space-evenly;
   align-items: center;
-  color: black;
+  color: white;
   flex-shrink: 0;
   min-height: 8vh;
 }
@@ -156,6 +156,7 @@
 
 #dark .cart-footer{
   color: white;
+  background: #F59E0B;
 }
 
 
@@ -176,6 +177,10 @@
   height: 5vh;
   justify-content: center;
   align-items: center;
+}
+
+#dark .checkout-btn{
+  border: 2px solid white;
 }
 
 .checkout-btn:hover {

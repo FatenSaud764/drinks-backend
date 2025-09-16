@@ -13,6 +13,7 @@ const AddItems = ({prod, num, setNum}) => {
     } else if (plus && num < parseInt(prod.stock)) {
       setNum(num + 1);
     }
+    else if(plus&&num===parseInt(prod.stock)){alert("Not enough stock!")}
   }
 
   return (

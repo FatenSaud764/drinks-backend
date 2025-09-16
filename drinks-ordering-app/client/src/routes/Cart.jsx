@@ -54,8 +54,19 @@ const Cart = () => {
     const new_quantity = quantity - 1;
     const update = async () => {
       try {
-        setCartItems(cartItems.map(item => item.drink_id === drink_id ? { ...item, quantity: item.quantity - 1 } : item));
-        const res = await AxiosInstance.patch(`/api/cart/`, { items: [{ "id": cart.id, "drink_id": drink_id, quantity: new_quantity }] }, { headers: { Authorization: `Bearer ${accessToken}` } });
+        // Update UI immediately, even if quantity becomes 0
+        setCartItems(prevCartItems =>
+          prevCartItems.map(item =>
+            item.drink_id === drink_id ? { ...item, quantity: item.quantity - 1 } : item
+          )
+        );
+
+        // Send update to backend
+        const res = await AxiosInstance.patch(`/api/cart/`, {
+          items: [{ "id": cart.id, "drink_id": drink_id, quantity: new_quantity }]
+        }, {
+          headers: { Authorization: `Bearer ${accessToken}` }
+        });
       }
       catch (err) {
         console.error(err);
@@ -87,9 +98,13 @@ const Cart = () => {
                     <span className="item-price">R {products.filter(product => { return product.id === item.drink_id }).map(product => product.price)}</span>
                   </div>
                   <div className="item-controls">
-                    <button onClick={() => decrement(item.quantity, item.drink_id)}>-</button>
+                    <button onClick={() => {
+                      if (item.quantity > 0) {
+                        decrement(item.quantity, item.drink_id)
+                      }
+                    }}>-</button>
                     <span className="item-qty">{cartItems[i].quantity}</span>
-                    <button onClick={() => increment(item.quantity, item.drink_id)}>+</button>
+                    <button onClick={() => { if (item.quantity < products.filter(product => { return product.id === item.drink_id }).map(product => product.stock)) { increment(item.quantity, item.drink_id) } else { alert("Not enough stock!") } }}>+</button>
                   </div>
                 </li>
               ))}

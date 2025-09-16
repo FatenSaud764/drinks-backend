@@ -3,7 +3,7 @@
     justify-items: center;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 10vh 50vh auto;
+    grid-template-rows: 10vh 50vh 12vh auto;
     row-gap: 2vh;
     height: 100vh;
     width: auto;
@@ -34,16 +34,17 @@
 }
 
 .addtocart{
-    margin-top: -5vh;
+    margin-top: -2vh;
     width: 15vh;
     height: 6vh;
-    background: #2563EB;
-    color: black;
+    background: #F59E0B;
+    color: white;
     border-radius: 20px;
     box-shadow: none;
     border: none;
     font-family: 'Nunito';
     cursor: pointer;
+    font-size: 15px;
 }
 
 .addtocart:hover {
