@@ -477,6 +477,33 @@ class StaffManagementAPITest(MediaRootTestCase):
         r = self.client.post('/api/management/', payload, format='json')
         self.assertEqual(r.status_code, 403)
 
+    def test_admin_can_delete_staff_user(self):
+        self.client.force_authenticate(user=self.admin)
+        # create a staff user to delete
+        u = User.objects.create_user(username='todelete', email='todelete@example.com', password='pw', role='staff')
+        # ensure present
+        self.assertTrue(User.objects.filter(id=u.id).exists())
+        r = self.client.delete(f'/api/management/{u.id}/')
+        self.assertEqual(r.status_code, 204, r.content)
+        self.assertFalse(User.objects.filter(id=u.id).exists())
+
+    def test_admin_cannot_delete_self(self):
+        self.client.force_authenticate(user=self.admin)
+        r = self.client.delete(f'/api/management/{self.admin.id}/')
+        self.assertEqual(r.status_code, 400)
+        self.assertTrue(User.objects.filter(id=self.admin.id).exists())
+
+    def test_non_admin_cannot_delete_user(self):
+        self.client.force_authenticate(user=self.staff)
+        r = self.client.delete(f'/api/management/{self.admin2.id}/')
+        self.assertEqual(r.status_code, 403)
+
+    def test_delete_nonexistent_user_returns_404(self):
+        self.client.force_authenticate(user=self.admin)
+        missing_id = 999999
+        r = self.client.delete(f'/api/management/{missing_id}/')
+        self.assertEqual(r.status_code, 404)
+
 
 class AuthFlowTest(MediaRootTestCase):
     def setUp(self):

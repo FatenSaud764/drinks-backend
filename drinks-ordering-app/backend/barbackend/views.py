@@ -649,6 +649,7 @@ class StaffUserViewset(viewsets.ViewSet):
     - POST /api/management/ : (legacy) create a new staff-level (non-admin) user.
     - POST /api/management/register/ : preferred endpoint to create a new staff-level (non-admin) user.
     - PATCH /api/management/{id}/role/ : update a user's privilege level (staff <-> admin) using body {"level": "staff"|"admin"}.
+        - DELETE /api/management/{id}/ : delete a staff or admin user (admin-only; cannot delete self).
       Access: request.user.is_admin must be True for all actions.
     """
 
@@ -722,3 +723,20 @@ class StaffUserViewset(viewsets.ViewSet):
                 target.is_staff = True
         target.save(update_fields=['role', 'is_staff', 'is_admin'])
         return Response(self.serializer_class(target).data)
+
+    def destroy(self, request, pk=None):
+        """DELETE /api/management/{id}/
+
+        Admin-only: Delete a staff or admin user.
+        Safeguards:
+        - Cannot delete yourself.
+        - Idempotent: deleting a non-existent user returns 404.
+        Returns 204 on success.
+        """
+        _require_platform_admin(request.user)
+        target = get_object_or_404(User, pk=pk)
+        if target.id == request.user.id:
+            return Response({'detail': 'Cannot delete your own account.'}, status=status.HTTP_400_BAD_REQUEST)
+        # Optionally, prevent deletion of the last admin, but not required here.
+        target.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
