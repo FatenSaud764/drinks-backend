@@ -75,6 +75,30 @@ const HistoryPage = () => {
   ));
   const statusOptions = ['all', 'completed', 'cancelled'];
 
+  // Artificial loading state to showcase loading spinner on initial load
+  const [artificialLoading, setArtificialLoading] = useState(true);
+  // Delay for showcasing the loading indicator
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setArtificialLoading(false);
+    }, 500); // timeout just to showcase the loading state
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading || artificialLoading) {
+    return (
+      <div className="page">
+        <div className="page-container">
+          <div className="loading-indicator">
+          <div className="loading-spinner"></div>
+          <p>Loading Order History...</p>
+        </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page">
       <div className="page-container">
