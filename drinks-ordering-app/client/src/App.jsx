@@ -2,6 +2,7 @@ import {Routes, Route} from 'react-router-dom'
 import Login from './routes/Login';
 import Products from './routes/Products';
 import Cart from './routes/Cart';
+import OrdersPage from './routes/Orders';
 import './index.css';
 import { createContext, useEffect, useState } from 'react';
 import { LightDark, ProductList, Search, SelectedProduct, Orders, AlcoholicFilter, DrinkCategory, LoggedIn, UserCart, SignUpModal, AccessTokens, RefreshTokens} from './contexts/contexts';
@@ -103,6 +104,7 @@ const GetCartData = async () => {
       <Route path='/products' element={<Products />} />
       <Route path='/cart' element={<Cart />} />
       <Route path='/drinkinfo' element={<DrinkInfo />} />
+      <Route path='/orders' element={<OrdersPage />} />
     </Routes>
     </UserCart.Provider>
     </ProductList.Provider>

@@ -62,7 +62,7 @@ export default function NavBar() {
                 <NavLink to="/home" className="menu-btn" onClick={closeMenu}>Home</NavLink>
                 <NavLink to="/products" className="menu-btn" onClick={closeMenu}>Products</NavLink>
                 {user && <NavLink to="/cart" className="menu-btn" onClick={closeMenu}>Cart</NavLink>}
-                {loggedin && <NavLink to="/orders" className="menu-btn" onClick={closeMenu}>Previous Orders</NavLink>}
+                {loggedin && <NavLink to="/orders" className="menu-btn" onClick={closeMenu}>Orders</NavLink>}
 
                 <div className="menu-divider"></div>
                 {accessToken && refreshToken && accessToken!='null' && refreshToken!='null' ? (
