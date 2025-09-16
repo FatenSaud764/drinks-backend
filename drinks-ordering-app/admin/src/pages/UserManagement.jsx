@@ -17,7 +17,7 @@ import { useSnackbar } from '../contexts/SnackbarContext';
 const UserManagementPage = () => {
   const { isAuthenticated } = useAuth();
   const { showSnackbar } = useSnackbar();
-  const { users, loading, error, registerUser, updateUserRole, clearError } = useManagement();
+  const { users, loading, error, registerUser, deleteUser, updateUserRole, clearError } = useManagement();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
@@ -143,8 +143,6 @@ const UserManagementPage = () => {
               <button
                 className="action-btn delete-btn"
                 onClick={() => handleDeleteUser(row.original.id)}
-                disabled
-                title="Delete functionality coming soon"
               >
                 Delete
               </button>
@@ -212,8 +210,24 @@ const UserManagementPage = () => {
   };
 
   const handleDeleteUser = async (userId) => {
-    // Placeholder for future delete functionality
-    showSnackbar('Delete functionality coming soon', 'info');
+    if (!isAuthenticated) {
+      showSnackbar('Authentication required to delete staff users', 'error');
+      return;
+    }
+    
+    console.log('Delete user ID:', userId);
+    const user = users.find(u => u.id === userId);
+    const userName = user ? user.username : `user ID ${userId}`;
+    
+    if (window.confirm(`Are you sure you want to delete "${userName}"?`)) {
+      try {
+        await deleteUser(userId);
+        showSnackbar(`"${userName}" deleted successfully!`, 'success');
+      } catch (err) {
+        console.error('Failed to delete user:', err);
+        showSnackbar(`Failed to delete user: ${err.message}`, 'error');
+      }
+    }
   };
 
   const handleInputChange = (field, value) => {

@@ -42,5 +42,14 @@ export const managementAPI = {
     } catch (error) {
       throw new Error(error.response?.data?.message || "Failed to register user");
     }
+  },
+
+  deleteUser: async (userId) => {
+    try {
+      const response = await api.delete(`/api/management/${userId}/`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || "Failed to delete user");
+    }
   }
 };

@@ -69,6 +69,17 @@ export const useManagement = () => {
     }
   }, []);
 
+  const deleteUser = useCallback(async (userId) => {
+    setError(null);
+    try {
+      await managementAPI.deleteUser(userId);
+      setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+    } catch (err) {
+      setError(err.message);
+      throw err; // Re-throw so the component can handle it
+    }
+  }, []);
+
   // Helper function to promote user to admin
   const promoteToAdmin = useCallback(async (userId) => {
     return updateUserRole(userId, { level: "admin" });
@@ -96,6 +107,7 @@ export const useManagement = () => {
     fetchUsers,
     updateUserRole,
     registerUser,
+    deleteUser,
     promoteToAdmin,
     demoteToStaff,
     clearError
