@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import { LightDark, SelectedProduct, CartModalBoolean } from '../contexts/contexts'
 import { useAuth } from '../contexts/AuthContext'
 import NavBar from '../components/NavBar';
