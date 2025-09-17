@@ -6,120 +6,144 @@ import Cart from './routes/Cart';
 import OrdersPage from './routes/Orders';
 import './index.css';
 import { createContext, useEffect, useState } from 'react';
-import { LightDark, ProductList, Search, SelectedProduct, Orders, AlcoholicFilter, DrinkCategory, LoggedIn, UserCart, SignUpModal, AccessTokens, RefreshTokens} from './contexts/contexts';
+import { LightDark, ProductList, Search, SelectedProduct, Orders, AlcoholicFilter, DrinkCategory, UserCart, SignUpModal} from './contexts/contexts';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { setAuthContext } from './components/Axios';
 import AxiosInstance from './components/Axios';
 import DrinkInfo from './routes/DrinkInfo';
 
-const App = () => {
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+  const { isLoggedIn, accessToken } = useAuth();
+  
+  if (!isLoggedIn || !accessToken || accessToken === 'null') {
+    return <Navigate to="/" replace />;
+  }
+  
+  return children;
+};
+
+// App Content Component (needs to be inside AuthProvider to use useAuth)
+const AppContent = () => {
+  const { isLoggedIn, accessToken } = useAuth();
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState([]);
-
   const [theme, setTheme] = useState(() => {return localStorage.getItem('theme') || 'dark';})
   const [alcoholicfilter, setAlcoholicFilter] = useState(() => {return localStorage.getItem('alcoholic filter') || "alcoholic";})
   const [search, setSearch] = useState('');
   const [selecteddrink, setSelectedDrink] = useState(() => {
-  const stored = localStorage.getItem('selected');
-  return stored ? JSON.parse(stored) : {};
-});
+    const stored = localStorage.getItem('selected');
+    return stored ? JSON.parse(stored) : {};
+  });
   const [category, setCategory] = useState('all');
-  const [loggedin, setLoggedIn] = useState(() => {const stored = localStorage.getItem('loggedin'); return stored ? stored : false})
   const [signupmodal, setSignUpModal] = useState(false);
-
-  const [accessToken, setAccessToken] = useState(() => {const stored = localStorage.getItem('access token'); return stored ? stored : null});
-  const [refreshToken, setRefreshToken] = useState(() => {const stored = localStorage.getItem('refresh token'); return stored ? stored : null});
-
-
-const [orders, setOrders] = useState([{}]);
+  const [orders, setOrders] = useState([{}]);
 
   const GetData = async () => {
-    AxiosInstance.get('api/drink/').then((res) => {
+    try {
+      const res = await AxiosInstance.get('api/drink/');
       setProducts(res.data);
-    })
+    } catch (err) {
+      console.error('Error fetching products:', err);
+    }
   }
 
-const GetCartData = async () => {
-  try {
-    const res = await AxiosInstance.get('api/cart/', {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    });
-    setCart(res.data);
-  } catch (err) {
-    console.error(err);
+  const GetCartData = async () => {
+    if (!accessToken || accessToken === 'null') return;
+    
+    try {
+      const res = await AxiosInstance.get('api/cart/');
+      setCart(res.data);
+    } catch (err) {
+      console.error('Error fetching cart:', err);
+    }
   }
-}
 
-  useEffect( () => {
+  useEffect(() => {
     localStorage.setItem('selected', JSON.stringify(selecteddrink));
     window.scrollTo({
       top: 0,
       left: 0,
-      behavior: 'smooth' // or 'auto' for instant jump
+      behavior: 'smooth'
     });
   }, [selecteddrink])
 
   useEffect(() => {
-    localStorage.setItem('access token', accessToken);
-  }, [accessToken])
+    GetData(); // Always fetch products
+    if (isLoggedIn && accessToken && accessToken !== 'null') {
+      GetCartData(); // Only fetch cart if authenticated
+    }
+  }, [isLoggedIn, accessToken])
 
   useEffect(() => {
-    localStorage.setItem('refresh token', refreshToken);
-  }, [refreshToken])
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   useEffect(() => {
-    GetCartData();
-    GetData();
-  }, [])
+    localStorage.setItem('alcoholic filter', alcoholicfilter);
+  }, [alcoholicfilter]);
 
   console.log('cart', cart);
 
-  useEffect(()=>{
-    localStorage.setItem('loggedin', loggedin)
-  },[loggedin]);
+  return (
+    <DrinkCategory.Provider value={{category, setCategory}}>
+      <AlcoholicFilter.Provider value={{alcoholicfilter, setAlcoholicFilter}}>
+        <Orders.Provider value={{orders, setOrders}}>
+          <SelectedProduct.Provider value={{selecteddrink, setSelectedDrink}}>
+            <Search.Provider value={{search, setSearch}}>
+              <LightDark.Provider value={{theme, setTheme}}>
+                <ProductList.Provider value={{products, setProducts}}>
+                  <UserCart.Provider value={{cart, setCart}}>
+                    <SignUpModal.Provider value={{signupmodal, setSignUpModal}}>
+                      <Routes>
+                        <Route path='/' element={!isLoggedIn || !accessToken || accessToken === 'null' ? <Login /> : <Navigate to="/products" />} />
+                        <Route path='/products' element={<Products />} />
+                        <Route path='/cart' element={
+                          <ProtectedRoute>
+                            <Cart />
+                          </ProtectedRoute>
+                        } />
+                        <Route path='/drinkinfo' element={
+                          <ProtectedRoute>
+                            <DrinkInfo />
+                          </ProtectedRoute>
+                        } />
+                        <Route path='/orders' element={
+                          <ProtectedRoute>
+                            <OrdersPage />
+                          </ProtectedRoute>
+                        } />
+                      </Routes>
+                    </SignUpModal.Provider>
+                  </UserCart.Provider>
+                </ProductList.Provider>
+              </LightDark.Provider>
+            </Search.Provider>
+          </SelectedProduct.Provider>
+        </Orders.Provider>
+      </AlcoholicFilter.Provider>
+    </DrinkCategory.Provider>
+  );
+}
 
-  useEffect(() => {
-        localStorage.setItem('theme', theme);
-      }, [theme]);
+// Auth Context Connector Component
+const AuthContextConnector = () => {
+  const authContext = useAuth();
   
   useEffect(() => {
-        localStorage.setItem('alcoholic filter', alcoholicfilter);
-      }, [alcoholicfilter]);
+    setAuthContext(authContext);
+  }, [authContext]);
+  
+  return null;
+};
 
+// Main App Component
+const App = () => {
   return (
-    <>
-    <RefreshTokens.Provider value={{refreshToken, setRefreshToken}}>
-    <AccessTokens.Provider value={{accessToken, setAccessToken}}>
-    <SignUpModal.Provider value={{signupmodal, setSignUpModal}}>
-    <LoggedIn.Provider value={{loggedin, setLoggedIn}}>
-    <DrinkCategory.Provider value={{category, setCategory}}>
-    <AlcoholicFilter.Provider value={{alcoholicfilter, setAlcoholicFilter}}>
-    <Orders.Provider value={{orders, setOrders}}>
-    <SelectedProduct.Provider value={{selecteddrink, setSelectedDrink}}>
-    <Search.Provider value={{search, setSearch}}>
-    <LightDark.Provider value={{theme, setTheme}}>
-    <ProductList.Provider value={{products, setProducts}}>
-    <UserCart.Provider value={{cart, setCart}}>
-    <Routes>
-      <Route path='/' element={!accessToken||accessToken=='null' ? <Login /> : <Products />} />
-      <Route path='/products' element={<Products />} />
-      <Route path='/cart' element={accessToken && accessToken!='null' ? <Cart /> : <Navigate to="/" />} />
-      <Route path='/drinkinfo' element={accessToken && accessToken!='null' ? <DrinkInfo /> : <Navigate to="/" />} />
-      <Route path='/orders' element={<OrdersPage />} />
-    </Routes>
-    </UserCart.Provider>
-    </ProductList.Provider>
-    </LightDark.Provider>
-    </Search.Provider>
-    </SelectedProduct.Provider>
-    </Orders.Provider>
-    </AlcoholicFilter.Provider>
-    </DrinkCategory.Provider>
-    </LoggedIn.Provider>
-    </SignUpModal.Provider>
-    </AccessTokens.Provider>
-    </RefreshTokens.Provider>
-    </>
+    <AuthProvider>
+      <AuthContextConnector />
+      <AppContent />
+    </AuthProvider>
   );
 }
 
