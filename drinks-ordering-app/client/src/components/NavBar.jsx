@@ -41,7 +41,6 @@ export default function NavBar() {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/');
   }
 
   const handleLogin = () => {
@@ -67,7 +66,6 @@ export default function NavBar() {
                 {isLoggedIn && <div className="menu-user-info">Hey, {user?.username || ''}</div>}
                 <NavLink to="/home" className="menu-btn" onClick={closeMenu}>Home</NavLink>
                 <NavLink to="/products" className="menu-btn" onClick={closeMenu}>Products</NavLink>
-                {user && <NavLink to="/cart" className="menu-btn" onClick={closeMenu}>Cart</NavLink>}
                 {isLoggedIn && <NavLink to="/orders" className="menu-btn" onClick={closeMenu}>Orders</NavLink>}
 
                 <div className="menu-divider"></div>
@@ -89,7 +87,6 @@ export default function NavBar() {
       <nav className="nav-center" aria-label="Primary">
         <NavLink to="/" end>Home</NavLink>
         <NavLink to="/products">Products</NavLink>
-        {user && <NavLink to="/cart">Cart</NavLink>}
         {user && <NavLink to="/orders" className="hide-sm">Previous Orders</NavLink>}
       </nav>
 
