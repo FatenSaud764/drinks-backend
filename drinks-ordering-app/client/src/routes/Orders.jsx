@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState, useRef } from 'react'
 import NavBar from '../components/NavBar'
 import { AccessTokens, LightDark, ProductList } from '../contexts/contexts'
 import './Orders.css'
@@ -12,10 +12,11 @@ const OrdersPage = () => {
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const intervalRef = useRef(null)
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (showLoading = true) => {
     try {
-      setLoading(true)
+      if (showLoading) setLoading(true)
       setError(null)
       
       // The API endpoint should automatically return orders for the authenticated user
@@ -41,7 +42,7 @@ const OrdersPage = () => {
       console.error('Error fetching orders:', err)
       setError('Failed to load orders. Please try again.')
     } finally {
-      setLoading(false)
+      if (showLoading) setLoading(false)
     }
   }
 
@@ -69,9 +70,36 @@ const OrdersPage = () => {
 
   useEffect(() => {
     if (accessToken && accessToken !== 'null') {
+      // Initial fetch
       fetchOrders()
+
+      // Set up polling every 2 seconds
+      intervalRef.current = setInterval(() => {
+        fetchOrders(false) // Don't show loading for background polls
+      }, 2000)
+
+      // Cleanup interval on unmount or when accessToken changes
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+        }
+      }
+    } else {
+      // Clear interval if no access token
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
     }
   }, [accessToken])
+
+  // Cleanup interval on component unmount
+  useEffect(() => {
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
+  }, [])
 
   const getProductName = (drinkId) => {
     if (!products || products.length === 0) {
@@ -166,7 +194,7 @@ const OrdersPage = () => {
         ) : error ? (
           <div className="error-message">
             <p>{error}</p>
-            <button onClick={fetchOrders} className="retry-button">
+            <button onClick={() => fetchOrders(true)} className="retry-button">
               Retry
             </button>
           </div>
