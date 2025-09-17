@@ -1,5 +1,6 @@
 /* Orders Page Styles */
 .orderswrapper {
+  display: flex;
   justify-content: center;
   justify-items: center;
   width: auto;
@@ -306,7 +307,7 @@
   font-size: 4.5vw;
   font-weight: 700;
   color: #333;
-  font-family: 'Lilita One';
+  font-family: 'Roboto Slab';
 }
 
 #dark .order-total {
