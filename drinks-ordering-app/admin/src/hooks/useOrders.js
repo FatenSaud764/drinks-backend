@@ -1,9 +1,9 @@
 /**
  * @author Kirsten Sanders
- * @description This is a hook that manages orders 
+ * @description This is a hook that manages orders with polling functionality
 */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { ordersAPI } from '../api/orders';
 
 // ===================================================
@@ -133,15 +133,16 @@ export const useOrder = (orderId) => {
 };
 
 // ===================================================
-// Hook for ACTIVE orders (pending, preparing, ready)
+// Hook for ACTIVE orders (pending, preparing, ready) with polling
 // ===================================================
 export const useActiveOrders = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const intervalRef = useRef(null);
 
-  const fetchActiveOrders = useCallback(async () => {
-    setLoading(true);
+  const fetchActiveOrders = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     setError(null);
     try {
       const data = await ordersAPI.fetchActiveOrders();
@@ -149,12 +150,25 @@ export const useActiveOrders = () => {
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
+    // Initial fetch
     fetchActiveOrders();
+
+    // Set up polling every 2 seconds
+    intervalRef.current = setInterval(() => {
+      fetchActiveOrders(false); // Don't show loading for background polls
+    }, 2000);
+
+    // Cleanup interval on unmount
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, [fetchActiveOrders]);
 
   const updateOrderStatus = async (orderId, status) => {
@@ -184,22 +198,23 @@ export const useActiveOrders = () => {
     orders,
     loading,
     error,
-    refetch: fetchActiveOrders,
+    refetch: () => fetchActiveOrders(true), // Manual refresh shows loading
     updateOrderStatus,
     clearError
   };
 };
 
 // ===================================================
-// Hook for HISTORY orders (completed/cancelled orders)
+// Hook for HISTORY orders (completed/cancelled orders) with polling
 // ===================================================
 export const useOrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const intervalRef = useRef(null);
 
-  const fetchOrderHistory = useCallback(async () => {
-    setLoading(true);
+  const fetchOrderHistory = useCallback(async (showLoading = true) => {
+    if (showLoading) setLoading(true);
     setError(null);
     try {
       const data = await ordersAPI.fetchOrderHistory();
@@ -207,12 +222,25 @@ export const useOrderHistory = () => {
     } catch (err) {
       setError(err.message);
     } finally {
-      setLoading(false);
+      if (showLoading) setLoading(false);
     }
   }, []);
 
   useEffect(() => {
+    // Initial fetch
     fetchOrderHistory();
+
+    // Set up polling every 2 seconds
+    intervalRef.current = setInterval(() => {
+      fetchOrderHistory(false); // Don't show loading for background polls
+    }, 2000);
+
+    // Cleanup interval on unmount
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
   }, [fetchOrderHistory]);
 
   const restoreOrder = async (orderId) => {
@@ -234,7 +262,7 @@ export const useOrderHistory = () => {
     orders,
     loading,
     error,
-    refetch: fetchOrderHistory,
+    refetch: () => fetchOrderHistory(true), // Manual refresh shows loading
     restoreOrder,
     clearError
   };
