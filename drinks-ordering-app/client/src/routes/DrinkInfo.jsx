@@ -1,5 +1,6 @@
-import React, { useContext, useState } from 'react'
-import { LightDark, SelectedProduct, AccessTokens, RefreshTokens, CartModalBoolean } from '../contexts/contexts'
+import React, { useState } from 'react'
+import { LightDark, SelectedProduct, CartModalBoolean } from '../contexts/contexts'
+import { useAuth } from '../contexts/AuthContext'
 import NavBar from '../components/NavBar';
 import './DrinkInfo.css'
 import AddItems from '../components/AddItems';
@@ -7,16 +8,16 @@ import AxiosInstance from '../components/Axios.jsx';
 import CartModal from '../components/CartModal.jsx';
 
 const DrinkInfo = () => {
-  const {selecteddrink, setSelectedDrink} = useContext(SelectedProduct);
-  const {theme, setTheme} = useContext(LightDark);
+  const { selecteddrink, setSelectedDrink } = useContext(SelectedProduct);
+  const { theme, setTheme } = useContext(LightDark);
   const [num, setNum] = useState(0);
-
-  const {accessToken, setAccessTokens} = useContext(AccessTokens);
-  const {refreshToken, setRefreshToken} = useContext(RefreshTokens);
   const [cartModal, setCartModal] = useState(false);
 
+  // Use the new auth context
+  const { accessToken, isLoggedIn } = useAuth();
+
   const addToCart = (e, num) => {
-    if (accessToken && refreshToken && accessToken != 'null' && refreshToken != 'null') {
+    if (isLoggedIn && accessToken) {
       const request = async () => {
         await AxiosInstance.post(
           '/api/cart/items/',

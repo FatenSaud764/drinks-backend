@@ -1,13 +1,15 @@
 import React, { useContext, useEffect, useState, useRef } from 'react'
 import NavBar from '../components/NavBar'
-import { AccessTokens, LightDark, ProductList } from '../contexts/contexts'
+import { LightDark, ProductList } from '../contexts/contexts'
+import { useAuth } from '../contexts/AuthContext'
 import './Orders.css'
 import AxiosInstance from '../components/Axios'
 
 const OrdersPage = () => {
   const { theme } = useContext(LightDark)
   const { products } = useContext(ProductList)
-  const { accessToken } = useContext(AccessTokens)
+  const { isLoggedIn } = useAuth() // Much simpler!
+  
   const [activeTab, setActiveTab] = useState('active')
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
@@ -19,27 +21,21 @@ const OrdersPage = () => {
       if (showLoading) setLoading(true)
       setError(null)
       
-      // The API endpoint should automatically return orders for the authenticated user
-      // based on the Bearer token provided in the Authorization header
-      const res = await AxiosInstance.get('/api/orders/', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
+      // No need for manual auth headers - handled automatically!
+      const res = await AxiosInstance.get('/api/orders/')
       
-      // Log the response for debugging
       console.log('Orders API response:', res.data)
       
-      // Sort orders by created_at date (most recent first)
       const sortedOrders = res.data.sort((a, b) => {
         const dateA = new Date(a.created_at || a.date)
         const dateB = new Date(b.created_at || b.date)
-        return dateB - dateA // Most recent first
+        return dateB - dateA
       })
       
       setOrders(sortedOrders)
     } catch (err) {
       console.error('Error fetching orders:', err)
+      // Auth errors are handled automatically by the interceptor!
       setError('Failed to load orders. Please try again.')
     } finally {
       if (showLoading) setLoading(false)
@@ -48,16 +44,14 @@ const OrdersPage = () => {
 
   const cancelOrder = async (orderId) => {
     try {
-      // Use the DELETE endpoint to cancel a specific order
-      await AxiosInstance.delete(`/api/orders/${orderId}/`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
+      // No manual auth handling needed!
+      await AxiosInstance.delete(`/api/orders/${orderId}/`)
       alert('Order cancelled successfully!')
-      fetchOrders() // Refresh orders after cancellation
+      fetchOrders()
     } catch (err) {
       console.error('Error cancelling order:', err)
+      
+      // Only handle business logic errors, auth is automatic
       if (err.response?.status === 404) {
         alert('Order not found or already cancelled')
       } else if (err.response?.status === 403) {
@@ -69,30 +63,25 @@ const OrdersPage = () => {
   }
 
   useEffect(() => {
-    if (accessToken && accessToken !== 'null') {
-      // Initial fetch
+    if (isLoggedIn) {
       fetchOrders()
 
-      // Set up polling every 2 seconds
       intervalRef.current = setInterval(() => {
-        fetchOrders(false) // Don't show loading for background polls
-      }, 2000)
+        fetchOrders(false)
+      }, 5000)
 
-      // Cleanup interval on unmount or when accessToken changes
       return () => {
         if (intervalRef.current) {
           clearInterval(intervalRef.current)
         }
       }
     } else {
-      // Clear interval if no access token
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
       }
     }
-  }, [accessToken])
+  }, [isLoggedIn])
 
-  // Cleanup interval on component unmount
   useEffect(() => {
     return () => {
       if (intervalRef.current) {
@@ -157,7 +146,7 @@ const OrdersPage = () => {
 
   const currentOrders = activeTab === 'active' ? activeOrders : pastOrders
 
-  if (!accessToken || accessToken === 'null') {
+  if (!isLoggedIn) {
     return (
       <div className="orderswrapper" id={theme}>
         <NavBar />
@@ -244,7 +233,6 @@ const OrdersPage = () => {
                   <div className="order-items">
                     {order.items && order.items.length > 0 ? (
                       order.items.map((item, index) => {
-                        // Handle nested item structure
                         const drinkId = item.drink_id || item.drink || item.product_id
                         const quantity = item.quantity || 1
                         

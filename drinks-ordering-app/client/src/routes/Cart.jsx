@@ -1,6 +1,7 @@
 import React, { useContext, useEffect } from 'react'
 import NavBar from '../components/NavBar'
-import { AccessTokens, LightDark, ProductList, UserCart } from '../contexts/contexts'
+import { LightDark, ProductList, UserCart } from '../contexts/contexts'
+import { useAuth } from '../contexts/AuthContext'
 import './Cart.css'
 import { useState } from 'react'
 import AxiosInstance from '../components/Axios'
@@ -9,12 +10,17 @@ import { FaRegTrashCan } from "react-icons/fa6";
 const Cart = () => {
   const { theme, setTheme } = useContext(LightDark)
   const { products, setProducts } = useContext(ProductList)
-  const { accessToken, refreshToken } = useContext(AccessTokens);
   const { cart, setCart } = useContext(UserCart);
-  console.log('cart', cart);
   const [cartItems, setCartItems] = useState([]);
 
+  // Use the new auth context
+  const { accessToken, isLoggedIn } = useAuth();
+
+  console.log('cart', cart);
+
   const fetchdata = async () => {
+    if (!isLoggedIn || !accessToken) return;
+    
     try {
       const res = await AxiosInstance.get('api/cart/', {
         headers: {
@@ -29,19 +35,27 @@ const Cart = () => {
   }
 
   const PlaceOrder = async() => {
+    if (!isLoggedIn || !accessToken) return;
+    
     try {
-    const result = await AxiosInstance.post('/api/orders/', cartItems, {headers : {Authorization: `Bearer ${accessToken}`}})
-    console.log('order', result.data)
-    alert("Placed order!")
-    fetchdata()
-  } catch (err) {
-    console.error(err);
-  }
+      const result = await AxiosInstance.post('/api/orders/', cartItems, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      })
+      console.log('order', result.data)
+      alert("Placed order!")
+      fetchdata()
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   const ClearCart = async() => {
+    if (!isLoggedIn || !accessToken) return;
+    
     try{
-      await AxiosInstance.delete('/api/cart/', {headers: {Authorization: `Bearer ${accessToken}`}})
+      await AxiosInstance.delete('/api/cart/', {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      })
       fetchdata();
     }
     catch(err) {
@@ -49,13 +63,14 @@ const Cart = () => {
     }
   }
 
-
   // Save to localStorage whenever cartItems changes
   useEffect(() => {
     fetchdata();
-  }, [])
+  }, [accessToken, isLoggedIn])
 
   const increment = (quantity, drink_id) => {
+    if (!isLoggedIn || !accessToken) return;
+    
     const new_quantity = quantity + 1;
     const update = async () => {
       try {
@@ -64,7 +79,11 @@ const Cart = () => {
             item.drink_id === drink_id ? { ...item, quantity: item.quantity + 1 } : item
           )
         );
-        const res = await AxiosInstance.patch(`/api/cart/`, { items: [{ "id": cart.id, "drink_id": drink_id, quantity: new_quantity }] }, { headers: { Authorization: `Bearer ${accessToken}` } });
+        const res = await AxiosInstance.patch(`/api/cart/`, { 
+          items: [{ "id": cart.id, "drink_id": drink_id, quantity: new_quantity }] 
+        }, { 
+          headers: { Authorization: `Bearer ${accessToken}` } 
+        });
       }
       catch (err) {
         console.error(err);
@@ -74,6 +93,8 @@ const Cart = () => {
   };
 
   const decrement = (quantity, drink_id) => {
+    if (!isLoggedIn || !accessToken) return;
+    
     const new_quantity = quantity - 1;
     const update = async () => {
       try {
@@ -102,8 +123,19 @@ const Cart = () => {
     setCartItems(cartItems.filter(item => item.id !== id));
   };
 
-
   const totalPrice = cartItems.reduce((sum, item) => sum + products.filter(product => { return product.id === item.drink_id }).map(product => product.price) * item.quantity, 0);
+
+  // Show login message if not authenticated
+  if (!isLoggedIn) {
+    return (
+      <div className="cartwrapper" id={theme}>
+        <NavBar />
+        <div className="cart-items">
+          <p className="empty-cart">Please log in to view your cart.</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="cartwrapper" id={theme}>

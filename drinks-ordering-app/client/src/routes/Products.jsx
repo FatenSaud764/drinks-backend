@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import './Products.css'
-import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct, AccessTokens, RefreshTokens, CartModalBoolean, UserCart } from '../contexts/contexts';
+import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct, CartModalBoolean, UserCart } from '../contexts/contexts';
+import { useAuth } from '../contexts/AuthContext';
 import ThemeButton from '../components/ThemeButton';
 import { TiShoppingCart } from "react-icons/ti";
 import { AiOutlineMenu } from "react-icons/ai";
@@ -28,34 +29,42 @@ const Products = () => {
   const [drinkAdded, setDrinkAdded] = useState('');
   const [cartItems, setCartItems] = useState([]);
 
-  const {accessToken, setAccessToken} = useContext(AccessTokens);
-  const {refreshToken, setRefreshToken} = useContext(RefreshTokens);
+  // Use the new auth context
+  const { accessToken, isLoggedIn } = useAuth();
 
   const fuse = useMemo(() => {
-  return new Fuse(products, {
-    keys: keys,
-    threshold: 0.4
-  });
-}, [products, keys]);
+    return new Fuse(products, {
+      keys: keys,
+      threshold: 0.4
+    });
+  }, [products, keys]);
 
   console.log('access', accessToken);
 
   const filtered = search === '' ? products : fuse.search(search).map(result => result.item);
 
   const sortedProducts = [...filtered].sort((a, b) => {
-  return (a.available === b.available) ? 0 : a.available ? -1 : 1;
-}).sort((a,b) => {if(a.available && b.available) {return a.name.localeCompare(b.name)}}).filter((a) => {return category==="alcoholic" ? a.category==="Alcoholic" : category==="nonalcoholic" ? a.category==="Non-Alcoholic" : a});
-
+    return (a.available === b.available) ? 0 : a.available ? -1 : 1;
+  }).sort((a,b) => {if(a.available && b.available) {return a.name.localeCompare(b.name)}}).filter((a) => {return category==="alcoholic" ? a.category==="Alcoholic" : category==="nonalcoholic" ? a.category==="Non-Alcoholic" : a});
 
   const addToCart = (e) => {
-    if(accessToken && refreshToken && accessToken!='null' && refreshToken!='null'){
-      const request = async () => {await AxiosInstance.post('/api/cart/items/', {"drink_id": e, "quantity": 1}, {headers:{Authorization: `Bearer ${accessToken}`}})}
+    if(isLoggedIn && accessToken){
+      const request = async () => {
+        await AxiosInstance.post('/api/cart/items/', 
+          {"drink_id": e, "quantity": 1}, 
+          {headers:{Authorization: `Bearer ${accessToken}`}}
+        )
+      }
       request();
       setCartModal(true)
-    } else{alert('Log in to add to cart and place orders')}
+    } else{
+      alert('Log in to add to cart and place orders')
+    }
   }
 
   const fetchdata = async () => {
+    if (!isLoggedIn || !accessToken) return;
+    
     try {
       const res = await AxiosInstance.get('api/cart/', {
         headers: {
@@ -68,11 +77,10 @@ const Products = () => {
     }
   }
 
-
   // Save to localStorage whenever cartItems changes
   useEffect(() => {
     fetchdata();
-  }, [])
+  }, [accessToken, isLoggedIn])
 
   return (
     <div className='prodwrapper' id={theme}>
@@ -87,7 +95,7 @@ const Products = () => {
           
           return (
               <div key={product.id} className='productdisplay'>
-              <button className='productbutton' onClick={() => {if(product.available && accessToken && refreshToken && accessToken != 'null' && refreshToken != 'null'){setSelectedDrink(product); navigate('/drinkinfo');}}}><img src={product.available ? `http://127.0.0.1:8000${product.image}` : nostock} className='drinkcard'/></button>
+              <button className='productbutton' onClick={() => {if(product.available && isLoggedIn && accessToken){setSelectedDrink(product); navigate('/drinkinfo');}}}><img src={product.available ? `http://127.0.0.1:8000${product.image}` : nostock} className='drinkcard'/></button>
               <div className='productdesc'>{product.name}</div>
               <div className='additemwrapper'>
               <div className='productprice'>R{product.price}</div>

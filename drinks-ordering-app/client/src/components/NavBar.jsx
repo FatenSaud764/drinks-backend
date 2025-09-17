@@ -1,10 +1,10 @@
-import React, { useContext, useRef, useEffect } from 'react'
-import { AccessTokens, LightDark, LoggedIn, RefreshTokens } from '../contexts/contexts'
+import React, { useRef, useEffect, useContext } from 'react'
+import { LightDark } from '../contexts/contexts'
 import './NavBar.css'
 import ThemeButton from './ThemeButton'
 import { TiShoppingCart } from "react-icons/ti";
 import { useNavigate, NavLink, Link } from 'react-router-dom';
-import useAuth from '../contexts/AuthContext.jsx'
+import { useAuth } from '../contexts/AuthContext.jsx'
 
 export default function NavBar() {
   const {theme, setTheme} = useContext(LightDark);
@@ -12,15 +12,12 @@ export default function NavBar() {
   const menuRef = useRef(null)
   const navRef = useRef(null)
 
-  const {loggedin, setLoggedIn} = useContext(LoggedIn);
-  const {accessToken, setAccessToken} = useContext(AccessTokens);
-  const {refreshToken, setRefreshToken} = useContext(RefreshTokens);
-
+  // Use only the new AuthContext
+  const { user, accessToken, refreshToken, isLoggedIn, login, logout } = useAuth();
 
   if(menuRef.current){
-  console.log('open', menuRef.current.open);}
-  
-  const { user, login, logout } = useAuth() || {}
+    console.log('open', menuRef.current.open);
+  }
 
   const closeMenu = () => {
     if (menuRef.current) menuRef.current.removeAttribute('open')
@@ -42,6 +39,15 @@ export default function NavBar() {
     }
   }, [])
 
+  const handleLogout = async () => {
+    await logout();
+    navigate('/');
+  }
+
+  const handleLogin = () => {
+    navigate('/');
+  }
+
   return (
     <header ref={navRef} className="nav" id={theme}>
       <div className="nav-left">
@@ -58,19 +64,17 @@ export default function NavBar() {
             <div className="menu-pane">
               <h2 className="menu-title">Menu</h2>
               <nav className="menu-buttons">
-                {loggedin && <div className="menu-user-info">Hey, {user?user.username:''}</div>}
+                {isLoggedIn && <div className="menu-user-info">Hey, {user?.username || ''}</div>}
                 <NavLink to="/home" className="menu-btn" onClick={closeMenu}>Home</NavLink>
                 <NavLink to="/products" className="menu-btn" onClick={closeMenu}>Products</NavLink>
                 {user && <NavLink to="/cart" className="menu-btn" onClick={closeMenu}>Cart</NavLink>}
-                {loggedin && <NavLink to="/orders" className="menu-btn" onClick={closeMenu}>Orders</NavLink>}
+                {isLoggedIn && <NavLink to="/orders" className="menu-btn" onClick={closeMenu}>Orders</NavLink>}
 
                 <div className="menu-divider"></div>
-                {accessToken && refreshToken && accessToken!='null' && refreshToken!='null' ? (
-                  <>
-                    <button className="menu-btn menu-logout" onClick={() => {setAccessToken(null); setRefreshToken(null);}}>Logout</button>
-                  </>
+                {accessToken && refreshToken && accessToken !== 'null' && refreshToken !== 'null' ? (
+                  <button className="menu-btn menu-logout" onClick={handleLogout}>Logout</button>
                 ) : (
-                  <button className="menu-btn menu-login" onClick={() => {navigate('/')}}>Login</button>
+                  <button className="menu-btn menu-login" onClick={handleLogin}>Login</button>
                 )}
               </nav>
             </div>
@@ -101,7 +105,7 @@ export default function NavBar() {
           {user ? (
             <>
               <span className="logged-in-username hide-sm">Hi, {user.username}</span>
-              <button className="user-btn hide-sm" onClick={logout}>Logout</button>
+              <button className="user-btn hide-sm" onClick={handleLogout}>Logout</button>
             </>
           ) : (
             <button className="user-btn hide-sm" onClick={() => login('guest')}>Login</button>
