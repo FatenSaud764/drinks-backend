@@ -1,4 +1,5 @@
 import {Routes, Route} from 'react-router-dom'
+import { Navigate } from 'react-router-dom';
 import Login from './routes/Login';
 import Products from './routes/Products';
 import Cart from './routes/Cart';
@@ -100,7 +101,7 @@ const GetCartData = async () => {
     <ProductList.Provider value={{products, setProducts}}>
     <UserCart.Provider value={{cart, setCart}}>
     <Routes>
-      <Route path='/' element={!accessToken||accessToken=='null' ? <Login /> : <Products />} />
+      <Route path='/' element={!accessToken || accessToken=='null' ? <Login /> : <Navigate to="/products" />} />
       <Route path='/products' element={<Products />} />
       <Route path='/cart' element={<Cart />} />
       <Route path='/drinkinfo' element={<DrinkInfo />} />

@@ -30,21 +30,37 @@ const Login = () => {
   }*/
 
   const checklogin = async (e) => {
-    try{
-    const request = await AxiosInstance.post('api/auth/token/', {username: username.current?username.current.value.trim():'', password: password.current?password.current.value.trim():''});
-    const {access, refresh} = await request.data;
+  e.preventDefault();
+
+  try {
+    const typedUsername = username.current ? username.current.value : '';
+    const typedPassword = password.current ? password.current.value : '';
+
+    // Enforce exact case matching
+    if (typedUsername !== typedUsername.trim() || typedPassword !== typedPassword.trim()) {
+      alert('Username and password are case-sensitive. Remove leading/trailing spaces.');
+      return;
+    }
+
+    const request = await AxiosInstance.post('api/auth/token/', {
+      username: typedUsername,
+      password: typedPassword
+    });
+
+    const { access, refresh } = request.data;
     setAccessToken(access);
     setRefreshToken(refresh);
-    if(accessToken && refreshToken && accessToken != 'null' && refreshToken != 'null') {
+
+    if (access && refresh) {
       navigate('/products');
     }
-    e.preventDefault();
+
+  } catch (error) {
+    alert('Incorrect credentials/ the user does not exist (please sign up!)');
+    window.location.reload();
   }
-  catch(error) {
-      alert('Incorrect credentials/ the user does not exist (please sign up!)');
-      window.location.reload();
-  }
-  }
+};
+
 
 
 
