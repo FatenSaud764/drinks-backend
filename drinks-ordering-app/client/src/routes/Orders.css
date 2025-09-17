@@ -461,3 +461,258 @@
   height: 5vh;
   width: 100%;
 }
+
+/* Add these styles to your existing Orders.css file */
+
+/* OTP Button */
+.otp-button {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.otp-button:hover {
+  background-color: #059669;
+}
+
+/* OTP Modal Overlay */
+.otp-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+/* OTP Modal */
+.otp-modal {
+  background: white;
+  border-radius: 12px;
+  max-width: 450px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Dark theme support for modal */
+#dark .otp-modal {
+  background: #1f2937;
+  color: white;
+}
+
+/* Modal Header */
+.otp-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 24px 0 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+#dark .otp-modal-header {
+  border-bottom-color: #374151;
+}
+
+.otp-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 4px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.close-button:hover {
+  background-color: #f3f4f6;
+}
+
+#dark .close-button:hover {
+  background-color: #374151;
+}
+
+/* Modal Content */
+.otp-modal-content {
+  padding: 24px;
+}
+
+.otp-modal-content > p {
+  margin: 0 0 16px 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+#dark .otp-modal-content > p {
+  color: #9ca3af;
+}
+
+/* OTP Error */
+.otp-error {
+  background-color: #fef2f2;
+  color: #dc2626;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #fecaca;
+  font-size: 14px;
+}
+
+#dark .otp-error {
+  background-color: #7f1d1d;
+  color: #fca5a5;
+  border-color: #991b1b;
+}
+
+/* OTP Loading */
+.otp-loading {
+  text-align: center;
+  padding: 24px;
+  color: #6b7280;
+  font-style: italic;
+}
+
+#dark .otp-loading {
+  color: #9ca3af;
+}
+
+/* OTP Display Section */
+.otp-display {
+  text-align: center;
+}
+
+.otp-display > p {
+  margin-bottom: 16px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.otp-code {
+  font-size: 36px;
+  font-weight: bold;
+  letter-spacing: 8px;
+  background-color: #f3f4f6;
+  color: #1f2937;
+  padding: 24px 20px;
+  border-radius: 12px;
+  margin: 20px 0;
+  font-family: 'Courier New', monospace;
+  border: 2px solid #e5e7eb;
+  user-select: all;
+}
+
+#dark .otp-code {
+  background-color: #374151;
+  color: #f9fafb;
+  border-color: #4b5563;
+}
+
+.otp-instructions {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 16px 0 24px 0;
+  line-height: 1.5;
+}
+
+#dark .otp-instructions {
+  color: #9ca3af;
+}
+
+.refresh-otp-button {
+  background-color: #6b7280;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.refresh-otp-button:hover:not(:disabled) {
+  background-color: #4b5563;
+}
+
+.refresh-otp-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.otp-retry-section {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.retry-otp-button {
+  background-color: #10b981;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.retry-otp-button:hover:not(:disabled) {
+  background-color: #059669;
+}
+
+.retry-otp-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .otp-modal {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .otp-modal-content {
+    padding: 20px;
+  }
+  
+  .otp-modal-header {
+    padding: 20px 20px 0 20px;
+  }
+  
+  .otp-code {
+    font-size: 28px;
+    letter-spacing: 6px;
+    padding: 20px 16px;
+  }
+  
+  .otp-actions {
+    flex-direction: column;
+  }
+  
+  .generate-otp-button,
+  .verify-otp-button {
+    flex: none;
+  }
+}

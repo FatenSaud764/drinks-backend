@@ -8,7 +8,7 @@ import AxiosInstance from '../components/Axios'
 const OrdersPage = () => {
   const { theme } = useContext(LightDark)
   const { products } = useContext(ProductList)
-  const { isLoggedIn } = useAuth() // Much simpler!
+  const { isLoggedIn } = useAuth()
   
   const [activeTab, setActiveTab] = useState('active')
   const [orders, setOrders] = useState([])
@@ -16,14 +16,16 @@ const OrdersPage = () => {
   const [error, setError] = useState(null)
   const intervalRef = useRef(null)
 
+  // ========== OTP STATE MANAGEMENT ==========
+  // TODO: Add state variables for OTP functionality
+  // Example: selectedOrderId, otpCode, otpLoading, otpError
+
   const fetchOrders = async (showLoading = true) => {
     try {
       if (showLoading) setLoading(true)
       setError(null)
       
-      // No need for manual auth headers - handled automatically!
       const res = await AxiosInstance.get('/api/orders/')
-      
       console.log('Orders API response:', res.data)
       
       const sortedOrders = res.data.sort((a, b) => {
@@ -35,23 +37,34 @@ const OrdersPage = () => {
       setOrders(sortedOrders)
     } catch (err) {
       console.error('Error fetching orders:', err)
-      // Auth errors are handled automatically by the interceptor!
       setError('Failed to load orders. Please try again.')
     } finally {
       if (showLoading) setLoading(false)
     }
   }
 
+  // ========== OTP FETCH FUNCTION ==========
+  // TODO: Implement function to fetch OTP for an order
+  // This should call GET /api/orders/{id}/otp/ endpoint (id being the order ID)
+  /*
+  const fetchOrderOtp = async (orderId) => {}
+  */
+
+  // ========== OTP VERIFICATION FUNCTION ==========
+  // TODO: Implement function to verify OTP
+  // This should call POST /api/orders/{id}/otp/verify/ endpoint
+  /*
+  const verifyOrderOtp = async (orderId, otpCode) => {}
+  */
+
   const cancelOrder = async (orderId) => {
     try {
-      // No manual auth handling needed!
       await AxiosInstance.delete(`/api/orders/${orderId}/`)
       alert('Order cancelled successfully!')
       fetchOrders()
     } catch (err) {
       console.error('Error cancelling order:', err)
       
-      // Only handle business logic errors, auth is automatic
       if (err.response?.status === 404) {
         alert('Order not found or already cancelled')
       } else if (err.response?.status === 403) {
@@ -157,6 +170,13 @@ const OrdersPage = () => {
     )
   }
 
+  // ========== OTP UI ==========
+  // TODO: Do whatever is needed to show OTP when required
+  // For this, it is completely up to you how you want to implement it ! Good luck ! :)
+  // You might want to add a modal or a section in the order card to display OTP
+  // Or just display it on the card directly using existing CSS styles in Orders.css
+  // You can be fancy with it or keep it simple, your choice ! :) Go wild, lol
+
   return (
     <div className="orderswrapper" id={theme}>
       <NavBar />
@@ -215,6 +235,7 @@ const OrdersPage = () => {
                       >
                         {order.status || 'Pending'}
                       </span>
+                      
                       {activeTab === 'active' && order.status?.toLowerCase() === 'pending' && (
                         <button 
                           className="cancel-button"
