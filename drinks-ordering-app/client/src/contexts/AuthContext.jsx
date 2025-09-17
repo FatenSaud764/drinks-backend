@@ -1,4 +1,4 @@
-// contexts/AuthContext.js
+/** @author Kirsten Sanders */
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import AxiosInstance from '../components/Axios';
 

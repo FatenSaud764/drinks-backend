@@ -12,6 +12,7 @@ const AxiosInstance = axios.create({
     }
 });
 
+// The following is added by Kirsten
 // Store auth context reference (will be set by AuthProvider)
 let authContextRef = null;
 

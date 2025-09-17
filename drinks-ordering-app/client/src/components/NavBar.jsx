@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useContext } from 'react'
+import React, { useContext, useRef, useEffect } from 'react'
 import { LightDark } from '../contexts/contexts'
 import './NavBar.css'
 import ThemeButton from './ThemeButton'

@@ -23,7 +23,7 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
-// App Content Component (needs to be inside AuthProvider to use useAuth)
+// App Content Component (needs to be inside AuthProvider to use useAuth so had to make this seperate)
 const AppContent = () => {
   const { isLoggedIn, accessToken } = useAuth();
   const [products, setProducts] = useState([]);
