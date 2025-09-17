@@ -261,13 +261,8 @@ class OrderViewset(viewsets.ViewSet):
         - Admin users: see all orders
         - Regular users: see only their own orders
         """
-        # Get the user (with fallback for development)
+        # Get the user (with fallback to first staff user)
         user = request.user if request.user.is_authenticated else User.objects.filter(role='staff').first()
-        
-        print(f"User: {user}")
-        print(f"User role: {getattr(user, 'role', 'No role')}")
-        print(f"User is_staff: {getattr(user, 'is_staff', 'No is_staff')}")
-        print(f"Has is_staff attr: {hasattr(user, 'is_staff')}")
 
         # If user is admin/staff, return all orders
         if hasattr(user, 'is_staff') and user.is_staff:
