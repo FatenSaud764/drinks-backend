@@ -38,6 +38,20 @@ class Command(BaseCommand):
 
         # --- Users ---
         self.stdout.write("Creating users (customers + staff)...")
+
+        # Create default staff FIRST to ensure User.objects.first() returns a staff member
+        # Added by Kirsten Sanders
+        default_staff = User.objects.create_user(
+            username='default_staff',
+            email='staff@example.com', 
+            password='defaultpassword123',
+            role='staff'
+        )
+        default_staff.is_staff = True
+        default_staff.save(update_fields=["is_staff"])
+        print(default_staff.username, default_staff.role, default_staff.is_staff)
+        # End added by Kirsten Sanders
+
         customer_defs = [
             ("alice", "alice@example.com", "alice123"),
             ("bob", "bob@example.com", "bob123"),
@@ -48,9 +62,11 @@ class Command(BaseCommand):
             ("dave", "dave@example.com", "dave123"),
             ("eve", "eve@example.com", "eve123"),
         ]
-        create_users = []
+
+        users = [default_staff]  # Start with default staff - added by Kirsten Sanders
+
         # Create users via manager to ensure proper password hashing
-        users = []
+        # users = [] # removed by Kirsten Sanders
         for uname, email, pwd in customer_defs:
             users.append(User.objects.create_user(username=uname, email=email, password=pwd, role='customer'))
         for uname, email, pwd in staff_defs:

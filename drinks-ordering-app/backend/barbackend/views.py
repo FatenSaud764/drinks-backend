@@ -258,22 +258,21 @@ class OrderViewset(viewsets.ViewSet):
     def get_queryset(self, request):
         """
         Returns a queryset filtered by user permissions:
-        - Admin users: see all orders  
+        - Admin users: see all orders
         - Regular users: see only their own orders
         """
-        # Get the authenticated user (with fallback for development)
-        user = request.user if request.user.is_authenticated else User.objects.first()
+        # Get the user (with fallback for development)
+        user = request.user if request.user.is_authenticated else User.objects.filter(role='staff').first()
         
-        if not user:
-            # If no user found, return empty queryset
-            return Order.objects.none()
-        
-        # Check if user has admin privileges
-        if hasattr(user, 'is_admin') and user.is_admin:
+        print(f"User: {user}")
+        print(f"User role: {getattr(user, 'role', 'No role')}")
+        print(f"User is_staff: {getattr(user, 'is_staff', 'No is_staff')}")
+        print(f"Has is_staff attr: {hasattr(user, 'is_staff')}")
+
+        # If user is admin/staff, return all orders
+        if hasattr(user, 'is_staff') and user.is_staff:
             return Order.objects.all()
-        elif hasattr(user, 'is_staff') and user.is_staff:
-            return Order.objects.all()
-        
+
         # For regular users, filter by their orders only
         return Order.objects.filter(user=user)
 
