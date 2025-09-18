@@ -12,6 +12,7 @@ const Cart = () => {
   const { products, setProducts } = useContext(ProductList)
   const { cart, setCart } = useContext(UserCart);
   const [cartItems, setCartItems] = useState([]);
+  const [ orderNote, setOrderNote ] = useState("");
 
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
@@ -38,7 +39,7 @@ const Cart = () => {
     if (!isLoggedIn || !accessToken) return;
     
     try {
-      const result = await AxiosInstance.post('/api/orders/', cartItems, {
+      const result = await AxiosInstance.post('/api/orders/', { orderNote, cartItems }, {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
       console.log('order', result.data)
@@ -166,11 +167,23 @@ const Cart = () => {
             </ul>
           )}
         </div>
+        {cartItems.length > 0 && 
+          <div className='add-note-wrapper'>
+            <form className='add-note-form'>
+              <input 
+                type='text' 
+                value={orderNote}
+                placeholder='Enter new order note...'
+                onChange={(e)=>setOrderNote(e.target.value)}
+              />
+            </form>
+          </div>
+        }
         {cartItems.length>0 && 
-      <div className='clearcart'>
-        <span className='clearcarttext'>Clear Cart</span>
-        <button className='clearcartbutton' onClick={() => {ClearCart()}}><FaRegTrashCan className='clearicon'/></button>
-      </div>
+          <div className='clearcart'>
+            <span className='clearcarttext'>Clear Cart</span>
+            <button className='clearcartbutton' onClick={() => {ClearCart()}}><FaRegTrashCan className='clearicon'/></button>
+          </div>
         }
       </div>
       
