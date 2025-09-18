@@ -83,37 +83,6 @@ const OrdersPage = () => {
   /*
   const verifyOrderOtp = async (orderId, otpCode) => {}
   */
- const verifyOrderOtp = async (orderId, otpCode) => {
-    try {
-      setOtpLoading(true)
-      setOtpError(null)
-      
-      const res = await AxiosInstance.post(`/api/orders/${orderId}/otp/verify/`, { otp: otpCode })
-      console.log('OTP Verify response:', res.data)
-
-      alert('OTP verified successfully!')
-
-      setOtpVisible(false)
-      setSelectedOrderId(null)
-      setOtpCode('')
-      setFetchedOtp(null)
-      fetchOrders()
-
-      return res.data
-    } catch (err) {
-      console.error('Error verifying OTP:', err)
-      if (err.response?.status === 400) {
-        setOtpError('Invalid OTP. Please try again.')
-      } else if (err.response?.status === 404) {
-        setOtpError('Order not found or OTP not available.')
-      } else {
-        setOtpError('Failed to verify OTP. Please try again.')
-      }
-      throw err
-    } finally {
-      setOtpLoading(false)
-    }
-  }
 
   const cancelOrder = async (orderId) => {
     try {
@@ -281,7 +250,7 @@ const OrdersPage = () => {
             </button>
             <button
               onClick={() => setShowOtpModal(false)}
-              className="cancel-button"
+              className="btn-cancel"
             >
               Cancel
             </button>

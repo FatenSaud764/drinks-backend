@@ -434,7 +434,7 @@
   transition: background-color 0.3s ease;
 }
 
-.cancel-button {
+.btn-cancel {
   background-color: var(--secondary-button-background);
   color: var(--button-text);
   border: none;
@@ -450,7 +450,7 @@
   background-color: var(--button-hover);
 }
 
-.cancel-button:hover {
+.btn-cancel:hover {
   background-color: var(--secondary-button-hover);
 }
 
