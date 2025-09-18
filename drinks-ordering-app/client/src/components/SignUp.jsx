@@ -2,7 +2,11 @@ import React, { useContext, useRef, useState } from 'react'
 import './SignUp.css'
 import { LightDark, SignUpModal } from '../contexts/contexts'
 import AxiosInstance from './Axios'
+// Icons
+import PersonIcon from '@mui/icons-material/Person';
+import LockIcon from '@mui/icons-material/Lock';
 import CloseIcon from '@mui/icons-material/Close';
+import EmailIcon from '@mui/icons-material/Email';
 
 const SignUp = () => {
 
@@ -34,22 +38,39 @@ const SignUp = () => {
           }
           setSignUpModal(false); }}>
            <h2>Create an account</h2> 
+           
            <div className='inputrow'>
             <label htmlFor='username'>Username</label>
-            <input type='text' name='username' className='usernamebox' ref = {user} required></input>
+            <div className='signup-input-container'>
+              <PersonIcon className='signup-input-icon' />
+              <input type='text' name='username' className='usernamebox' ref = {user} required></input>
+            </div>
            </div>
+           
            <div className='inputrow'>
             <label htmlFor='email'>Email</label>
-            <input type='email' name='email' className='emailbox' ref = {mail} required></input>
+            <div className='signup-input-container'>
+              <EmailIcon className='signup-input-icon' />
+              <input type='email' name='email' className='emailbox' ref = {mail} required></input>
+            </div>
            </div>
+           
            <div className='inputrow'>
             <label htmlFor='password'>Password</label>
-            <input type='password' name='password' className='passwordbox' ref = {pass} required></input>
+            <div className='signup-input-container'>
+              <LockIcon className='signup-input-icon' />
+              <input type='password' name='password' className='passwordbox' ref = {pass} required></input>
+            </div>
            </div>
+           
            <div className='inputrow'>
             <label htmlFor='confirmpassword'>Confirm password</label>
-            <input type='password' name='password' className='passwordbox' ref = {confirmpass} required></input>
+            <div className='signup-input-container'>
+              <LockIcon className='signup-input-icon' />
+              <input type='password' name='password' className='passwordbox' ref = {confirmpass} required></input>
+            </div>
            </div>
+           
            <input type='submit' value='Signup' className='signupsubmit'></input>
         </form>
     </div>

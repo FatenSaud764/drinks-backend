@@ -155,3 +155,70 @@
     gap: 15px !important;
   }
 }
+
+.signup-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.signup-input-icon {
+    position: absolute;
+    left: 12px;
+    color: #F59E0B;
+    z-index: 1;
+    pointer-events: none;
+    font-size: 1rem;
+}
+
+/* Update input styling to accommodate icons */
+.usernamebox, .emailbox, .passwordbox {
+    width: 100%;
+    padding-left: 40px !important; /* Left padding to make room for icon */
+    box-sizing: border-box;
+}
+
+/* Dark theme icon color */
+#dark .signup-input-icon {
+    color: #F59E0B;
+}
+
+/* Icon color on focus */
+.signup-input-container:focus-within .signup-input-icon {
+    color: #F59E0B;
+}
+
+/* Mobile responsiveness for signup icons */
+@media (max-width: 768px) {
+    .signup-input-icon {
+        font-size: 0.9rem;
+        left: 10px;
+    }
+    
+    .usernamebox, .emailbox, .passwordbox {
+        padding-left: 35px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .signup-input-icon {
+        font-size: 0.8rem;
+        left: 8px;
+    }
+    
+    .usernamebox, .emailbox, .passwordbox {
+        padding-left: 32px !important;
+    }
+}
+
+@media (max-width: 375px) {
+    .signup-input-icon {
+        font-size: 0.7rem;
+        left: 6px;
+    }
+    
+    .usernamebox, .emailbox, .passwordbox {
+        padding-left: 28px !important;
+    }
+}
