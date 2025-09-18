@@ -120,6 +120,8 @@ export const AuthProvider = ({ children }) => {
     }
   }, [refreshToken, logout]);
 
+  
+
   // Check authentication status on app load
   const checkAuth = useCallback(async () => {
     const tokens = getAuthTokens();

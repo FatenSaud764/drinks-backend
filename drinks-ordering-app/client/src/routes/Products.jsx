@@ -15,6 +15,8 @@ import AddItems from '../components/AddItems.jsx';
 import CartModal from '../components/CartModal.jsx';
 import NavBar from '../components/NavBar'
 import AxiosInstance from '../components/Axios.jsx';
+import { DRINK_CATEGORIES } from '../../../packages/shared/types.js';
+
 
 const Products = () => {
   const {products, setProducts} = useContext(ProductList);
@@ -45,7 +47,7 @@ const Products = () => {
 
   const sortedProducts = [...filtered].sort((a, b) => {
     return (a.available === b.available) ? 0 : a.available ? -1 : 1;
-  }).sort((a,b) => {if(a.available && b.available) {return a.name.localeCompare(b.name)}}).filter((a) => {return category==="alcoholic" ? a.category==="Alcoholic" : category==="nonalcoholic" ? a.category==="Non-Alcoholic" : a});
+  }).sort((a,b) => {if(a.available && b.available) {return a.name.localeCompare(b.name)}}).filter((a) => {return category.toLowerCase() == "all" ? true : a.category.toLowerCase() == category.toLowerCase()});
 
   const addToCart = (e) => {
     if(isLoggedIn && accessToken){

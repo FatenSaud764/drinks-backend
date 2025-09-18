@@ -3,6 +3,7 @@ import { AlcoholicFilter, DrinkCategory, Search } from '../contexts/contexts';
 import { useRef } from 'react';
 import './SearchBar.css';
 import { BsSearch } from "react-icons/bs";
+import { DRINK_CATEGORIES } from '../../../packages/shared/types.js';
 
 const SearchBar = () => {
     const {search, setSearch} = useContext(Search);
@@ -21,8 +22,9 @@ const SearchBar = () => {
                 <input type='submit' ref={submit} style={{display:'none'}}/>
                 <select value={category} className='selectcategory' onChange={(e) => {setCategory(e.target.value)}}>
                   <option value='all'>All Drinks</option>
-                  <option value='alcoholic'>Alcoholic</option>
-                  <option value='nonalcoholic'>Non-Alcoholic</option>
+                  {Object.values(DRINK_CATEGORIES).map((drinkcategory) =>
+                    <option value={drinkcategory}>{drinkcategory.charAt(0).toUpperCase() + drinkcategory.slice(1).toLowerCase()}</option>
+                  )}
                 </select>
             </div>
         </form>
