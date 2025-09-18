@@ -4,7 +4,6 @@ import { LightDark, ProductList } from '../contexts/contexts'
 import { useAuth } from '../contexts/AuthContext'
 import './Orders.css'
 import AxiosInstance from '../components/Axios'
-import '../styles/Orders.css'
 
 const OrdersPage = () => {
   const { theme } = useContext(LightDark)
