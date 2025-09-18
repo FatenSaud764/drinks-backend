@@ -8,13 +8,15 @@ export const ORDER_STATUSES = {
 };
 
 export const DRINK_CATEGORIES = {
-  ALCOHOLIC: 'Alcoholic',
-  NON_ALCOHOLIC: 'Non_Alcoholic',
-  COCKTAIL: 'Cocktail',
-  SHOT: 'Shot',
-  BEER: 'Beer',
-  WINE: 'Wine', 
-  OTHER: 'Other',
+  ALCOHOLIC: 'alcoholic',
+  NON_ALCOHOLIC: 'non-alcoholic',
+  COCKTAIL: 'cocktail',
+  MOCKTAIL: 'mocktail',
+  SHOT: 'shot',
+  BEER: 'beer',
+  CIDER: 'cider',
+  WINE: 'wine', 
+  OTHER: 'other',
 };
 
 export const USER_ROLES = {
