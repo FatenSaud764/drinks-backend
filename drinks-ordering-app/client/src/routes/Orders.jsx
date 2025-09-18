@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, useRef } from 'react'
 import NavBar from '../components/NavBar'
 import { LightDark, ProductList } from '../contexts/contexts'
 import { useAuth } from '../contexts/AuthContext'
+import './Orders.css'
 import AxiosInstance from '../components/Axios'
 import '../styles/Orders.css'
 
