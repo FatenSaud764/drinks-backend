@@ -3,11 +3,33 @@
     justify-items: center;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 10vh 50vh 12vh auto;
+    grid-template-rows: 10vh 50vh 6vh 20vh auto auto;
     row-gap: 2vh;
-    height: 100vh;
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
     width: auto;
     background: #f5f0eb;
+}
+
+.radiobuttons{
+    display: flex;
+    flex-direction: column;
+    gap: 5vh;
+    align-items: center;
+    width: auto;
+    min-width: 50vw;
+    height: 20vh;
+}
+
+.sizeselect{
+    display: flex;
+    flex-direction: row;
+    gap: 3vw;
+    min-width: 20vw;
+    width: auto;
+    font-family: 'Roboto Slab';
+
 }
 
 .drinkinfowrapper#dark{

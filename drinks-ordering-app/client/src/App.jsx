@@ -70,6 +70,9 @@ const AppContent = () => {
 
   useEffect(() => {
     GetData(); // Always fetch products
+    const interval = setInterval(() => {
+      GetData();
+    }, 1000)
     if (isLoggedIn && accessToken && accessToken !== 'null') {
       GetCartData(); // Only fetch cart if authenticated
     }

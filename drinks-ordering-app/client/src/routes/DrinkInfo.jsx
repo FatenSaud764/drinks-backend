@@ -12,6 +12,7 @@ const DrinkInfo = () => {
   const { theme, setTheme } = useContext(LightDark);
   const [num, setNum] = useState(0);
   const [cartModal, setCartModal] = useState(false);
+  const [selectedSize, setSelectedSize] = useState(null);
 
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
@@ -40,6 +41,20 @@ const DrinkInfo = () => {
         </div>
         <div className='drinkprice'>
           R{selecteddrink.price}
+        </div>
+        <div className='radiobuttons'>
+          <label className='sizeselect'>
+          <input type='radio' value='small' onChange={(e) => setSelectedSize(e.target.value)} checked={selectedSize==='small'}/>
+          Small drink
+        </label>
+        <label className='sizeselect'>
+          <input type='radio' value='medium' onChange={(e) => setSelectedSize(e.target.value)} checked={selectedSize==='medium'}/>
+          Medium drink
+        </label>
+        <label className='sizeselect'>
+          <input type='radio' value='large' onChange={(e) => setSelectedSize(e.target.value)} checked={selectedSize==='large'}/>
+          Large drink
+        </label>
         </div>
         <AddItems prod={selecteddrink} num={num} setNum={setNum} />
         <button className='addtocart' onClick={() => {addToCart(selecteddrink.id, num)}}>Add to cart</button>
