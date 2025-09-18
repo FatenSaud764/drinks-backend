@@ -128,7 +128,40 @@
     color: #F59E0B;
     z-index: 1;
     pointer-events: none;
-    font-size: 1.2rem;
+    font-size: 1rem;
+}
+
+/* Mobile responsiveness for icons */
+@media (max-width: 768px) {
+    .input-icon {
+        font-size: 0.8rem;
+        left: 3vw;
+    }
+    
+    .username, .password {
+        padding-left: 10vw;
+    }
+}
+
+@media (max-width: 480px) {
+    .input-icon {
+        font-size: 0.7rem;
+    }
+    
+    .username, .password {
+        padding-left: 10vw !important;
+    }
+}
+
+@media (max-width: 375px) {
+    .input-icon {
+        font-size: 0.6rem;
+        left: 2vw;
+    }
+    
+    .username, .password {
+        padding-left: 10vw;
+    }
 }
 
 .username{
