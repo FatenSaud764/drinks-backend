@@ -50,7 +50,6 @@
     font-family: 'Lilita One';
 }
 
-
 .signup{
     position: absolute;
     transform: translate(-50%, -50%);
@@ -73,7 +72,6 @@
     color:#F59E0B !important;
 }
 
-
 .content h1{
     position: absolute;
     transform: translate(-50%, -50%);
@@ -81,7 +79,6 @@
     top: 10%;
     color: #F59E0B;
     font-size: 6vh;
-    
 }
 
 .content h4{
@@ -106,19 +103,46 @@
     font-weight: 300;
 }
 
-.username{
+/* Input container with icon styling */
+.input-container {
     position: absolute;
     transform: translate(-50%, -50%);
     left: 50%;
+    display: flex;
+    align-items: center;
+    width: 50vw;
+    height: 3vh;
+}
+
+.input-container:nth-of-type(1) {
     top: 41%;
+}
+
+.input-container:nth-of-type(2) {
+    top: 56%;
+}
+
+.input-icon {
+    position: absolute;
+    left: 2vw;
+    color: #F59E0B;
+    z-index: 1;
+    pointer-events: none;
+    font-size: 1.2rem;
+}
+
+.username{
+    position: absolute;
+    left: 0;
+    top: 0;
     height: 3vh;
     width: 50vw;
-    padding-left: 3vw;
+    padding-left: 4.5vw;
     border: 2px solid #F59E0B;
     border-radius: 2vw;
     font-family: 'Nunito';
     font-size: 0.9rem;
-    color:#1F2937
+    color:#1F2937;
 }
 
 .username::placeholder{
@@ -131,15 +155,23 @@
 
 .password{
     position: absolute;
-    transform: translate(-50%, -50%);
-    left: 50%;
-    top: 56%;
+    left: 0;
+    top: 0;
     height: 3vh;
     width: 50vw;
-    padding-left: 3vw;
+    padding-left: 4.5vw;
     border: 2px solid #F59E0B;
     border-radius: 2vw;
     font-family: 'Nunito';
     font-size: 0.9rem;
-    color:#1F2937
+    color:#1F2937;
+}
+
+/* Icon color changes */
+#dark .input-icon {
+    color: #F59E0B;
+}
+
+.input-container:focus-within .input-icon {
+    color: #F59E0B;
 }

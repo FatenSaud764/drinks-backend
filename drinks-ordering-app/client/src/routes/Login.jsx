@@ -5,6 +5,9 @@ import ThemeButton from '../components/ThemeButton';
 import { LightDark, SignUpModal } from '../contexts/contexts';
 import { useAuth } from '../contexts/AuthContext';
 import SignUp from '../components/SignUp';
+// Icons
+import PersonIcon from '@mui/icons-material/Person';
+import LockIcon from '@mui/icons-material/Lock';
 
 const Login = () => {
   const username = useRef(null);
@@ -55,8 +58,17 @@ const Login = () => {
           <form onSubmit={(e) => {checklogin(e); e.preventDefault();}}>
             <h1>SwiftServe</h1>
             <h4>Skip the queue!</h4>
-            <input type='text' placeholder='Username' required className='username' ref={username}/>
-            <input type='password' placeholder='Password' className='password' ref={password} required/>
+            
+            <div className='input-container'>
+              <PersonIcon className='input-icon' />
+              <input type='text' placeholder='Username' required className='username' ref={username}/>
+            </div>
+            
+            <div className='input-container'>
+              <LockIcon className='input-icon' />
+              <input type='password' placeholder='Password' className='password' ref={password} required/>
+            </div>
+            
             <button type='submit' className='login' disabled={isLoading}>
               {isLoading ? 'Logging in...' : 'Log in'}
             </button>
