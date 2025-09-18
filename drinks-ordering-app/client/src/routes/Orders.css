@@ -1,0 +1,463 @@
+/* Orders Page Styles */
+.orderswrapper {
+  display: flex;
+  justify-content: center;
+  justify-items: center;
+  width: auto;
+  min-height: 100vh;
+  height: auto;
+  overflow-y: auto;
+  background: #f5f0eb;
+}
+
+.orderswrapper#dark {
+  background: #1F2937 !important;
+}
+
+.orders-content {
+  margin-top: 8vh;
+  height: auto;
+  width: 100%;
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: auto auto 1fr;
+  row-gap: 3vh;
+  justify-content: center;
+  justify-items: center;
+  padding: 20px;
+  max-width: 800px;
+}
+
+.orders-title {
+  font-size: 6vw;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 0;
+  color: #333;
+  font-family: 'Gabriela';
+}
+
+#dark .orders-title {
+  color: white !important;
+}
+
+/* Tabs - Fixed size at top */
+.orders-tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0;
+  border-bottom: 2px solid #e5e5e5;
+  width: 400px;
+  max-width: 90%;
+}
+
+#dark .orders-tabs {
+  border-bottom-color: #4a5568;
+}
+
+.tab-button {
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+  position: relative;
+  font-family: 'Gabriela';
+  flex: 1;
+  text-align: center;
+}
+
+.tab-button:hover {
+  color: #F59E0B;
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.tab-button.active {
+  color: #F59E0B;
+  border-bottom-color: #F59E0B;
+  background-color: rgba(245, 158, 11, 0.05);
+}
+
+#dark .tab-button {
+  color: #a0aec0;
+}
+
+#dark .tab-button:hover {
+  color: #F59E0B;
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+#dark .tab-button.active {
+  color: #F59E0B;
+  border-bottom-color: #F59E0B;
+}
+
+/* Loading and Messages */
+.loading, .login-message, .no-orders {
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 4.5vw;
+  color: #666;
+  font-family: 'Roboto Slab';
+}
+
+#dark .loading, #dark .login-message, #dark .no-orders {
+  color: white !important;
+}
+
+.login-message {
+  background-color: #fff;
+  border-radius: 2.5vw;
+  border: 0.8vw solid #F59E0B;
+}
+
+#dark .login-message {
+  background-color: #2d3748;
+  border-color: #F59E0B;
+}
+
+/* Orders List */
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4vw;
+  width: 90%;
+  align-self: start;
+}
+
+/* Order Card */
+.order-card {
+  background-color: #fff;
+  border: 0.8vw solid #F59E0B;
+  border-radius: 2.98vw;
+  padding: 6vw;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+#dark .order-card {
+  background-color: #2d3748;
+  border-color: #F59E0B;
+}
+
+.order-card:hover {
+  transform: translateY(-1vw);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Order Header */
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 5vw;
+  flex-wrap: wrap;
+  gap: 3vw;
+}
+
+.order-info h3 {
+  font-size: 4.5vw;
+  font-weight: 600;
+  margin: 0 0 2vw 0;
+  color: #333;
+  font-family: 'Roboto Slab';
+}
+
+#dark .order-info h3 {
+  color: white !important;
+}
+
+.order-date {
+  font-size: 3.5vw;
+  color: #666;
+  font-family: 'Roboto Slab';
+}
+
+#dark .order-date {
+  color: #a0aec0 !important;
+}
+
+.order-status-section {
+  display: flex;
+  align-items: center;
+  gap: 3vw;
+}
+
+.order-status {
+  padding: 2vw 4vw;
+  border-radius: 5vw;
+  font-size: 3vw;
+  font-weight: 500;
+  color: white;
+  text-transform: capitalize;
+  font-family: 'Roboto Slab';
+}
+
+.cancel-button {
+  padding: 2vw 4vw;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 1.5vw;
+  font-size: 3vw;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: 'Roboto Slab';
+}
+
+.cancel-button:hover {
+  background-color: #c82333;
+}
+
+.retry-button {
+  padding: 2vw 4vw;
+  background-color: #666363;
+  color: white;
+  border: none;
+  border-radius: 1.5vw;
+  font-size: 3vw;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  margin-top: 2vw;
+}
+
+.retry-button:hover {
+  background-color: #737870;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 3.5vw;
+}
+
+/* Order Items */
+.order-items {
+  margin-bottom: 5vw;
+}
+
+.order-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3vw 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+#dark .order-item {
+  border-bottom-color: #4a5568;
+}
+
+.order-item:last-child {
+  border-bottom: none;
+}
+
+.item-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1vw;
+}
+
+.item-name {
+  font-weight: 500;
+  font-size: 3.8vw;
+  color: #333;
+  font-family: 'Roboto Slab';
+}
+
+#dark .item-name {
+  color: white !important;
+}
+
+.item-quantity {
+  font-size: 3.2vw;
+  color: #666;
+  font-family: 'Roboto Slab';
+}
+
+#dark .item-quantity {
+  color: #a0aec0 !important;
+}
+
+.item-total {
+  font-weight: 600;
+  color: #F59E0B;
+  font-size: 3.8vw;
+  font-family: 'Lilita One';
+}
+
+/* Order Footer */
+.order-footer {
+  border-top: 2px solid #e5e5e5;
+  padding-top: 4vw;
+  text-align: right;
+}
+
+#dark .order-footer {
+  border-top-color: #4a5568;
+}
+
+.order-total {
+  font-size: 4.5vw;
+  font-weight: 700;
+  color: #333;
+  font-family: 'Roboto Slab';
+}
+
+#dark .order-total {
+  color: white !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .orders-content {
+    padding: 15px;
+    margin-top: 10vh;
+  }
+
+  .orders-title {
+    font-size: 8vw;
+  }
+
+  .orders-tabs {
+    width: 300px;
+  }
+
+  .tab-button {
+    padding: 12px 15px;
+    font-size: 16px;
+  }
+
+  .order-card {
+    padding: 5vw;
+  }
+
+  .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4vw;
+  }
+
+  .order-status-section {
+    align-self: stretch;
+    justify-content: space-between;
+  }
+
+  .item-details {
+    flex: 1;
+  }
+
+  .order-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2vw;
+  }
+
+  .item-total {
+    align-self: flex-end;
+  }
+
+  .orders-title {
+    font-size: 7vw;
+  }
+
+  .order-info h3 {
+    font-size: 5.5vw;
+  }
+
+  .order-date {
+    font-size: 4vw;
+  }
+
+  .order-status {
+    font-size: 3.5vw;
+    padding: 2.5vw 4.5vw;
+  }
+
+  .cancel-button {
+    font-size: 3.5vw;
+    padding: 2.5vw 4.5vw;
+  }
+
+  .item-name {
+    font-size: 4.2vw;
+  }
+
+  .item-quantity {
+    font-size: 3.8vw;
+  }
+
+  .item-total {
+    font-size: 4.2vw;
+  }
+
+  .order-total {
+    font-size: 5vw;
+  }
+}
+
+@media (max-width: 400px) {
+  .orders-content {
+    margin-top: 12vh;
+  }
+
+  .orders-tabs {
+    width: 280px;
+  }
+
+  .tab-button {
+    padding: 10px 12px;
+    font-size: 14px;
+  }
+
+  .orders-title {
+    font-size: 8vw;
+  }
+
+  .order-info h3 {
+    font-size: 6vw;
+  }
+
+  .order-date {
+    font-size: 4.5vw;
+  }
+
+  .order-status {
+    font-size: 4vw;
+    padding: 3vw 5vw;
+  }
+
+  .cancel-button {
+    font-size: 4vw;
+    padding: 3vw 5vw;
+  }
+
+  .item-name {
+    font-size: 4.8vw;
+  }
+
+  .item-quantity {
+    font-size: 4.2vw;
+  }
+
+  .item-total {
+    font-size: 4.8vw;
+  }
+
+  .order-total {
+    font-size: 5.5vw;
+  }
+}
+
+/* Add footer like other pages */
+.footer {
+  margin-top: 4vh;
+  height: 5vh;
+  width: 100%;
+}
