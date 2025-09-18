@@ -3,7 +3,7 @@
     justify-items: center;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 10vh 50vh 6vh 20vh auto auto;
+    grid-template-rows: 10vh 45vh 6vh 15vh auto auto;
     row-gap: 2vh;
     height: auto;
     min-height: 100vh;
@@ -15,11 +15,16 @@
 .radiobuttons{
     display: flex;
     flex-direction: column;
-    gap: 5vh;
+    gap: 3vh;
     align-items: center;
     width: auto;
     min-width: 50vw;
     height: 20vh;
+    
+}
+
+#dark .radiobuttons{
+    color: white;
 }
 
 .sizeselect{
@@ -37,7 +42,7 @@
 }
 
 .drinkname{
-    margin-top: 45vh;
+    margin-top: 42vh;
     font-size: 30px !important;
     font-family: 'DM Serif Text';
 }
@@ -57,7 +62,7 @@
 
 .addtocart{
     margin-top: -2vh;
-    width: 15vh;
+    width: 20vh;
     height: 6vh;
     background: #F59E0B;
     color: white;
@@ -83,7 +88,7 @@
 }
 
 .drinkimage{
-    margin-top: 15vh;
+    margin-top: 12vh;
     height: 39vh;
     width: 35vh;
     border-radius: 50px;

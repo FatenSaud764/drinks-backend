@@ -129,8 +129,7 @@
 .hamburger { display: none }
 .hamburger summary { 
   list-style: none; 
-  cursor: pointer; 
-  border: 1px solid rgba(255, 255, 255, 0.3); 
+  cursor: pointer;  
   border-radius: 12px; 
   min-width: 44px; 
   min-height: 44px; 

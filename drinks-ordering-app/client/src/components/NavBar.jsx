@@ -61,9 +61,9 @@ export default function NavBar() {
           <div className="sidebar-backdrop" onClick={closeMenu} />
           <aside id="hamburger-sidebar" className="sidebar opaque" aria-label="Mobile menu">
             <div className="menu-pane">
-              <h2 className="menu-title">Menu</h2>
+              <h2 className="menu-title" style={{fontFamily: 'Roboto Slab', fontSize: '20px'}}>Menu</h2>
               <nav className="menu-buttons">
-                {isLoggedIn && <div className="menu-user-info">Hey, {user?.username || ''}</div>}
+                {isLoggedIn && <div className="menu-user-info">Welcome, {user?.username || 'User'}!</div>}
                 <NavLink to="/home" className="menu-btn" onClick={closeMenu}>Home</NavLink>
                 <NavLink to="/products" className="menu-btn" onClick={closeMenu}>Products</NavLink>
                 {isLoggedIn && <NavLink to="/orders" className="menu-btn" onClick={closeMenu}>Orders</NavLink>}
