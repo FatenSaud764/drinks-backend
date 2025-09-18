@@ -45,6 +45,26 @@ const OrdersPage = () => {
   const [pendingCompletionOrder, setPendingCompletionOrder] = useState(null);
   const [pinModalMode, setPinModalMode] = useState('complete'); // 'complete' or 'find'
 
+  // Custom sorting function: pending orders first, then oldest to newest
+  const sortOrders = (ordersToSort) => {
+    return [...ordersToSort].sort((a, b) => {
+      // If one is pending and the other isn't, pending goes first
+      if (a.status === ORDER_STATUSES.PENDING && b.status !== ORDER_STATUSES.PENDING) {
+        return -1;
+      }
+      if (b.status === ORDER_STATUSES.PENDING && a.status !== ORDER_STATUSES.PENDING) {
+        return 1;
+      }
+      
+      // If both are pending or both are not pending, sort by creation date (oldest first)
+      // Assuming orders have a createdAt field or similar timestamp
+      const aDate = new Date(a.createdAt || a.created_at || a.orderTime || 0);
+      const bDate = new Date(b.createdAt || b.created_at || b.orderTime || 0);
+      
+      return aDate - bDate; // oldest first
+    });
+  };
+
   // Filter orders based on status and search term - exclude completed and cancelled
   useEffect(() => {
     let filtered = orders.filter(order => 
@@ -53,6 +73,9 @@ const OrdersPage = () => {
 
     filtered = filterOrdersByStatus(filtered, statusFilter);
     filtered = filterOrdersBySearch(filtered, searchTerm);
+    
+    // Apply custom sorting: pending orders first, then oldest to newest
+    filtered = sortOrders(filtered);
 
     setFilteredOrders(filtered);
   }, [orders, statusFilter, searchTerm]);
