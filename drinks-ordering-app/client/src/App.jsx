@@ -14,9 +14,9 @@ import DrinkInfo from './routes/DrinkInfo';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
-  const { isLoggedIn, accessToken } = useAuth();
+  const { isLoggedIn, accessToken} = useAuth();
   
-  if (!isLoggedIn || !accessToken || accessToken === 'null') {
+  if (!isLoggedIn) {
     return <Navigate to="/" replace />;
   }
   
@@ -83,7 +83,8 @@ const AppContent = () => {
     localStorage.setItem('alcoholic filter', alcoholicfilter);
   }, [alcoholicfilter]);
 
-  console.log('cart', cart);
+  console.log('access', accessToken);
+  console.log('logged', isLoggedIn)
 
   return (
     <DrinkCategory.Provider value={{category, setCategory}}>
