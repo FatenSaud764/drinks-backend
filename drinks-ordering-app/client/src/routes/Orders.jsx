@@ -220,40 +220,6 @@ const OrdersPage = () => {
                 <p>Please provide this OTP when collecting your order.</p>
               </div>
             )}
-
-            <div className="otp-input">
-              <label htmlFor="otp">Enter OTP to verify:</label>
-              <input 
-                type="text"
-                id="otp"
-                value={otpCode}
-                onChange={(e) => setOtpCode(e.target.value)}
-                maxLength={6}
-                placeholder="Enter OTP"
-                className="otp"
-              />
-            </div>
-            {otpError && (
-              <div className="otp-error">
-                <p>{otpError}</p>
-              </div>
-            )}
-          </div>
-
-          <div className='otp-footer'>
-            <button 
-              className="verify-button"
-              onClick={() => verifyOrderOtp(selectedOrderId, otpCode)}
-              disabled={otpLoading || !otpCode}
-            >
-              {otpLoading ? 'Verifying...' : 'Verify OTP'}
-            </button>
-            <button
-              onClick={() => setShowOtpModal(false)}
-              className="btn-cancel"
-            >
-              Cancel
-            </button>
           </div>
         </div>
       </div>
