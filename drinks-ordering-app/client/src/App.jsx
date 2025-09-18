@@ -16,7 +16,7 @@ import DrinkInfo from './routes/DrinkInfo';
 const ProtectedRoute = ({ children }) => {
   const { isLoggedIn, accessToken} = useAuth();
   
-  if (!isLoggedIn) {
+  if (!isLoggedIn || !accessToken || accessToken === 'null') {
     return <Navigate to="/" replace />;
   }
   
@@ -97,7 +97,7 @@ const AppContent = () => {
                   <UserCart.Provider value={{cart, setCart}}>
                     <SignUpModal.Provider value={{signupmodal, setSignUpModal}}>
                       <Routes>
-                        <Route path='/' element={!isLoggedIn || !accessToken || accessToken === 'null' ? <Login /> : <Navigate to="/products" />} />
+                        <Route path='/' element={isLoading ? <div></div> : !isLoggedIn || !accessToken || accessToken === 'null' ? <Login /> : <Navigate to="/products" />} />
                         <Route path='/products' element={<Products />} />
                         <Route path='/cart' element={
                           <ProtectedRoute>
