@@ -203,28 +203,55 @@ const OrdersPage = () => {
   // You might want to add a modal or a section in the order card to display OTP
   // Or just display it on the card directly using existing CSS styles in Orders.css
   // You can be fancy with it or keep it simple, your choice ! :) Go wild, lol
-  const OtpVisiblity = () => (
-    otpVisible && (
-      <div className="otp-modal" onClick={() => setOtpVisible(false)}>
-        <div className="otp-content" onClick={(e) => e.stopPropagation()}>
-          <div className= "otp-header">
-            <h2>Order OTP</h2>
-            <button className="close-button" onClick={() => setOtpVisible(false)}>X</button>
-          </div>
-          
-          <div className="otp-body">
-            {fetchedOtp && (
-              <div className="otp-display">
-                <p>Your OTP for order #{selectedOrderId} is:</p>
-                <h3 className="otp-code">{fetchedOtp}</h3>
-                <p>Please provide this OTP when collecting your order.</p>
-              </div>
-            )}
-          </div>
+  // Updated OtpVisiblity component for Orders.jsx
+const OtpVisiblity = () => (
+  otpVisible && (
+    <div className="otp-modal" onClick={() => setOtpVisible(false)}>
+      <div className="otp-content" onClick={(e) => e.stopPropagation()}>
+        <div className="otp-header">
+          <h2>Order Pickup Code</h2>
+          <button className="close-button" onClick={() => setOtpVisible(false)}>×</button>
         </div>
+        
+        {selectedOrderId && (
+          <div className="order-subtitle">Order #{selectedOrderId}</div>
+        )}
+        
+        <div className="otp-body">
+          {fetchedOtp ? (
+            <>
+              <p className="pickup-code-text">Your pickup code is:</p>
+              <div className="otp-display">
+                <div className="otp-code">{fetchedOtp}</div>
+              </div>
+              <p className="instruction-text">
+                Show this code to the staff when collecting your order.
+              </p>
+            </>
+          ) : (
+            <div className="loading">Loading your pickup code...</div>
+          )}
+          
+          {otpError && (
+            <div className="otp-error">{otpError}</div>
+          )}
+        </div>
+        
+        {fetchedOtp && (
+          <div className="otp-footer">
+            <button 
+              className="refresh-button" 
+              onClick={() => fetchOrderOtp(selectedOrderId)}
+              disabled={otpLoading}
+            >
+              {otpLoading ? 'Refreshing...' : 'Refresh Code'}
+            </button>
+          </div>
+        )}
       </div>
-    )
+    </div>
   )
+)
   return (
     <div className="orderswrapper" id={theme}>
       <NavBar />

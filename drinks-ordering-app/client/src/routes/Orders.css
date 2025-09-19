@@ -314,6 +314,7 @@
   color: white !important;
 }
 
+/* OTP Modal Styles - Updated to match design */
 .otp-modal {
   position: fixed;
   top: 0;
@@ -330,149 +331,242 @@
 }
 
 .otp-content {
-  background-color: var(--background-color);
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
   text-align: center;
   max-width: 400px;
-  max-height: 80vh;
   width: 90%;
-  overflow-y: auto;
+  position: relative;
+  margin: 20px;
+}
+
+#dark .otp-content {
+  background-color: #2d3748;
+  color: white;
 }
 
 .otp-header {
-  margin-bottom: 15px;
-  font-size: 1.5em;
-  color: var(--text-color);
+  margin-bottom: 20px;
+  position: relative;
 }
 
 .otp-header h2 {
-  margin: 0;
-  font-size: 1.5em;
-  font-family: 'Lilita One';
-  color: var(--text-color);
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  font-family: 'Roboto Slab', serif;
+}
+
+#dark .otp-header h2 {
+  color: white;
 }
 
 .close-button {
   position: absolute;
-  top: 10px;
-  right: 15px;
-  font-size: 1.5em;
-  color: var(--text-color);
+  top: -20px;
+  right: -20px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: #666;
+  color: white;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.close-button:hover {
+  background: #444;
+}
+
+.order-subtitle {
+  font-size: 16px;
+  color: #666;
+  font-family: 'Roboto Slab', serif;
+  margin-bottom: 30px;
+}
+
+#dark .order-subtitle {
+  color: #a0aec0;
 }
 
 .otp-body {
-  margin-bottom: 15px;
-  font-size: 1em;
-  color: var(--text-color);
-}
-
-.otp-display {
-  font-size: 2em;
-  font-weight: bold;
-  letter-spacing: 5px;
-  margin: 15px 0;
-  color: var(--accent-color);
-}
-
-.otp-code {
-  width: 100%;
-  padding: 10px;
-  font-size: 1.2em;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  text-align: center;
-  box-sizing: border-box;
-  background-color: var(--input-background);
-  color: var(--text-color);
-}
-
-.otp-input {
-  width: 100%;
-  padding: 10px;
-  font-size: 1.2em;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  text-align: center;
-  box-sizing: border-box;
-  background-color: var(--input-background);
-  color: var(--text-color);
-}
-
-.otp-body h3 {
-  margin: 0 0 10px 0;
-  font-size: 1.2em;
-  color: var(--text-color);
+  margin-bottom: 30px;
 }
 
 .otp-body p {
-  margin: 0;
-  font-size: 1em;
-  color: var(--text-color);
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  color: #555;
+  font-family: 'Roboto Slab', serif;
 }
 
-.otp-error {
-  color: var(--error-color);
-  margin-top: 10px;
-  font-size: 0.9em;
+#dark .otp-body p {
+  color: #e2e8f0;
+}
+
+.pickup-code-text {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: 500;
+  font-family: 'Roboto Slab', serif;
+}
+
+#dark .pickup-code-text {
+  color: white;
+}
+
+.otp-display {
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border: 2px solid #e9ecef;
+}
+
+#dark .otp-display {
+  background-color: #4a5568;
+  border-color: #718096;
+}
+
+.otp-code {
+  font-size: 32px;
+  font-weight: bold;
+  letter-spacing: 8px;
+  margin: 15px 0;
+  color: #2563EB;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+}
+
+#dark .otp-code {
+  background-color: #1a202c;
+  color: #F59E0B;
+  border-color: #4a5568;
+}
+
+.instruction-text {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+  margin-top: 20px;
+  font-family: 'Roboto Slab', serif;
+}
+
+#dark .instruction-text {
+  color: #a0aec0;
 }
 
 .otp-footer {
-  margin-top: 15px;
+  margin-top: 30px;
 }
 
-.verify-button {
-  background-color: var(--button-background);
-  color: var(--button-text);
+.refresh-button {
+  background-color: #6c757d;
+  color: white;
   border: none;
-  padding: 10px 20px;
-  font-size: 1em;
-  border-radius: 4px;
+  padding: 12px 24px;
+  font-size: 14px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.2s ease;
+  font-family: 'Roboto Slab', serif;
+  font-weight: 500;
 }
 
-.btn-cancel {
-  background-color: var(--secondary-button-background);
-  color: var(--button-text);
+.refresh-button:hover {
+  background-color: #5a6268;
+}
+
+/* Get OTP Button Styling */
+.otp-button {
+  background-color: #28a745;
+  color: white;
   border: none;
-  padding: 10px 20px;
-  font-size: 1em;
-  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 12px;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
-  margin-left: 10px;
+  transition: background-color 0.2s ease;
+  font-family: 'Roboto Slab', serif;
+  font-weight: 500;
+  white-space: nowrap;
 }
 
-.verify-button:hover {
-  background-color: var(--button-hover);
+.otp-button:hover {
+  background-color: #218838;
 }
 
-.btn-cancel:hover {
-  background-color: var(--secondary-button-hover);
+.otp-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
 }
 
 /* Responsive Design */
 @media (max-width: 480px) {
   .otp-content {
-    padding: 15px;
+    padding: 30px 20px;
+    margin: 10px;
   }
   
-  .otp-header {
-    font-size: 1.2em;
+  .otp-header h2 {
+    font-size: 20px;
   }
   
-  .otp-display {
-    font-size: 1.5em;
-    letter-spacing: 3px;
+  .otp-code {
+    font-size: 24px;
+    letter-spacing: 4px;
   }
   
-  .verify-button, .cancel-button {
-    width: 100%;
-    margin: 10px 0 0 0;
+  .pickup-code-text {
+    font-size: 16px;
   }
+  
+  .instruction-text {
+    font-size: 13px;
+  }
+}
+
+/* CSS Variables for theming */
+:root {
+  --background-color: white;
+  --text-color: #333;
+  --accent-color: #2563EB;
+  --border-color: #e9ecef;
+  --input-background: #f8f9fa;
+  --button-background: #6c757d;
+  --button-text: white;
+  --button-hover: #5a6268;
+  --secondary-button-background: #dc3545;
+  --secondary-button-hover: #c82333;
+  --error-color: #dc3545;
+}
+
+#dark {
+  --background-color: #2d3748;
+  --text-color: white;
+  --accent-color: #F59E0B;
+  --border-color: #4a5568;
+  --input-background: #4a5568;
+  --button-background: #6c757d;
+  --button-text: white;
+  --button-hover: #5a6268;
+  --secondary-button-background: #dc3545;
+  --secondary-button-hover: #c82333;
+  --error-color: #dc3545;
 }
 
 @media (max-width: 768px) {

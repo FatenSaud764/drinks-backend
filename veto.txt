@@ -1,5 +1,0 @@
-BYT1
-IMP3
-PRL2
-SU1
-SU2
