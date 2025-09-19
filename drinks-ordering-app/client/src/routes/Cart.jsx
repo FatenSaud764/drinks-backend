@@ -17,6 +17,8 @@ const Cart = () => {
   const { cart, setCart } = useContext(UserCart);
   const [cartItems, setCartItems] = useState([]);
   const [open, setOpen] = useState(false);
+  const [ orderNote, setOrderNote ] = useState("");
+  const [ displayNote, setDisplayNote ] = useState("");
 
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
@@ -33,6 +35,7 @@ const Cart = () => {
         },
       });
       setCartItems(res.data.items);
+      console.log('my cart', cartItems);
     } catch (err) {
       console.error(err);
     }
@@ -40,6 +43,7 @@ const Cart = () => {
 
   const PlaceOrder = async() => {
     if (!isLoggedIn || !accessToken) return;
+    updateNote();
     
     try {
       const result = await AxiosInstance.post('/api/orders/', cartItems, {
@@ -141,6 +145,21 @@ const Cart = () => {
 
   const totalPrice = cartItems.reduce((sum, item) => sum + products.filter(product => { return product.id === item.drink_id }).map(product => product.price) * item.quantity, 0);
 
+  const updateNote = async () => {
+    if (!isLoggedIn || !accessToken) return;
+
+    try {
+      const res = await AxiosInstance.patch('/api/cart/', {
+        note: orderNote
+      }, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      fetchdata();
+    } catch (error) {
+      console.error('Error updating note:', error);
+    }
+  };
+
   // Show login message if not authenticated
   if (!isLoggedIn) {
     return (
@@ -204,11 +223,25 @@ const Cart = () => {
             </ul>
           )}
         </div>
+        {cartItems.length > 0 && 
+          <div className='add-note-wrapper'>
+            <form className='add-note-form' onSubmit={updateNote}>
+              <textarea 
+                maxlength="128"
+                className='new-note-text'
+                type='textarea'
+                value={orderNote}
+                placeholder='Enter a note for your order...'
+                onChange={(e)=>setOrderNote(e.target.value)}
+              />
+            </form>
+          </div>
+        }
         {cartItems.length>0 && 
-      <div className='clearcart'>
-        <span className='clearcarttext'>Clear Cart</span>
-        <button className='clearcartbutton' onClick={() => {ClearCart()}}><FaRegTrashCan className='clearicon'/></button>
-      </div>
+          <div className='clearcart'>
+            <span className='clearcarttext'>Clear Cart</span>
+            <button className='clearcartbutton' onClick={() => {ClearCart()}}><FaRegTrashCan className='clearicon'/></button>
+          </div>
         }
       </div>
       
