@@ -187,9 +187,10 @@ const Cart = () => {
         {cartItems.length > 0 && 
           <div className='add-note-wrapper'>
             <form className='add-note-form' onSubmit={updateNote}>
-              <input 
+              <textarea 
+                maxlength="128"
                 className='new-note-text'
-                type='text'
+                type='textarea'
                 value={orderNote}
                 placeholder='Enter a note for your order...'
                 onChange={(e)=>setOrderNote(e.target.value)}

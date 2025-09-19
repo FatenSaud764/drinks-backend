@@ -274,16 +274,17 @@
 }
 
 .new-note-text {
-    border: 2px solid #F59E0B;
-    border-radius: 30vh;
-    padding-left: 4vw;
-    width: 50vw;
-    height:3.4vh;
-    cursor: pointer;
-    font-family: 'Lalita One';
-
+  border: 2px solid #F59E0B;
+  border-radius: 1.5vh;
+  padding-left: 4vw;
+  padding-right: 4vw;
+  width: 80vw;
+  height:13vh;
+  cursor: pointer;
+  font-family: 'Lalita One';
+  resize: none;
 }
 
 .new-note-text:focus{
-    outline: none;
+  outline: none;
 }
