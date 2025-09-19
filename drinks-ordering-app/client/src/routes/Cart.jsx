@@ -38,12 +38,12 @@ const Cart = () => {
 
   const PlaceOrder = async() => {
     if (!isLoggedIn || !accessToken) return;
+    updateNote();
     
     try {
       const result = await AxiosInstance.post('/api/orders/', cartItems, {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
-      setDisplayNote("");
       console.log('order', result.data)
       alert("Placed order!")
       fetchdata()
@@ -128,10 +128,8 @@ const Cart = () => {
 
   const totalPrice = cartItems.reduce((sum, item) => sum + products.filter(product => { return product.id === item.drink_id }).map(product => product.price) * item.quantity, 0);
 
-  const updateNote = async (e) => {
-    e.preventDefault();
+  const updateNote = async () => {
     if (!isLoggedIn || !accessToken) return;
-    setDisplayNote(orderNote);
 
     try {
       const res = await AxiosInstance.patch('/api/cart/', {
@@ -186,11 +184,6 @@ const Cart = () => {
             </ul>
           )}
         </div>
-        {displayNote !== "" &&
-          <div className='display-note'>
-            Order note: {displayNote}
-          </div>
-        }
         {cartItems.length > 0 && 
           <div className='add-note-wrapper'>
             <form className='add-note-form' onSubmit={updateNote}>
@@ -198,10 +191,9 @@ const Cart = () => {
                 className='new-note-text'
                 type='text'
                 value={orderNote}
-                placeholder='Enter new order note...'
+                placeholder='Enter a note for your order...'
                 onChange={(e)=>setOrderNote(e.target.value)}
               />
-              <button type="submit" className='save-note-btn'>Save Note</button>
             </form>
           </div>
         }
