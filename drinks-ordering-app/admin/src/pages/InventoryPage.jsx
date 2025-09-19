@@ -229,11 +229,17 @@ const InventoryPage = () => {
         accessorKey: 'available',
         header: 'Status',
         size: 120,
-        Cell: ({ cell }) => (
-          <span className={`status-badge ${cell.getValue() ? 'available' : 'unavailable'}`}>
-            {cell.getValue() ? 'Available' : 'Unavailable'}
-          </span>
-        ),
+        Cell: ({ row }) => {
+          const stock = row.original.stock || 0;
+          const unavailableThreshold = row.original.unavailable_threshold || 5;
+          const isAvailable = stock > unavailableThreshold;
+          
+          return (
+            <span className={`status-badge ${isAvailable ? 'available' : 'unavailable'}`}>
+              {isAvailable ? 'Available' : 'Unavailable'}
+            </span>
+          );
+        }
       },
       {
         accessorKey: 'description',
@@ -371,7 +377,7 @@ const InventoryPage = () => {
         image: formData.image,
         price: parseFloat(formData.price),
         category: formData.category.trim(),
-        available: stockValue >= unavailableThreshold,
+        available: stockValue > unavailableThreshold,
         stock: stockValue,
         low_stock_threshold: parseInt(formData.low_stock_threshold),
         unavailable_threshold: unavailableThreshold
@@ -468,12 +474,14 @@ const InventoryPage = () => {
   const stats = useMemo(() => {
     return {
       total: drinks.length,
-      available: drinks.filter(d => d.available).length,
-      unavailable: drinks.filter(d => !d.available).length,
+      available: drinks.filter(d => (d.stock || 0) > (d.unavailable_threshold || 5)).length,
+      unavailable: drinks.filter(d => (d.stock || 0) <= (d.unavailable_threshold || 5)).length,
       lowStock: drinks.filter(d => {
         const stock = d.stock || 0;
-        const threshold = d.low_stock_threshold || 10;
-        return stock <= threshold;
+        const lowThreshold = d.low_stock_threshold || 10;
+        const unavailableThreshold = d.unavailable_threshold || 5;
+        // low stock if strictly above unavailable threshold but at or below low threshold
+        return stock > unavailableThreshold && stock <= lowThreshold;
       }).length
     };
   }, [drinks]);
