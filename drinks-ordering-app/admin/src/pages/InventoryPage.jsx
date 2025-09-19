@@ -135,8 +135,8 @@ const InventoryPage = () => {
   };
 
   const getStockStatus = (stock, lowThreshold, unavailableThreshold) => {
-    if (stock < unavailableThreshold) return 'unavailable';
-    if (stock < lowThreshold) return 'low-stock';
+    if (stock <= unavailableThreshold) return 'unavailable';
+    if (stock <= lowThreshold) return 'low-stock';
     return '';
   };
 
@@ -473,7 +473,7 @@ const InventoryPage = () => {
       lowStock: drinks.filter(d => {
         const stock = d.stock || 0;
         const threshold = d.low_stock_threshold || 10;
-        return stock < threshold;
+        return stock <= threshold;
       }).length
     };
   }, [drinks]);
