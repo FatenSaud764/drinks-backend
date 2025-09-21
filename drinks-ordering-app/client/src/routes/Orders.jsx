@@ -210,7 +210,7 @@ const OtpVisiblity = () => (
       <div className="otp-content" onClick={(e) => e.stopPropagation()}>
         <div className="otp-header">
           <h2>Order Pickup Code</h2>
-          <button className="close-button" onClick={() => setOtpVisible(false)}>×</button>
+          <button className="close-button" onClick={() => setOtpVisible(false)}>X</button>
         </div>
         
         {selectedOrderId && (
@@ -218,7 +218,9 @@ const OtpVisiblity = () => (
         )}
         
         <div className="otp-body">
-          {fetchedOtp ? (
+          {otpLoading ? (
+            <div className="loading">Loading your pickup code...</div>
+          ) : fetchedOtp ? (
             <>
               <p className="pickup-code-text">Your pickup code is:</p>
               <div className="otp-display">
@@ -252,6 +254,7 @@ const OtpVisiblity = () => (
     </div>
   )
 )
+
   return (
     <div className="orderswrapper" id={theme}>
       <NavBar />

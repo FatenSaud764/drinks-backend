@@ -42,6 +42,36 @@
   color: white !important;
 }
 
+/* OTP Error Message Styling */
+.otp-error {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 10px;
+  font-family: 'Roboto Slab', serif;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+#dark .otp-error {
+  color: #f8d7da;
+  background-color: #4a1e1e;
+  border-color: #6b2c32;
+}
+
+/* Ensure loading text in modal is styled properly */
+.otp-body .loading {
+  font-size: 16px;
+  color: #666;
+  padding: 20px;
+  font-family: 'Roboto Slab', serif;
+}
+
+#dark .otp-body .loading {
+  color: #e2e8f0;
+}
+
 /* Tabs - Fixed size at top */
 .orders-tabs {
   display: flex;
