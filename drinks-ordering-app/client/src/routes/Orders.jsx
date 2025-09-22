@@ -16,11 +16,8 @@ const OrdersPage = () => {
   const [error, setError] = useState(null)
   const intervalRef = useRef(null)
 
-  // ========== OTP STATE MANAGEMENT ==========
-  // TODO: Add state variables for OTP functionality
-  // Example: selectedOrderId, otpCode, otpLoading, otpError
+  // OTP states
   const [selectedOrderId, setSelectedOrderId] = useState(null)
-  const [otpCode, setOtpCode] = useState('')
   const [otpLoading, setOtpLoading] = useState(false)
   const [otpError, setOtpError] = useState(null)
   const [otpVisible, setOtpVisible] = useState(false)
@@ -49,13 +46,8 @@ const OrdersPage = () => {
     }
   }
 
-  // ========== OTP FETCH FUNCTION ==========
-  // TODO: Implement function to fetch OTP for an order
-  // This should call GET /api/orders/{id}/otp/ endpoint (id being the order ID)
-  /*
-  const fetchOrderOtp = async (orderId) => {}
-  */
- const fetchOrderOtp = async (orderId) => {
+  // This function fetches the OTP for a given order ID
+  const fetchOrderOtp = async (orderId) => {
     try {
       setOtpLoading(true)
       setOtpError(null)
@@ -63,7 +55,7 @@ const OrdersPage = () => {
       const res = await AxiosInstance.get(`/api/orders/${orderId}/otp/`)
       console.log('OTP Fetch response:', res.data)
 
-      setFetchedOtp(res.data.otp)
+      setFetchedOtp(res.data.code)
       setSelectedOrderId(orderId)
       setOtpVisible(true)
 
@@ -76,13 +68,6 @@ const OrdersPage = () => {
       setOtpLoading(false)
     }
   }
-
-  // ========== OTP VERIFICATION FUNCTION ==========
-  // TODO: Implement function to verify OTP
-  // This should call POST /api/orders/{id}/otp/verify/ endpoint
-  /*
-  const verifyOrderOtp = async (orderId, otpCode) => {}
-  */
 
   const cancelOrder = async (orderId) => {
     try {
@@ -197,63 +182,43 @@ const OrdersPage = () => {
     )
   }
 
-  // ========== OTP UI ==========
-  // TODO: Do whatever is needed to show OTP when required
-  // For this, it is completely up to you how you want to implement it ! Good luck ! :)
-  // You might want to add a modal or a section in the order card to display OTP
-  // Or just display it on the card directly using existing CSS styles in Orders.css
-  // You can be fancy with it or keep it simple, your choice ! :) Go wild, lol
-  // Updated OtpVisiblity component for Orders.jsx
-const OtpVisiblity = () => (
-  otpVisible && (
-    <div className="otp-modal" onClick={() => setOtpVisible(false)}>
-      <div className="otp-content" onClick={(e) => e.stopPropagation()}>
-        <div className="otp-header">
-          <h2>Order Pickup Code</h2>
-          <button className="close-button" onClick={() => setOtpVisible(false)}>X</button>
-        </div>
-        
-        {selectedOrderId && (
-          <div className="order-subtitle">Order #{selectedOrderId}</div>
-        )}
-        
-        <div className="otp-body">
-          {otpLoading ? (
-            <div className="loading">Loading your pickup code...</div>
-          ) : fetchedOtp ? (
-            <>
-              <p className="pickup-code-text">Your pickup code is:</p>
-              <div className="otp-display">
-                <div className="otp-code">{fetchedOtp}</div>
-              </div>
-              <p className="instruction-text">
-                Show this code to the staff when collecting your order.
-              </p>
-            </>
-          ) : (
-            <div className="loading">Loading your pickup code...</div>
+  // OTP Modal Component
+  const OtpVisiblity = () => (
+    otpVisible && (
+      <div className="otp-modal" onClick={() => setOtpVisible(false)}>
+        <div className="otp-content" onClick={(e) => e.stopPropagation()}>
+          <div className="otp-header">
+            <h2>Order Pickup Code</h2>
+            <button className="close-button" onClick={() => setOtpVisible(false)}>×</button>
+          </div>
+          
+          {selectedOrderId && (
+            <div className="order-subtitle">Order #{selectedOrderId}</div>
           )}
           
-          {otpError && (
-            <div className="otp-error">{otpError}</div>
-          )}
-        </div>
-        
-        {fetchedOtp && (
-          <div className="otp-footer">
-            <button 
-              className="refresh-button" 
-              onClick={() => fetchOrderOtp(selectedOrderId)}
-              disabled={otpLoading}
-            >
-              {otpLoading ? 'Refreshing...' : 'Refresh Code'}
-            </button>
+          <div className="otp-body">
+            {fetchedOtp ? (
+              <>
+                <p className="pickup-code-text">Your pickup code is:</p>
+                <div className="otp-display">
+                  <div className="otp-code">{fetchedOtp}</div>
+                </div>
+                <p className="instruction-text">
+                  Show this code to the staff when collecting your order.
+                </p>
+              </>
+            ) : (
+              <div className="loading">Loading your pickup code...</div>
+            )}
+            
+            {otpError && (
+              <div className="otp-error">{otpError}</div>
+            )}
           </div>
-        )}
+        </div>
       </div>
-    </div>
+    )
   )
-)
 
   return (
     <div className="orderswrapper" id={theme}>
@@ -328,10 +293,7 @@ const OtpVisiblity = () => (
                         </button>
                       )}
 
-                      {activeTab === 'active' && (
-                        order.status?.toLowerCase() === 'ready' || 
-                        order.status?.toLowerCase() === 'preparing'
-                      ) && (
+                      {activeTab === 'active' && order.status?.toLowerCase() === 'ready' && (
                         <button 
                           className="otp-button"
                           onClick={() => fetchOrderOtp(order.id)}
