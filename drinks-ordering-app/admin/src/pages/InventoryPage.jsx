@@ -165,7 +165,6 @@ const InventoryPage = () => {
                   alt={row.original.name}
                   className="drink-image"
                   onError={(e) => {
-                    console.log('Image failed to load:', imageUrl);
                     e.target.style.display = 'none';
                     e.target.nextSibling.style.display = 'block';
                   }}
@@ -393,7 +392,6 @@ const InventoryPage = () => {
       
       closeModal();
     } catch (err) {
-      console.error(`Failed to ${modalMode} drink:`, err);
       showSnackbar(`Failed to ${modalMode} drink: ${err.message}`, 'error');
     }
   };
@@ -419,7 +417,6 @@ const InventoryPage = () => {
       showSnackbar('Global thresholds updated successfully!', 'success');
       closeThresholdModal();
     } catch (err) {
-      console.error('Failed to update global thresholds:', err);
       showSnackbar(`Failed to update thresholds: ${err.message}`, 'error');
     }
   };
@@ -431,7 +428,6 @@ const InventoryPage = () => {
       const status = currentAvailability ? 'disabled' : 'enabled';
       showSnackbar(`"${drink?.name || 'Drink'}" ${status} successfully!`, 'success');
     } catch (err) {
-      console.error('Failed to toggle availability:', err);
       showSnackbar(`Failed to toggle availability: ${err.message}`, 'error');
     }
   };
