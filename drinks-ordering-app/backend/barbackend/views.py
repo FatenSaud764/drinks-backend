@@ -19,7 +19,7 @@ from drf_spectacular.utils import (
 )
 from drf_spectacular.types import OpenApiTypes
 
-CART_EXPIRY_SECONDS = 30  # 30 seconds for testing (added for expiry functionality)
+CART_EXPIRY_SECONDS = 15*60  # 15 minutes  (added for expiry functionality)
 
 def _require_platform_admin(user):
     if not getattr(user, 'is_authenticated', False) or not getattr(user, 'is_admin', False):
