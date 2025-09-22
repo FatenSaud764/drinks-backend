@@ -5,8 +5,6 @@ import './AddItems.css'
 const AddItems = ({prod, num, setNum}) => {
   const {theme, setTheme} = useContext(LightDark);
 
-  console.log('stock', parseInt(prod))
-
   const updateCount = (num, plus) => {
     if (!plus && num > 0) {
       setNum(num - 1);

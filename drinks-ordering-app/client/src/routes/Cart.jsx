@@ -6,12 +6,19 @@ import './Cart.css'
 import { useState } from 'react'
 import AxiosInstance from '../components/Axios'
 import { FaRegTrashCan } from "react-icons/fa6";
+import Snackbar from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert'
+import Slide from '@mui/material/Slide'
+
 
 const Cart = () => {
   const { theme, setTheme } = useContext(LightDark)
   const { products, setProducts } = useContext(ProductList)
   const { cart, setCart } = useContext(UserCart);
   const [cartItems, setCartItems] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [ orderNote, setOrderNote ] = useState("");
+  const [ displayNote, setDisplayNote ] = useState("");
 
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
@@ -36,18 +43,21 @@ const Cart = () => {
 
   const PlaceOrder = async() => {
     if (!isLoggedIn || !accessToken) return;
+    updateNote();
     
     try {
       const result = await AxiosInstance.post('/api/orders/', cartItems, {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
       console.log('order', result.data)
-      alert("Placed order!")
+      setOpen(true);
       fetchdata()
     } catch (err) {
       console.error(err);
     }
   }
+
+  console.log('open', open)
 
   const ClearCart = async() => {
     if (!isLoggedIn || !accessToken) return;
@@ -123,7 +133,32 @@ const Cart = () => {
     setCartItems(cartItems.filter(item => item.id !== id));
   };
 
+  useEffect(() => {
+  if (open) {
+    const timer = setTimeout(() => {
+      setOpen(false);
+    }, 3000);
+    
+    return () => clearTimeout(timer); // Cleanup
+  }
+}, [open]);
+
   const totalPrice = cartItems.reduce((sum, item) => sum + products.filter(product => { return product.id === item.drink_id }).map(product => product.price) * item.quantity, 0);
+
+  const updateNote = async () => {
+    if (!isLoggedIn || !accessToken) return;
+
+    try {
+      const res = await AxiosInstance.patch('/api/cart/', {
+        note: orderNote
+      }, {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
+      fetchdata();
+    } catch (error) {
+      console.error('Error updating note:', error);
+    }
+  };
 
   // Show login message if not authenticated
   if (!isLoggedIn) {
@@ -140,6 +175,28 @@ const Cart = () => {
   return (
     <div className="cartwrapper" id={theme}>
       <NavBar />
+      <Slide in={open} direction='right'>
+        <Snackbar open={open} onClose={() => {setOpen(false)}} anchorOrigin={{vertical: 'bottom', horizontal: 'left'}} sx={{bottom: '2vh', left: '2vh'}}><Alert onClose={() => {setOpen(false)}} severity="success" sx={
+          {
+            display: 'flex',
+            alignItems: 'center',
+            width: '70vw',
+            background: '#2563EB',
+            color: 'white',
+            '& .MuiAlert-icon': {
+              alignItems: 'center',
+      color: 'white',
+    },
+    '& .MuiAlert-message': {
+      alignItems: 'center',
+      fontWeight: '800',
+      fontFamily: 'Roboto Slab',
+      fontSize: '18px',
+      color: 'white',
+    }
+          }
+        }>Order placed!</Alert></Snackbar>
+      </Slide>
       <div className='cart-items'>
         <div className="cart-items-list">
           {cartItems.length === 0 ? (
@@ -166,11 +223,25 @@ const Cart = () => {
             </ul>
           )}
         </div>
+        {cartItems.length > 0 && 
+          <div className='add-note-wrapper'>
+            <form className='add-note-form' onSubmit={updateNote}>
+              <textarea 
+                maxlength="128"
+                className='new-note-text'
+                type='textarea'
+                value={orderNote}
+                placeholder='Enter a note for your order...'
+                onChange={(e)=>setOrderNote(e.target.value)}
+              />
+            </form>
+          </div>
+        }
         {cartItems.length>0 && 
-      <div className='clearcart'>
-        <span className='clearcarttext'>Clear Cart</span>
-        <button className='clearcartbutton' onClick={() => {ClearCart()}}><FaRegTrashCan className='clearicon'/></button>
-      </div>
+          <div className='clearcart'>
+            <span className='clearcarttext'>Clear Cart</span>
+            <button className='clearcartbutton' onClick={() => {ClearCart()}}><FaRegTrashCan className='clearicon'/></button>
+          </div>
         }
       </div>
       

@@ -12,12 +12,13 @@ const DrinkInfo = () => {
   const { theme, setTheme } = useContext(LightDark);
   const [num, setNum] = useState(0);
   const [cartModal, setCartModal] = useState(false);
+  const [selectedSize, setSelectedSize] = useState(null);
 
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
 
   const addToCart = (e, num) => {
-    if (isLoggedIn && accessToken) {
+    if (isLoggedIn && accessToken && num>0) {
       const request = async () => {
         await AxiosInstance.post(
           '/api/cart/items/',
@@ -27,13 +28,18 @@ const DrinkInfo = () => {
       request();
       setCartModal(true);
     } else {
-      alert('Log in to add to cart and place orders');
+      alert('Please select at least one drink to add to cart!');
     }
   }
 
+  console.log('modal', cartModal)
+
   return (
     <div className='drinkinfowrapper' id={theme}>
+        <CartModalBoolean.Provider value={{cartModal, setCartModal}}>
         <NavBar />
+          {cartModal && <CartModal />}
+        </CartModalBoolean.Provider>
         <img src= {`http://127.0.0.1:8000${selecteddrink.image}`} className='drinkimage' />
         <div className='drinkname'>
           {selecteddrink.name}
@@ -41,13 +47,23 @@ const DrinkInfo = () => {
         <div className='drinkprice'>
           R{selecteddrink.price}
         </div>
+        <div className='radiobuttons'>
+          <label className='sizeselect'>
+          <input type='radio' value='small' onChange={(e) => setSelectedSize(e.target.value)} checked={selectedSize==='small'}/>
+          Small drink
+        </label>
+        <label className='sizeselect'>
+          <input type='radio' value='medium' onChange={(e) => setSelectedSize(e.target.value)} checked={selectedSize==='medium'}/>
+          Medium drink
+        </label>
+        <label className='sizeselect'>
+          <input type='radio' value='large' onChange={(e) => setSelectedSize(e.target.value)} checked={selectedSize==='large'}/>
+          Large drink
+        </label>
+        </div>
         <AddItems prod={selecteddrink} num={num} setNum={setNum} />
         <button className='addtocart' onClick={() => {addToCart(selecteddrink.id, num)}}>Add to cart</button>
-        <div className="drink-info-cartmodal-wrapper">
-          <CartModalBoolean.Provider value={{cartModal, setCartModal}}>
-            {cartModal && <CartModal/>}
-          </CartModalBoolean.Provider>
-        </div>
+        <br />
     </div>
   )
 }

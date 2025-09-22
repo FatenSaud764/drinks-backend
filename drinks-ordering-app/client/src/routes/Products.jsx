@@ -87,11 +87,11 @@ const Products = () => {
   return (
     <div className='prodwrapper' id={theme}>
       <NavBar />
+      <CartModalBoolean.Provider value={{cartModal, setCartModal}}>
+        {cartModal && <CartModal/>}
+      </CartModalBoolean.Provider>
       <div className='prodplussearch'>
         <div><SearchBar /></div>
-        <CartModalBoolean.Provider value={{cartModal, setCartModal}}>
-        {cartModal && <CartModal/>}
-        </CartModalBoolean.Provider>
         <div className='prodlist'>
         {sortedProducts.map((product) => {
           
