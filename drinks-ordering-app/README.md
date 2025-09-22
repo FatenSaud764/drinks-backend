@@ -30,83 +30,71 @@ Starts both development servers (bar-end and client-end) simultaneously.
    make dev
    ```
 
-3. **Run only the Client**
-
-   ```bash
-   make client
-   ```
-
-4. **Run only the Bar**
-
-   ```bash
-   make bar
-   ```
-
-5. **Build Both**
+3. **Build Both**
 
    ```bash
    make build
    ```
 
-6. **Clean Build Files**
+4. **Clean Build Files**
 
    ```bash
    make clean
    ```
 
-7. **Install Frontend Dependencies**
+5. **Install Frontend Dependencies**
 
    ```bash
    make install-frontend
    ```
 
-8. **Install Backend Dependencies**
+6. **Install Backend Dependencies**
 
    ```bash
    make install-backend
    ```
 
-9. **Start Database (Postgres in Docker)**
+7. **Start Database (Postgres in Docker)**
 
    ```bash
    make start-db
    ```
 
-10. **Initialize Database**
+8. **Initialize Database**
 
-```bash
-make init-db
-```
+   ```bash
+   make init-db
+   ```
 
-11. **Stop Database**
+9. **Stop Database**
 
-```bash
-make stop-db
-```
+   ```bash
+   make stop-db
+   ```
 
-12. **Start Frontend Only (admin + client)**
+10. **Start Frontend Only (admin + client)**
 
-```bash
-make frontend
-```
+   ```bash
+   make frontend
+   ```
 
-13. **Start Backend Only**
+11. **Start Backend Only**
 
-```bash
-make backend
-```
+   ```bash
+   make backend
+   ```
 
-14. **Run Backend Tests**
+12. **Run Backend Tests**
 
-```bash
-make test-backend
-```
+   ```bash
+   make test-backend
+   ```
 
-15. **Apply Backend Migrations**
+13. **Apply Backend Migrations**
 
-```bash
-make migrate
-```
+   ```bash
+   make migrate
+   ```
 
 ## Available Django management commands
 
