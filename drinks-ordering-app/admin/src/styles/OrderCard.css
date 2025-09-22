@@ -33,6 +33,12 @@
   position: relative;
 }
 
+.item-price {
+  margin: 0 10px;
+  color: var(--text-muted) !important;
+  font-size: 0.9rem;
+}
+
 /* Responsiveness */
 @media (max-width: 768px) {
   .order-note {

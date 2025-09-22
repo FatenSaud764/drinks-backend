@@ -8,7 +8,7 @@ import AxiosInstance from '../components/Axios'
 const OrdersPage = () => {
   const { theme } = useContext(LightDark)
   const { products } = useContext(ProductList)
-  const { isLoggedIn } = useAuth() // Much simpler!
+  const { isLoggedIn } = useAuth()
   
   const [activeTab, setActiveTab] = useState('active')
   const [orders, setOrders] = useState([])
@@ -16,14 +16,19 @@ const OrdersPage = () => {
   const [error, setError] = useState(null)
   const intervalRef = useRef(null)
 
+  // OTP states
+  const [selectedOrderId, setSelectedOrderId] = useState(null)
+  const [otpLoading, setOtpLoading] = useState(false)
+  const [otpError, setOtpError] = useState(null)
+  const [otpVisible, setOtpVisible] = useState(false)
+  const [fetchedOtp, setFetchedOtp] = useState(null)
+
   const fetchOrders = async (showLoading = true) => {
     try {
       if (showLoading) setLoading(true)
       setError(null)
       
-      // No need for manual auth headers - handled automatically!
       const res = await AxiosInstance.get('/api/orders/')
-      
       console.log('Orders API response:', res.data)
       
       const sortedOrders = res.data.sort((a, b) => {
@@ -35,23 +40,43 @@ const OrdersPage = () => {
       setOrders(sortedOrders)
     } catch (err) {
       console.error('Error fetching orders:', err)
-      // Auth errors are handled automatically by the interceptor!
       setError('Failed to load orders. Please try again.')
     } finally {
       if (showLoading) setLoading(false)
     }
   }
 
+  // This function fetches the OTP for a given order ID
+  const fetchOrderOtp = async (orderId) => {
+    try {
+      setOtpLoading(true)
+      setOtpError(null)
+      
+      const res = await AxiosInstance.get(`/api/orders/${orderId}/otp/`)
+      console.log('OTP Fetch response:', res.data)
+
+      setFetchedOtp(res.data.code)
+      setSelectedOrderId(orderId)
+      setOtpVisible(true)
+
+      return res.data
+    } catch (err) {
+      console.error('Error fetching OTP:', err)
+      setOtpError('Failed to fetch OTP. Please try again.')
+      throw err
+    } finally {
+      setOtpLoading(false)
+    }
+  }
+
   const cancelOrder = async (orderId) => {
     try {
-      // No manual auth handling needed!
       await AxiosInstance.delete(`/api/orders/${orderId}/`)
       alert('Order cancelled successfully!')
       fetchOrders()
     } catch (err) {
       console.error('Error cancelling order:', err)
       
-      // Only handle business logic errors, auth is automatic
       if (err.response?.status === 404) {
         alert('Order not found or already cancelled')
       } else if (err.response?.status === 403) {
@@ -157,9 +182,48 @@ const OrdersPage = () => {
     )
   }
 
+  // OTP Modal Component
+  const OtpVisiblity = () => (
+    otpVisible && (
+      <div className="otp-modal" onClick={() => setOtpVisible(false)}>
+        <div className="otp-content" onClick={(e) => e.stopPropagation()}>
+          <div className="otp-header">
+            <h2>Order Pickup Code</h2>
+            <button className="close-button" onClick={() => setOtpVisible(false)}>×</button>
+          </div>
+          
+          {selectedOrderId && (
+            <div className="order-subtitle">Order #{selectedOrderId}</div>
+          )}
+          
+          <div className="otp-body">
+            {fetchedOtp ? (
+              <>
+                <p className="pickup-code-text">Your pickup code is:</p>
+                <div className="otp-display">
+                  <div className="otp-code">{fetchedOtp}</div>
+                </div>
+                <p className="instruction-text">
+                  Show this code to the staff when collecting your order.
+                </p>
+              </>
+            ) : (
+              <div className="loading">Loading your pickup code...</div>
+            )}
+            
+            {otpError && (
+              <div className="otp-error">{otpError}</div>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  )
+
   return (
     <div className="orderswrapper" id={theme}>
       <NavBar />
+      <OtpVisiblity />
       <div className="orders-content">
         <h1 className="orders-title">My Orders</h1>
         
@@ -215,6 +279,7 @@ const OrdersPage = () => {
                       >
                         {order.status || 'Pending'}
                       </span>
+                      
                       {activeTab === 'active' && order.status?.toLowerCase() === 'pending' && (
                         <button 
                           className="cancel-button"
@@ -227,6 +292,16 @@ const OrdersPage = () => {
                           Cancel
                         </button>
                       )}
+
+                      {activeTab === 'active' && order.status?.toLowerCase() === 'ready' && (
+                        <button 
+                          className="otp-button"
+                          onClick={() => fetchOrderOtp(order.id)}
+                          disabled={otpLoading}
+                        >
+                          {otpLoading && selectedOrderId === order.id ? 'Loading...' : 'Get OTP'}
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -235,25 +310,28 @@ const OrdersPage = () => {
                       order.items.map((item, index) => {
                         const drinkId = item.drink_id || item.drink || item.product_id
                         const quantity = item.quantity || 1
+                        const unitPrice = getProductPrice(drinkId)
+                        const totalPrice = unitPrice * quantity
                         
                         return (
                           <div key={index} className="order-item">
-                            <div className="item-details">
-                              <span className="item-name">{getProductName(drinkId)}</span>
-                              <span className="item-quantity">Qty: {quantity}</span>
+                            <div className="item-display">
+                              <span className="item-main">
+                                {quantity}x {getProductName(drinkId)}
+                              </span>
+                              <span className="unit-price">
+                                | @R{unitPrice.toFixed(2)}
+                              </span>
                             </div>
                             <span className="item-total">
-                              R{(getProductPrice(drinkId) * quantity).toFixed(2)}
+                              R{totalPrice.toFixed(2)}
                             </span>
                           </div>
                         )
                       })
                     ) : (
                       <div className="order-item">
-                        <div className="item-details">
-                          <span className="item-name">No items found</span>
-                          <span className="item-quantity">Check order details</span>
-                        </div>
+                        <span className="item-display">No items found</span>
                         <span className="item-total">R0.00</span>
                       </div>
                     )}

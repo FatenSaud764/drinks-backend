@@ -85,7 +85,6 @@ const UserManagementPage = () => {
       await updateUserRole(userId, { level: newLevel });
       showSnackbar(`User role updated to ${newLevel} successfully!`, 'success');
     } catch (err) {
-      console.error('Failed to update user role:', err);
       showSnackbar(`Failed to update user role: ${err.message}`, 'error');
     }
   };
@@ -204,7 +203,6 @@ const UserManagementPage = () => {
       showSnackbar(`Staff user "${userData.username}" added successfully!`, 'success');
       closeModal();
     } catch (err) {
-      console.error('Failed to add user:', err);
       showSnackbar(`Failed to add user: ${err.message}`, 'error');
     }
   };
@@ -215,7 +213,6 @@ const UserManagementPage = () => {
       return;
     }
     
-    console.log('Delete user ID:', userId);
     const user = users.find(u => u.id === userId);
     const userName = user ? user.username : `user ID ${userId}`;
     
@@ -224,7 +221,6 @@ const UserManagementPage = () => {
         await deleteUser(userId);
         showSnackbar(`"${userName}" deleted successfully!`, 'success');
       } catch (err) {
-        console.error('Failed to delete user:', err);
         showSnackbar(`Failed to delete user: ${err.message}`, 'error');
       }
     }

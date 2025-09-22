@@ -42,6 +42,36 @@
   color: white !important;
 }
 
+/* OTP Error Message Styling */
+.otp-error {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 10px;
+  font-family: 'Roboto Slab', serif;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+#dark .otp-error {
+  color: #f8d7da;
+  background-color: #4a1e1e;
+  border-color: #6b2c32;
+}
+
+/* Ensure loading text in modal is styled properly */
+.otp-body .loading {
+  font-size: 16px;
+  color: #666;
+  padding: 20px;
+  font-family: 'Roboto Slab', serif;
+}
+
+#dark .otp-body .loading {
+  color: #e2e8f0;
+}
+
 /* Tabs - Fixed size at top */
 .orders-tabs {
   display: flex;
@@ -238,10 +268,6 @@
 }
 
 /* Order Items */
-.order-items {
-  margin-bottom: 5vw;
-}
-
 .order-item {
   display: flex;
   justify-content: space-between;
@@ -258,30 +284,36 @@
   border-bottom: none;
 }
 
-.item-details {
-  display: flex;
-  flex-direction: column;
-  gap: 1vw;
-}
-
-.item-name {
+.item-display {
   font-weight: 500;
   font-size: 3.8vw;
   color: #333;
   font-family: 'Roboto Slab';
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5vw;
 }
 
-#dark .item-name {
+#dark .item-display {
   color: white !important;
 }
 
-.item-quantity {
+.item-main {
+  font-weight: 500;
+  font-size: 3.8vw;
+  color: inherit;
+  font-family: 'Roboto Slab';
+}
+
+.unit-price {
+  font-weight: 400;
   font-size: 3.2vw;
   color: #666;
   font-family: 'Roboto Slab';
 }
 
-#dark .item-quantity {
+#dark .unit-price {
   color: #a0aec0 !important;
 }
 
@@ -290,6 +322,38 @@
   color: #F59E0B;
   font-size: 3.8vw;
   font-family: 'Lilita One';
+  text-align: right;
+  min-width: fit-content;
+  margin-left: 10px;
+}
+
+/* Mobile responsive updates */
+@media (max-width: 768px) {
+  .item-main {
+    font-size: 4.2vw;
+  }
+
+  .unit-price {
+    font-size: 3.6vw;
+  }
+
+  .item-total {
+    font-size: 4.2vw;
+  }
+}
+
+@media (max-width: 400px) {
+  .item-main {
+    font-size: 4.8vw;
+  }
+
+  .unit-price {
+    font-size: 4.0vw;
+  }
+
+  .item-total {
+    font-size: 4.8vw;
+  }
 }
 
 /* Order Footer */
@@ -314,7 +378,261 @@
   color: white !important;
 }
 
+/* OTP Modal Styles - Updated to match design */
+.otp-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.otp-content {
+  background-color: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  position: relative;
+  margin: 20px;
+}
+
+#dark .otp-content {
+  background-color: #2d3748;
+  color: white;
+}
+
+.otp-header {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.otp-header h2 {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  font-family: 'Roboto Slab', serif;
+}
+
+#dark .otp-header h2 {
+  color: white;
+}
+
+.close-button {
+  position: absolute;
+  top: -20px;
+  right: -20px;
+  width: 30px;
+  height: 30px;
+  border: none;
+  background: #666;
+  color: white;
+  border-radius: 50%;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+}
+
+.close-button:hover {
+  background: #444;
+}
+
+.order-subtitle {
+  font-size: 16px;
+  color: #666;
+  font-family: 'Roboto Slab', serif;
+  margin-bottom: 30px;
+}
+
+#dark .order-subtitle {
+  color: #a0aec0;
+}
+
+.otp-body {
+  margin-bottom: 30px;
+}
+
+.otp-body p {
+  margin: 0 0 20px 0;
+  font-size: 16px;
+  color: #555;
+  font-family: 'Roboto Slab', serif;
+}
+
+#dark .otp-body p {
+  color: #e2e8f0;
+}
+
+.pickup-code-text {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: 500;
+  font-family: 'Roboto Slab', serif;
+}
+
+#dark .pickup-code-text {
+  color: white;
+}
+
+.otp-display {
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 20px 0;
+  border: 2px solid #e9ecef;
+}
+
+#dark .otp-display {
+  background-color: #4a5568;
+  border-color: #718096;
+}
+
+.otp-code {
+  font-size: 32px;
+  font-weight: bold;
+  letter-spacing: 8px;
+  margin: 15px 0;
+  color: #2563EB;
+  font-family: 'Courier New', monospace;
+  text-align: center;
+  padding: 10px;
+  background: white;
+  border-radius: 8px;
+  border: 2px solid #e9ecef;
+}
+
+#dark .otp-code {
+  background-color: #1a202c;
+  color: #F59E0B;
+  border-color: #4a5568;
+}
+
+.instruction-text {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.4;
+  margin-top: 20px;
+  font-family: 'Roboto Slab', serif;
+}
+
+#dark .instruction-text {
+  color: #a0aec0;
+}
+
+.otp-footer {
+  margin-top: 30px;
+}
+
+.refresh-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: 'Roboto Slab', serif;
+  font-weight: 500;
+}
+
+.refresh-button:hover {
+  background-color: #5a6268;
+}
+
+/* Get OTP Button Styling */
+.otp-button {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: 'Roboto Slab', serif;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.otp-button:hover {
+  background-color: #218838;
+}
+
+.otp-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
 /* Responsive Design */
+@media (max-width: 480px) {
+  .otp-content {
+    padding: 30px 20px;
+    margin: 10px;
+  }
+  
+  .otp-header h2 {
+    font-size: 20px;
+  }
+  
+  .otp-code {
+    font-size: 24px;
+    letter-spacing: 4px;
+  }
+  
+  .pickup-code-text {
+    font-size: 16px;
+  }
+  
+  .instruction-text {
+    font-size: 13px;
+  }
+}
+
+/* CSS Variables for theming */
+:root {
+  --background-color: white;
+  --text-color: #333;
+  --accent-color: #2563EB;
+  --border-color: #e9ecef;
+  --input-background: #f8f9fa;
+  --button-background: #6c757d;
+  --button-text: white;
+  --button-hover: #5a6268;
+  --secondary-button-background: #dc3545;
+  --secondary-button-hover: #c82333;
+  --error-color: #dc3545;
+}
+
+#dark {
+  --background-color: #2d3748;
+  --text-color: white;
+  --accent-color: #F59E0B;
+  --border-color: #4a5568;
+  --input-background: #4a5568;
+  --button-background: #6c757d;
+  --button-text: white;
+  --button-hover: #5a6268;
+  --secondary-button-background: #dc3545;
+  --secondary-button-hover: #c82333;
+  --error-color: #dc3545;
+}
+
 @media (max-width: 768px) {
   .orders-content {
     padding: 15px;

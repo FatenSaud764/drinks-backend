@@ -26,7 +26,6 @@ export const useInventory = () => {
 
   useEffect(() => {
     fetchDrinks();
-    console.log("Fetching drinks from inventory API");
   }, [fetchDrinks]);
 
   const createDrink = async (drinkData) => {
