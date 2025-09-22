@@ -18,7 +18,6 @@ const Cart = () => {
   const [cartItems, setCartItems] = useState([]);
   const [open, setOpen] = useState(false);
   const [ orderNote, setOrderNote ] = useState("");
-  const [ displayNote, setDisplayNote ] = useState("");
 
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
@@ -46,7 +45,7 @@ const Cart = () => {
     updateNote();
     
     try {
-      const result = await AxiosInstance.post('/api/orders/', cartItems, {
+      const result = await AxiosInstance.post('/api/orders/', cartItems, orderNote, {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
       console.log('order', result.data)
