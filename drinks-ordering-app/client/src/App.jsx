@@ -101,7 +101,8 @@ const AppContent = () => {
                   <UserCart.Provider value={{cart, setCart}}>
                     <SignUpModal.Provider value={{signupmodal, setSignUpModal}}>
                       <Routes>
-                        <Route path='/' element={!isLoggedIn || !accessToken || accessToken === 'null' ? <Login /> : <Navigate to="/products" />} />
+                        <Route path='/' element={<Products />} />
+                        <Route path='/login' element={!isLoggedIn || !accessToken || accessToken === 'null' ? <Login /> : <Navigate to="/products" />} />
                         <Route path='/products' element={<Products />} />
                         <Route path='/cart' element={
                           <ProtectedRoute>

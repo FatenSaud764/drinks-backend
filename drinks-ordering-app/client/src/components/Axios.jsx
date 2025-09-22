@@ -109,7 +109,7 @@ AxiosInstance.interceptors.response.use(
           localStorage.removeItem('access token');
           localStorage.removeItem('refresh token');
           localStorage.setItem('loggedin', 'false');
-          window.location.href = '/';
+          window.location.href = '/login';
         }
         
         return Promise.reject(refreshError);
