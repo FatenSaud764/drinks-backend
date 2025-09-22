@@ -310,25 +310,28 @@ const OrdersPage = () => {
                       order.items.map((item, index) => {
                         const drinkId = item.drink_id || item.drink || item.product_id
                         const quantity = item.quantity || 1
+                        const unitPrice = getProductPrice(drinkId)
+                        const totalPrice = unitPrice * quantity
                         
                         return (
                           <div key={index} className="order-item">
-                            <div className="item-details">
-                              <span className="item-name">{getProductName(drinkId)}</span>
-                              <span className="item-quantity">Qty: {quantity}</span>
+                            <div className="item-display">
+                              <span className="item-main">
+                                {quantity} {getProductName(drinkId)}
+                              </span>
+                              <span className="unit-price">
+                                | @R{unitPrice.toFixed(2)}
+                              </span>
                             </div>
                             <span className="item-total">
-                              R{(getProductPrice(drinkId) * quantity).toFixed(2)}
+                              R{totalPrice.toFixed(2)}
                             </span>
                           </div>
                         )
                       })
                     ) : (
                       <div className="order-item">
-                        <div className="item-details">
-                          <span className="item-name">No items found</span>
-                          <span className="item-quantity">Check order details</span>
-                        </div>
+                        <span className="item-display">No items found</span>
                         <span className="item-total">R0.00</span>
                       </div>
                     )}

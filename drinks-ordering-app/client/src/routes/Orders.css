@@ -268,10 +268,6 @@
 }
 
 /* Order Items */
-.order-items {
-  margin-bottom: 5vw;
-}
-
 .order-item {
   display: flex;
   justify-content: space-between;
@@ -288,38 +284,76 @@
   border-bottom: none;
 }
 
-.item-details {
-  display: flex;
-  flex-direction: column;
-  gap: 1vw;
-}
-
-.item-name {
+.item-display {
   font-weight: 500;
   font-size: 3.8vw;
   color: #333;
   font-family: 'Roboto Slab';
+  flex: 1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5vw;
 }
 
-#dark .item-name {
+#dark .item-display {
   color: white !important;
 }
 
-.item-quantity {
+.item-main {
+  font-weight: 500;
+  font-size: 3.8vw;
+  color: inherit;
+  font-family: 'Roboto Slab';
+}
+
+.unit-price {
+  font-weight: 400;
   font-size: 3.2vw;
   color: #666;
   font-family: 'Roboto Slab';
 }
 
-#dark .item-quantity {
+#dark .unit-price {
   color: #a0aec0 !important;
 }
 
 .item-total {
-  font-weight: 400;
+  font-weight: 600;
   color: #F59E0B;
   font-size: 3.8vw;
   font-family: 'Lilita One';
+  text-align: right;
+  min-width: fit-content;
+  margin-left: 10px;
+}
+
+/* Mobile responsive updates */
+@media (max-width: 768px) {
+  .item-main {
+    font-size: 4.2vw;
+  }
+
+  .unit-price {
+    font-size: 3.6vw;
+  }
+
+  .item-total {
+    font-size: 4.2vw;
+  }
+}
+
+@media (max-width: 400px) {
+  .item-main {
+    font-size: 4.8vw;
+  }
+
+  .unit-price {
+    font-size: 4.0vw;
+  }
+
+  .item-total {
+    font-size: 4.8vw;
+  }
 }
 
 /* Order Footer */
