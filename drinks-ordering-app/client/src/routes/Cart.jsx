@@ -137,7 +137,7 @@ const Cart = () => {
   if (open) {
     const timer = setTimeout(() => {
       setOpen(false);
-    }, 3000);
+    }, 5000);
     
     return () => clearTimeout(timer); // Cleanup
   }
@@ -176,11 +176,11 @@ const Cart = () => {
     <div className="cartwrapper" id={theme}>
       <NavBar />
       <Slide in={open} direction='right'>
-        <Snackbar open={open} onClose={() => {setOpen(false)}} anchorOrigin={{vertical: 'bottom', horizontal: 'left'}} sx={{bottom: '2vh', left: '2vh'}}><Alert onClose={() => {setOpen(false)}} severity="success" sx={
+        <Snackbar open={open} onClose={() => {setOpen(false)}} anchorOrigin={{vertical: 'bottom', horizontal: 'left'}} sx={{bottom: '4vh', left: '2vh'}}><Alert onClose={() => {setOpen(false)}} severity="success" sx={
           {
             display: 'flex',
             alignItems: 'center',
-            width: '70vw',
+            width: '80vw',
             background: '#2563EB',
             color: 'white',
             '& .MuiAlert-icon': {
@@ -195,7 +195,7 @@ const Cart = () => {
       color: 'white',
     }
           }
-        }>Order placed!</Alert></Snackbar>
+        }>Order placed! Please navigate to the "Orders" page to track your order!</Alert></Snackbar>
       </Slide>
       <div className='cart-items'>
         <div className="cart-items-list">
@@ -207,7 +207,7 @@ const Cart = () => {
                 <li key={item.id} className="cart-item">
                   <div className="item-info">
                     <span className="item-name">{products.filter(product => { return product.id === item.drink_id }).map(product => product.name)}</span>
-                    <span className="item-price">R {products.filter(product => { return product.id === item.drink_id }).map(product => product.price)}</span>
+                    <span className="item-price">R {(products.filter(product => { return product.id === item.drink_id }).map(product => product.price)*1.0*item.quantity).toFixed(2)}</span>
                   </div>
                   <div className="item-controls">
                     <button onClick={() => {
