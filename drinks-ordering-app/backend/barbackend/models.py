@@ -109,6 +109,7 @@ class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='cart')
     note = models.TextField(blank=True, default="")
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True) # Added to reset 15-minute timer upon activity
 
     def __str__(self):
         return f"Cart for {self.user.username}"

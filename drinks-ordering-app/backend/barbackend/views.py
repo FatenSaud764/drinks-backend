@@ -19,6 +19,8 @@ from drf_spectacular.utils import (
 )
 from drf_spectacular.types import OpenApiTypes
 
+CART_EXPIRY_SECONDS = 15*60  # 15 minutes  (added for expiry functionality)
+
 def _require_platform_admin(user):
     if not getattr(user, 'is_authenticated', False) or not getattr(user, 'is_admin', False):
         raise PermissionDenied("Admin privileges required.")
@@ -470,7 +472,15 @@ class CartViewset(viewsets.GenericViewSet):
         Helper method to get or create the current user's cart.
         """
         user = request.user if request.user.is_authenticated else User.objects.first()
-        cart, _ = Cart.objects.get_or_create(user=user)
+        cart, created = Cart.objects.get_or_create(user=user) # added 'created' for expiry functionality
+
+        if not created and (timezone.now() - cart.updated_at).total_seconds() > CART_EXPIRY_SECONDS:
+            # Expire the cart: clear items and reset note
+            cart.items.all().delete()
+            cart.note = ""
+            cart.save()  # refresh updated_at after expiry
+
+
         return cart
 
     @extend_schema(
@@ -504,6 +514,7 @@ class CartViewset(viewsets.GenericViewSet):
         serializer = CartSerializer(cart, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            cart.save() # added for expiry functionality
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -514,6 +525,7 @@ class CartViewset(viewsets.GenericViewSet):
         serializer = CartSerializer(cart, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
+            cart.save() # added for expiry functionality
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -562,6 +574,7 @@ class CartViewset(viewsets.GenericViewSet):
             if not created:
                 item.quantity += serializer.validated_data['quantity']
                 item.save()
+            cart.save() # added for expiry functionality
             return Response(CartSerializer(cart).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -586,6 +599,7 @@ class CartViewset(viewsets.GenericViewSet):
         item = get_object_or_404(CartItem, pk=item_id, cart=cart)
         if request.method == 'DELETE':
             item.delete()
+            cart.save() # added for expiry functionality
             return Response(CartSerializer(cart).data)
         serializer = CartItemSerializer(item, data=request.data, partial=True)
         if serializer.is_valid():
