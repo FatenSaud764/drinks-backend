@@ -44,7 +44,7 @@ export default function NavBar() {
   }
 
   const handleLogin = () => {
-    navigate('/');
+    navigate('/login');
   }
 
   return (
