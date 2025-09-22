@@ -317,7 +317,7 @@ const OrdersPage = () => {
                           <div key={index} className="order-item">
                             <div className="item-display">
                               <span className="item-main">
-                                {quantity} {getProductName(drinkId)}
+                                {quantity}x {getProductName(drinkId)}
                               </span>
                               <span className="unit-price">
                                 | @R{unitPrice.toFixed(2)}
