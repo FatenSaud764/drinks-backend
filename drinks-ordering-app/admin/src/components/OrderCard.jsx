@@ -63,11 +63,12 @@ const OrderCard = ({
           {order.items.map((item, index) => {
             const drink = getDrinkById(item.drink_id);
             const itemName = drink?.name || 'Unknown Item';
-            const itemPrice = drink?.price || 0;
+            const itemPrice = Number(drink?.price) || 0;
             
             return (
               <div key={index} className="item-row">
                 <span>{item.quantity}x {itemName}</span>
+                <span className='item-price'>@ {formatCurrency(itemPrice)}</span>
                 <span>{formatCurrency(itemPrice * item.quantity)}</span>
               </div>
             );
