@@ -106,6 +106,8 @@ class APITest(MediaRootTestCase):
         # Create a user and their cart
         self.user = User.objects.create_user(username='eve', email='eve@example.com', password='pw', role='customer')
         self.cart = Cart.objects.create(user=self.user)
+        # Force authenticate the client with the test user for order filtering
+        self.client.force_authenticate(user=self.user)
         # Drinks
         self.drink1 = Drink.objects.create(name='Cola', description='Soda', image=dummy_image('c.png'), price=Decimal('1.25'), available=True, stock=20)
         self.drink2 = Drink.objects.create(name='Juice', description='OJ', image=dummy_image('j.png'), price=Decimal('2.75'), available=True, stock=20)
