@@ -6,6 +6,7 @@
 import { toast } from 'react-toastify';
 import { ORDER_STATUSES } from 'shared/types';
 
+/** Defines the valid order status flow (from pending to completed). */
 export const STATUS_FLOW = [
   ORDER_STATUSES.PENDING,
   ORDER_STATUSES.PREPARING,
@@ -13,31 +14,37 @@ export const STATUS_FLOW = [
   ORDER_STATUSES.COMPLETED
 ];
 
-// Status flow utilities
+// ---------------- Status flow utilities ----------------
+/** Get the index of a given status in the STATUS_FLOW array. */
 export const getCurrentStatusIndex = (status) => {
   return STATUS_FLOW.indexOf(status);
 };
 
+/** Check if an order can move to the previous status. */
 export const canMoveToPrevious = (status) => {
   const currentIndex = getCurrentStatusIndex(status);
   return currentIndex > 0 && status !== ORDER_STATUSES.CANCELLED;
 };
 
+/** Check if an order can move to the next status. */
 export const canMoveToNext = (status) => {
   const currentIndex = getCurrentStatusIndex(status);
   return currentIndex < STATUS_FLOW.length - 1 && currentIndex !== -1 && status !== ORDER_STATUSES.CANCELLED;
 };
 
+/** Get the previoud status in the flow, if any */
 export const getPreviousStatus = (status) => {
   const currentIndex = getCurrentStatusIndex(status);
   return currentIndex > 0 ? STATUS_FLOW[currentIndex - 1] : null;
 };
 
+/** Get the next status in the flow, if any */
 export const getNextStatus = (status) => {
   const currentIndex = getCurrentStatusIndex(status);
   return currentIndex < STATUS_FLOW.length - 1 && currentIndex !== -1 ? STATUS_FLOW[currentIndex + 1] : null;
 };
 
+/** Get allowed status options (actions) for a given order status. */
 export const getStatusOptions = (currentStatus) => {
   switch (currentStatus) {
     case ORDER_STATUSES.PENDING:
@@ -62,7 +69,8 @@ export const getStatusOptions = (currentStatus) => {
   }
 };
 
-// Formatting utilities
+// ---------------- Formatting utilities ----------------
+/** Format a date into a localized time string. */
 export const formatTime = (date) => {
   return new Date(date).toLocaleTimeString('en-US', { 
     hour: '2-digit', 
@@ -70,6 +78,7 @@ export const formatTime = (date) => {
   });
 };
 
+/** Format a date into a localized date string. */
 export const formatDate = (date) => {
   return new Date(date).toLocaleDateString('en-US', {
     month: 'short',
@@ -78,17 +87,19 @@ export const formatDate = (date) => {
   });
 };
 
+/** Format a numeric value into currency (Rand). */
 export const formatCurrency = (amount) => {
   return `R${amount.toFixed(2)}`;
 };
 
-// Order filtering utilities
+// ---------------- Order filtering utilities ----------------
+/** Filter orders by status (all, pending, preparing, ready, completed, cancelled). */
 export const filterOrdersByStatus = (orders, statusFilter) => {
   if (statusFilter === 'all') return orders;
   return orders.filter(order => order.status === statusFilter);
 };
 
-// Will probably need to adjust infuture depending on what the order heading will be
+/** Filter orders by search term (order number). */
 export const filterOrdersBySearch = (orders, searchTerm) => {
   if (!searchTerm) return orders;
   const searchLower = searchTerm.toLowerCase();
@@ -108,6 +119,7 @@ export const filterOrdersBySearch = (orders, searchTerm) => {
   });
 };
 
+/** Filter orders by date (today, yesterday, week, or all). */
 export const filterOrdersByDate = (orders, dateFilter) => {
   if (dateFilter === 'all') return orders;
   
@@ -117,23 +129,34 @@ export const filterOrdersByDate = (orders, dateFilter) => {
   yesterday.setDate(yesterday.getDate() - 1);
   const weekAgo = new Date(today);
   weekAgo.setDate(weekAgo.getDate() - 7);
+  const monthAgo = new Date(today);
+  monthAgo.setDate(monthAgo.getDate() - 30);
+  const yearAgo = new Date(today);
+  yearAgo.setDate(yearAgo.getDate() - 365);
 
   return orders.filter(order => {
-    const orderDate = new Date(order.lastUpdated);
-    switch(dateFilter) {
+    const orderDate = new Date(order.updated_at || order.created_at);
+    if (isNaN(orderDate)) return false; // safeguard
+
+    switch (dateFilter) {
       case 'today':
         return orderDate >= today;
       case 'yesterday':
         return orderDate >= yesterday && orderDate < today;
       case 'week':
         return orderDate >= weekAgo;
+      case 'month':
+        return orderDate >= monthAgo;
+      case 'year':
+        return orderDate >= yearAgo;
       default:
         return true;
     }
   });
 };
 
-// Status count utilities
+// ---------------- Status count utilities ----------------
+/**  Get counts of active orders (excluding completed and cancelled). */
 export const getActiveOrderStatusCounts = (orders) => {
   // Only count active orders (not completed or cancelled)
   const activeOrders = orders.filter(order => 
@@ -148,6 +171,7 @@ export const getActiveOrderStatusCounts = (orders) => {
   };
 };
 
+/**  Get counts of historical orders (completed and cancelled). */
 export const getHistoryOrderStatusCounts = (orders) => {
   return {
     all: orders.length,
@@ -156,13 +180,15 @@ export const getHistoryOrderStatusCounts = (orders) => {
   };
 };
 
-// Notification utilities
+// ---------------- Notification utilities ----------------
+/** Notify a client about an order status update. */
 export const notifyClient = (orderId, status) => {
-  // Replace with actual notification system - API call
+  // Replace with actual notification system - API call (Message Passing)
   toast.info(`Notification sent: Order ${orderId} is now ${status.toUpperCase()}`);
 };
 
+/** Remind a client that their order is ready for collection. */
 export const notifyClientReminder = (orderId) => {
-  // Notify customer to collect their completed order
+  // Replace with actual notification system - API call (Message Passing)
   toast.info(`Reminder sent: Order ${orderId} is ready for collection`);
 };

@@ -19,7 +19,7 @@ const FilterControls = ({
       <div className="search-container">
         <input
           type="text"
-          placeholder="Search by order number or customer name..."
+          placeholder="Search by order number..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="search-input"
@@ -53,6 +53,8 @@ const FilterControls = ({
               <option value="today">Today</option>
               <option value="yesterday">Yesterday</option>
               <option value="week">Past Week</option>
+              <option value="month">Past Month</option>
+              <option value="year">Past Year</option>
             </select>
           </div>
         )}

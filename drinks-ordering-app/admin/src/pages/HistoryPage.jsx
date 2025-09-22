@@ -38,7 +38,6 @@ const HistoryPage = () => {
   const [dateFilter, setDateFilter] = useState('all');
 
   // Filter orders based on status, search term, and date
-  // Only show completed and cancelled orders
   useEffect(() => {
     let filtered = historyOrders.filter(order => 
       [ORDER_STATUSES.COMPLETED, ORDER_STATUSES.CANCELLED].includes(order.status)
