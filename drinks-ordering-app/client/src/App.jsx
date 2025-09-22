@@ -11,6 +11,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { setAuthContext } from './components/Axios';
 import AxiosInstance from './components/Axios';
 import DrinkInfo from './routes/DrinkInfo';
+import Home from './routes/Home';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -117,6 +118,7 @@ const AppContent = () => {
                             <OrdersPage />
                           </ProtectedRoute>
                         } />
+                        <Route path='/home' element={<Home />} />
                       </Routes>
                     </SignUpModal.Provider>
                   </UserCart.Provider>
