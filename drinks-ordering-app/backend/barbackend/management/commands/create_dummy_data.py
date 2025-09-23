@@ -84,17 +84,34 @@ class Command(BaseCommand):
         self.stdout.write("Creating drinks with images from media/assets ...")
         # Map friendly drink names to actual files in media/assets
         drink_defs = [
-            ("Espresso Martini", "EspressoMartini.jpg", Decimal('11.00'), "cocktail", 50),
-            ("Gin & Tonic", "gintonic.jpg", Decimal('9.50'), "cocktail", 40),
-            ("Manhattan", "manhatten.png", Decimal('12.00'), "cocktail", 35),
-            ("Mimosa", "mimosa.png", Decimal('8.00'), "cocktail", 45),
-            ("Passionfruit Martini", "passionmartini.png", Decimal('10.50'), "cocktail", 30),
-            ("Peach Vodka", "peachvodka.jpg", Decimal('9.00'), "cocktail", 25),
-            ("Tequila Shot", "tequila.png", Decimal('5.00'), "shot", 60),
-            ("Irish Ale", "irishale.png", Decimal('6.00'), "beer", 80),
-            ("Still Water", "StillWater.jpg", Decimal('2.00'), "soft", 200),
-            ("Water", "water.jpg", Decimal('1.50'), "soft", 200),
-        ]
+            # Water
+            ("Still Water", "StillWater.jpg", Decimal('18.00'), "water", 200),
+            ("Tap Water", "TapWater.jpg", Decimal('0.00'), "water", 200),
+            # Non-alcoholic
+            ("Coco Cola", "cococola.jpg", Decimal('28.00'), "non-alcoholic", 30),
+            ("Orange Juice", "OrangeJuice.jpg", Decimal('25.00'), "non-alcoholic", 30),
+            # Cocktails
+            ("Espresso Martini", "EspressoMartini.jpg", Decimal('95.00'), "cocktail", 50),
+            ("Gin & Tonic", "GinTonic.jpg", Decimal('90.00'), "cocktail", 40),
+            ("Mimosa", "Mimosa.png", Decimal('80.00'), "cocktail", 45),
+            ("Passionfruit Martini", "PassionMartini.png", Decimal('90.50'), "cocktail", 30),
+            ("Peach Vodka", "PeachVodka.jpg", Decimal('72.00'), "cocktail", 25),
+            ("Tequila Shot", "TequilaSour.png", Decimal('35.00'), "cocktail", 60),
+            ("Pina Colada", "PinaColada.jpg", Decimal('85.00'), "cocktail", 20),
+            # Mocktails
+            ("Sunrise Mocktail", "SunriseMocktail.jpg", Decimal('60.00'), "mocktail", 30),
+            # Beers            
+            ("Irish Ale", "IrishAle.jpg", Decimal('49.00'), "beer", 80),
+            ("Black Label Beer", "BlackLabelBeer.jpg", Decimal('45.00'), "beer", 20),
+            ("Heineken", "HeinekenBeer.jpg", Decimal('42.00'), "beer", 35),
+            # Wines
+            ("Red Wine", "RedWine.jpg", Decimal('120.00'), "wine", 40),
+            ("White Wine", "WhiteWine.jpg", Decimal('110.00'), "wine", 40),
+            # Shots
+            ("Jagermeister", "Jagermeister.jpg", Decimal('50.00'), "shot", 70),
+            ("Whiskey Shot", "WhiskeyShot.jpg", Decimal('55.00'), "shot", 65),
+            ("Vodka Shot", "VodkaShot.jpg", Decimal('45.00'), "shot", 80),
+            ]
 
         def resolve_image(filename: str) -> str:
             # Ensure the file exists under MEDIA_ROOT/assets; otherwise fallback to a generic cocktail image
