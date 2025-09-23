@@ -67,7 +67,7 @@ body.sidebar-mobile-open {
   visibility: visible;
 }
 
-/* Add this to your CSS file to ensure snackbars appear above modals */
+/* To ensure snackbars appear above modals */
 .snackbar-container,
 .MuiSnackbar-root {
   z-index: 10000 !important; /* Higher than anything */
