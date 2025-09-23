@@ -1,0 +1,35 @@
+.errorwrapper{
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    height: 100vh;
+    background: rgb(255, 255, 255);
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+    align-content: center;
+    gap: 1vh;
+}
+
+.error404{
+    font-family: 'Nunito';
+    font-size: 40px;
+}
+
+.pagedoesnotexist{
+    font-family: 'Nunito';
+}
+
+.returnbutton{
+    font-family: 'Nunito';
+    font-size: 15px;
+    height: 4vh;
+    width: 40vw;
+    margin-top: 1vh;
+    background: #F59E0B;
+    box-shadow: none;
+    border: none;
+    color: white;
+    border-radius: 2vh;
+    cursor: pointer;
+}

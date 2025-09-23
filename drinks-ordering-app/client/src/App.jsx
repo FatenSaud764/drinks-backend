@@ -12,6 +12,7 @@ import { setAuthContext } from './components/Axios';
 import AxiosInstance from './components/Axios';
 import DrinkInfo from './routes/DrinkInfo';
 import Home from './routes/Home';
+import NotFound from './routes/NotFound';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
