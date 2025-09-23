@@ -120,6 +120,7 @@ const AppContent = () => {
                           </ProtectedRoute>
                         } />
                         <Route path='/home' element={<Home />} />
+                        <Route path='*' element={<NotFound />} />
                       </Routes>
                     </SignUpModal.Provider>
                   </UserCart.Provider>
