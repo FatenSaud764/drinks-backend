@@ -12,6 +12,7 @@ import { setAuthContext } from './components/Axios';
 import AxiosInstance from './components/Axios';
 import DrinkInfo from './routes/DrinkInfo';
 import Home from './routes/Home';
+import NotFound from './routes/NotFound';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -101,7 +102,7 @@ const AppContent = () => {
                   <UserCart.Provider value={{cart, setCart}}>
                     <SignUpModal.Provider value={{signupmodal, setSignUpModal}}>
                       <Routes>
-                        <Route path='/' element={<Products />} />
+                        <Route path='/' element={<Navigate to="/products" replace />} />
                         <Route path='/login' element={!isLoggedIn || !accessToken || accessToken === 'null' ? <Login /> : <Navigate to="/products" />} />
                         <Route path='/products' element={<Products />} />
                         <Route path='/cart' element={
@@ -120,6 +121,7 @@ const AppContent = () => {
                           </ProtectedRoute>
                         } />
                         <Route path='/home' element={<Home />} />
+                        <Route path='*' element={<NotFound />} />
                       </Routes>
                     </SignUpModal.Provider>
                   </UserCart.Provider>
