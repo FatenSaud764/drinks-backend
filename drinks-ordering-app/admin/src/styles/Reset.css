@@ -102,13 +102,11 @@ body.sidebar-mobile-open {
   min-width: 0; /* Prevent flex items from growing beyond container */
 }
 
-/* If you're using the page class from your document, update it too */
 .page {
   flex: 1;
   min-height: 100vh;
   background: var(--gradient-background);
   padding: 2rem 0;
-  /* Remove margin-left transition since we're handling it at app-layout level */
 }
 
 /* Ensure mobile doesn't get the margin adjustment */
