@@ -26,6 +26,7 @@ export const DRINK_CATEGORIES = {
   BEER: 'beer',
   CIDER: 'cider',
   WINE: 'wine',
+  WATER: 'water',
   OTHER: 'other',
 };
 
