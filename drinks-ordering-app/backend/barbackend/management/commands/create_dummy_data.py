@@ -88,7 +88,7 @@ class Command(BaseCommand):
             ("Still Water", "StillWater.jpg", Decimal('18.00'), "water", 200),
             ("Tap Water", "TapWater.jpg", Decimal('0.00'), "water", 200),
             # Non-alcoholic
-            ("Coco Cola", "cococola.jpg", Decimal('28.00'), "non-alcoholic", 30),
+            ("Coco Cola", "CocoCola.jpg", Decimal('28.00'), "non-alcoholic", 30),
             ("Orange Juice", "OrangeJuice.jpg", Decimal('25.00'), "non-alcoholic", 30),
             # Cocktails
             ("Espresso Martini", "EspressoMartini.jpg", Decimal('95.00'), "cocktail", 50),
