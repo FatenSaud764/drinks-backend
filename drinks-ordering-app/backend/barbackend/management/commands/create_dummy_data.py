@@ -108,7 +108,7 @@ class Command(BaseCommand):
             ("Red Wine", "RedWine.jpg", Decimal('120.00'), "wine", 40),
             ("White Wine", "WhiteWine.jpg", Decimal('110.00'), "wine", 40),
             # Shots
-            ("Jagermeister", "Jagermeister.jpg", Decimal('50.00'), "shot", 70),
+            ("Jagermeister Shot", "Jagermeister.jpg", Decimal('50.00'), "shot", 70),
             ("Whiskey Shot", "WhiskeyShot.jpg", Decimal('55.00'), "shot", 65),
             ]
 

@@ -35,7 +35,7 @@ install-frontend:
 
 .PHONY: start-db
 start-db:
-	docker-compose up -d postgres
+	docker compose up -d postgres
 
 .PHONY: init-db
 init-db: start-db

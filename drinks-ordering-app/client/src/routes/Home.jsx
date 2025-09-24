@@ -17,7 +17,7 @@ const Home = () => {
       <NavBar />
       <div className='greeting'>Welcome back, {user?.username}!</div>
       <div className='buttonslist'>
-        {Object.values(DRINK_CATEGORIES).map((drink) => <button className='categorybutton' onClick={() => {setCategory(drink); navigate('/products')}}>
+        {Object.values(DRINK_CATEGORIES).map((drink) => <button key={drink} className='categorybutton' onClick={() => {setCategory(drink); navigate('/products')}}>
             <img src={getDrinkImage(drink)} className='drinkimg'/>
             {drink.charAt(0).toUpperCase() + drink.slice(1).toLowerCase()}
             </button>)}
