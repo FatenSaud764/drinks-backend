@@ -7,6 +7,7 @@ import shot from './assets/shots.jpeg'
 import cider from './assets/cider.jpeg'
 import wine from './assets/Wine.jpeg'
 import other from './assets/CocoCola.jpg'
+import water from './assets/StillWater.jpg'
 
 // Types used across the application
 export const ORDER_STATUSES = {
@@ -38,6 +39,7 @@ export const DRINK_CATEGORY_IMAGES = {
   SHOT: shot,
   BEER: beer,
   CIDER: cider,
+  WATER: water,
   WINE: wine,
   OTHER: other,
 };
@@ -53,6 +55,7 @@ export const getDrinkImage = (drinkType) => {
     'beer': DRINK_CATEGORY_IMAGES.BEER,
     'cider': DRINK_CATEGORY_IMAGES.CIDER,
     'wine': DRINK_CATEGORY_IMAGES.WINE,
+    'water': DRINK_CATEGORY_IMAGES.WATER,
     'other': DRINK_CATEGORY_IMAGES.OTHER,
   };
   
