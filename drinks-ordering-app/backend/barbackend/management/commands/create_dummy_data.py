@@ -94,7 +94,7 @@ class Command(BaseCommand):
             ("Espresso Martini", "EspressoMartini.jpg", Decimal('95.00'), "cocktail", 50),
             ("Gin & Tonic", "GinTonic.jpg", Decimal('90.00'), "cocktail", 40),
             ("Mimosa", "Mimosa.png", Decimal('80.00'), "cocktail", 45),
-            ("Passionfruit Martini", "PassionMartini.png", Decimal('90.50'), "cocktail", 30),
+            ("Passionfruit Martini", "PassionMartini.jpg", Decimal('90.50'), "cocktail", 30),
             ("Peach Vodka", "PeachVodka.jpg", Decimal('72.00'), "cocktail", 25),
             ("Tequila Shot", "TequilaSour.png", Decimal('35.00'), "cocktail", 60),
             ("Pina Colada", "PinaColada.jpg", Decimal('85.00'), "cocktail", 20),
