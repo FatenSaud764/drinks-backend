@@ -41,7 +41,6 @@ const Products = () => {
     });
   }, [products, keys]);
 
-  console.log('access', accessToken);
 
   const filtered = search === '' ? products : fuse.search(search).map(result => result.item);
 

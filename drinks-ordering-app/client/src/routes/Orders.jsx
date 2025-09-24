@@ -29,7 +29,6 @@ const OrdersPage = () => {
       setError(null)
       
       const res = await AxiosInstance.get('/api/orders/')
-      console.log('Orders API response:', res.data)
       
       const sortedOrders = res.data.sort((a, b) => {
         const dateA = new Date(a.created_at || a.date)
@@ -53,7 +52,7 @@ const OrdersPage = () => {
       setOtpError(null)
       
       const res = await AxiosInstance.get(`/api/orders/${orderId}/otp/`)
-      console.log('OTP Fetch response:', res.data)
+  
 
       setFetchedOtp(res.data.code)
       setSelectedOrderId(orderId)

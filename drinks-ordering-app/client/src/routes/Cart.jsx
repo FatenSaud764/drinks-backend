@@ -22,7 +22,6 @@ const Cart = () => {
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
 
-  console.log('cart', cart);
 
   const fetchdata = async () => {
     if (!isLoggedIn || !accessToken) return;
@@ -34,7 +33,6 @@ const Cart = () => {
         },
       });
       setCartItems(res.data.items);
-      console.log('my cart', cartItems);
     } catch (err) {
       console.error(err);
     }
@@ -48,7 +46,6 @@ const Cart = () => {
       const result = await AxiosInstance.post('/api/orders/', cartItems, orderNote, {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
-      console.log('order', result.data)
       setOpen(true);
       fetchdata()
     } catch (err) {
@@ -56,7 +53,6 @@ const Cart = () => {
     }
   }
 
-  console.log('open', open)
 
   const ClearCart = async() => {
     if (!isLoggedIn || !accessToken) return;

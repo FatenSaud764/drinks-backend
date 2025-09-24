@@ -12,7 +12,6 @@ const SearchBar = () => {
     const {alcoholicfilter, setAlcoholicFilter} = useContext(AlcoholicFilter);
     const {category, setCategory} = useContext(DrinkCategory);
 
-    console.log('category', category);
 
   return (
     <>
