@@ -94,9 +94,12 @@
 }
 
 .content h5{
+    display: flex;
     justify-content: center;
+    justify-items: center;
     position: absolute;
     transform: translate(-50%, -50%);
+    width: 100%;
     left: 50%;
     top: 88%;
     color: white;
