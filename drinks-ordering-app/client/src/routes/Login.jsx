@@ -41,12 +41,12 @@ const Login = () => {
         navigate('/products');
       } else {
         alert(result.error || 'Login failed');
-        window.location.reload();
+
       }
 
     } catch (error) {
       alert('Incorrect credentials/ the user does not exist (please sign up!)');
-      window.location.reload();
+
     }
   };
 
