@@ -25,11 +25,16 @@ const SignUp = () => {
             if(pass.current.value===confirmpass.current.value) {
             try{
               const signup = async () => {
-              await AxiosInstance.post('api/auth/register/', {"username": user.current.value.trim(), "email": mail.current.value.trim(), "role": "customer", "password": pass.current.value.trim()});}
-              signup();
+              try{
+              await AxiosInstance.post('api/auth/register/', {"username": user.current.value.trim(), "email": mail.current.value.trim(), "role": "customer", "password": pass.current.value.trim()});
               alert("User created successfully!");
+              }
+              catch(error) {
+                alert("Failed to create user, please try again!");
+              }
             }
-          
+              signup();
+            }
             catch(error){
               alert("Failed to create user, please try again!");
             }
