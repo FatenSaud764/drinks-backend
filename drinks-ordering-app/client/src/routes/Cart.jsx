@@ -40,7 +40,7 @@ const Cart = () => {
 
   const PlaceOrder = async() => {
     if (!isLoggedIn || !accessToken) return;
-    updateNote();
+    await updateNote();
     
     try {
       const result = await AxiosInstance.post('/api/orders/', cartItems, orderNote, {
@@ -52,6 +52,8 @@ const Cart = () => {
       console.error(err);
     }
   }
+
+  console.log('order', orderNote);
 
 
   const ClearCart = async() => {
@@ -222,7 +224,7 @@ const Cart = () => {
           <div className='add-note-wrapper'>
             <form className='add-note-form' onSubmit={updateNote}>
               <textarea 
-                maxlength="128"
+                maxLength="128"
                 className='new-note-text'
                 type='textarea'
                 value={orderNote}
