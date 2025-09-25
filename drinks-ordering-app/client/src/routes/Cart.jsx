@@ -172,7 +172,6 @@ const Cart = () => {
   return (
     <div className="cartwrapper" id={theme}>
       <NavBar />
-      <Slide in={open} direction='right'>
         <Snackbar open={open} onClose={() => {setOpen(false)}} anchorOrigin={{vertical: 'bottom', horizontal: 'left'}} sx={{bottom: '4vh', left: '2vh'}}><Alert onClose={() => {setOpen(false)}} severity="success" sx={
           {
             display: 'flex',
@@ -193,7 +192,6 @@ const Cart = () => {
     }
           }
         }>Order placed! Please navigate to the "Orders" page to track your order!</Alert></Snackbar>
-      </Slide>
       <div className='cart-items'>
         <div className="cart-items-list">
           {cartItems.length === 0 ? (
