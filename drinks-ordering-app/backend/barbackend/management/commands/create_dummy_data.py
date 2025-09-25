@@ -88,20 +88,20 @@ class Command(BaseCommand):
             ("Still Water", "StillWater.jpg", Decimal('18.00'), "water", 200),
             ("Tap Water", "TapWater.jpg", Decimal('0.00'), "water", 200),
             # Non-alcoholic
-            ("Coco Cola", "CocoCola.jpg", Decimal('28.00'), "non-alcoholic", 30),
-            ("Orange Juice", "OrangeJuice.jpg", Decimal('25.00'), "non-alcoholic", 30),
+            ("Coca Cola", "CocoCola.jpg", Decimal('28.00'), "other", 30),
+            ("Orange Juice", "OrangeJuice.jpg", Decimal('25.00'), "other", 30),
             # Cocktails
-            ("Espresso Martini", "EspressoMartini.jpg", Decimal('95.00'), "cocktail", 50),
+            ("Espresso Martini", "espressomartini.png", Decimal('95.00'), "cocktail", 50),
             ("Gin & Tonic", "GinTonic.jpg", Decimal('90.00'), "cocktail", 40),
             ("Mimosa", "Mimosa.png", Decimal('80.00'), "cocktail", 45),
             ("Passionfruit Martini", "PassionMartini.png", Decimal('90.50'), "cocktail", 30),
-            ("Peach Vodka", "PeachVodka.jpg", Decimal('72.00'), "cocktail", 25),
-            ("Tequila Shot", "TequilaSour.png", Decimal('35.00'), "cocktail", 60),
+            ("Peach Vodka", "PeachVodka.jpg", Decimal('72.00'), "alcoholic", 25),
+            ("Tequila Shot", "TequilaSour.png", Decimal('35.00'), "alcoholic", 60),
             ("Pina Colada", "PinaColada.jpg", Decimal('85.00'), "cocktail", 20),
             # Mocktails
             ("Sunrise Mocktail", "SunriseMocktail.jpg", Decimal('60.00'), "mocktail", 30),
             # Beers            
-            ("Irish Ale", "IrishAle.jpg", Decimal('49.00'), "beer", 80),
+            ("Irish Ale", "irishale.jpeg", Decimal('49.00'), "beer", 80),
             ("Black Label Beer", "BlackLabelBeer.jpg", Decimal('45.00'), "beer", 20),
             ("Heineken", "HeinekenBeer.jpg", Decimal('42.00'), "beer", 35),
             # Wines
