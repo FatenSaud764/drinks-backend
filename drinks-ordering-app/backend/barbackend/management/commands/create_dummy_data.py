@@ -110,6 +110,12 @@ class Command(BaseCommand):
             # Shots
             ("Jagermeister Shot", "Jagermeister.jpg", Decimal('50.00'), "shot", 70),
             ("Whiskey Shot", "WhiskeyShot.jpg", Decimal('55.00'), "shot", 65),
+            ("Apple Cider", "applecider.jpeg", Decimal('65.00'), "cider", 65),
+            ("Passionfruit Lemonade", "passionlemonade.jpeg", Decimal('25.00'), "other", 55),
+            ("Switch Energy Drink", "switch.jpeg", Decimal('15.00'), "other", 25),
+            ("Pear Cider", "pearcider.jpeg", Decimal('60.00'), "cider", 55),
+            ("Non-Alcoholic Beer", "nonalcoholbeer.jpeg", Decimal('40.00'), "non-alcoholic", 35),
+            ("Rosé Wine", "rosewine.jpeg", Decimal('120.00'), "wine", 55)
             ]
 
         def resolve_image(filename: str) -> str:
