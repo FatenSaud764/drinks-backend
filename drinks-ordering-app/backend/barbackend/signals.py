@@ -4,6 +4,8 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from .models import Drink, Order, OrderItem, OrderOTP
+from django.db import transaction
+from django.db.models import F
 from django.db import IntegrityError
 from .otp_utils import generate_numeric_code
 
@@ -63,6 +65,48 @@ def on_order_finalize_invalidate_otp(sender, instance: Order, **kwargs):
         return
     if prev.status != instance.status and instance.status in ('completed', 'cancelled'):
         OrderOTP.objects.filter(order=instance, is_used=False).update(is_used=True, updated_at=timezone.now())
+
+
+@receiver(pre_save, sender=Order)
+def adjust_inventory_on_status_change(sender, instance: Order, **kwargs):
+    """Handle inventory deduction/restock when order status changes.
+
+    Rules:
+    - When leaving 'pending' to any other status except 'cancelled', deduct stock for each item IF not already deducted.
+    - If transitioning to 'cancelled' and stock had been deducted previously (inventory_deducted=True), restock (add back quantities) and mark inventory_deducted False.
+    Safeguards against double deduction via the inventory_deducted flag.
+    Uses atomic transaction & F expressions for concurrency safety.
+    """
+    if not instance.pk:
+        return
+    try:
+        prev = Order.objects.select_related().get(pk=instance.pk)
+    except Order.DoesNotExist:
+        return
+    # No change
+    if prev.status == instance.status:
+        return
+
+    # Deduct path: leaving pending -> (preparing|ready|completed) etc., excluding cancelled immediate jump
+    if prev.status == 'pending' and instance.status != 'cancelled' and not prev.inventory_deducted:
+        with transaction.atomic():
+            # Lock order items' related drinks for update to avoid race (optional optimization: select_for_update)
+            items = list(prev.items.select_related('drink').all())
+            for it in items:
+                # Use F expression to avoid race conditions
+                Drink.objects.filter(pk=it.drink_id).update(stock=F('stock') - it.quantity)
+            # Mark inventory deducted on instance (so save will persist) and prev
+            instance.inventory_deducted = True
+    # Restock path: moving to cancelled AFTER deduction happened
+    elif instance.status == 'cancelled' and prev.inventory_deducted:
+        with transaction.atomic():
+            items = list(prev.items.select_related('drink').all())
+            for it in items:
+                Drink.objects.filter(pk=it.drink_id).update(stock=F('stock') + it.quantity)
+            instance.inventory_deducted = False
+    else:
+        # Preserve flag state if no relevant transition; ensure instance carries forward existing state
+        instance.inventory_deducted = prev.inventory_deducted
 
 
 @receiver(post_save, sender=Drink)

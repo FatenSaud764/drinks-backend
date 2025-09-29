@@ -585,3 +585,62 @@ class UserRoleHierarchyTest(MediaRootTestCase):
         self.assertTrue(su.is_superuser)
         self.assertTrue(su.is_staff)
         self.assertTrue(su.is_admin)
+
+
+class InventoryAdjustmentTest(MediaRootTestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='invuser', email='inv@example.com', password='pw', role='customer')
+        self.drink_a = Drink.objects.create(name='InvA', description='', image=dummy_image('ia.png'), price=Decimal('2.00'), available=True, stock=30)
+        self.drink_b = Drink.objects.create(name='InvB', description='', image=dummy_image('ib.png'), price=Decimal('3.00'), available=True, stock=10)
+
+    def test_deduct_on_leaving_pending(self):
+        order = Order.objects.create(user=self.user, status='pending', total_price=Decimal('0.00'))
+        OrderItem.objects.create(order=order, drink=self.drink_a, quantity=5)
+        OrderItem.objects.create(order=order, drink=self.drink_b, quantity=2)
+        # Change to preparing triggers deduction
+        order.status = 'preparing'
+        order.save()
+        self.drink_a.refresh_from_db(); self.drink_b.refresh_from_db(); order.refresh_from_db()
+        self.assertEqual(self.drink_a.stock, 25)
+        self.assertEqual(self.drink_b.stock, 8)
+        self.assertTrue(order.inventory_deducted)
+
+    def test_cancel_restocks_if_deducted(self):
+        order = Order.objects.create(user=self.user, status='pending', total_price=Decimal('0.00'))
+        OrderItem.objects.create(order=order, drink=self.drink_a, quantity=3)
+        # Move to ready (deduct)
+        order.status = 'ready'
+        order.save()
+        self.drink_a.refresh_from_db(); order.refresh_from_db()
+        self.assertEqual(self.drink_a.stock, 27)
+        self.assertTrue(order.inventory_deducted)
+        # Cancel -> restock
+        order.status = 'cancelled'
+        order.save()
+        self.drink_a.refresh_from_db(); order.refresh_from_db()
+        self.assertEqual(self.drink_a.stock, 30)
+        self.assertFalse(order.inventory_deducted)
+
+    def test_multiple_status_changes_no_double_deduct(self):
+        order = Order.objects.create(user=self.user, status='pending', total_price=Decimal('0.00'))
+        OrderItem.objects.create(order=order, drink=self.drink_b, quantity=4)
+        # preparing (deduct)
+        order.status = 'preparing'
+        order.save(); self.drink_b.refresh_from_db(); self.assertEqual(self.drink_b.stock, 6)
+        # ready (no further deduct)
+        order.status = 'ready'
+        order.save(); self.drink_b.refresh_from_db(); self.assertEqual(self.drink_b.stock, 6)
+        # completed (no further deduct)
+        order.status = 'completed'
+        order.save(); self.drink_b.refresh_from_db(); self.assertEqual(self.drink_b.stock, 6)
+        order.refresh_from_db(); self.assertTrue(order.inventory_deducted)
+
+    def test_cancel_without_prior_deduction_no_stock_change(self):
+        order = Order.objects.create(user=self.user, status='pending', total_price=Decimal('0.00'))
+        OrderItem.objects.create(order=order, drink=self.drink_b, quantity=1)
+        # Cancel directly while still pending -> nothing deducted earlier, so no restock
+        order.status = 'cancelled'
+        order.save()
+        self.drink_b.refresh_from_db(); order.refresh_from_db()
+        self.assertEqual(self.drink_b.stock, 10)
+        self.assertFalse(order.inventory_deducted)
