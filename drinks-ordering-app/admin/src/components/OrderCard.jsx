@@ -173,7 +173,8 @@ const HistoryOrderActions = ({ order, onUpdateStatus }) => {
         <span className="date-value">{formatDate(order.lastUpdated)}</span>
       </div>
       
-      <div className="action-buttons-group">
+      {/* Restore button - taking it out as I do not want staff to be able to restore an order and the client placing another one */}
+      {/* <div className="action-buttons-group">
         {order.status === 'cancelled' && (
           <button 
             className="restore-button"
@@ -182,7 +183,7 @@ const HistoryOrderActions = ({ order, onUpdateStatus }) => {
             Restore Order
           </button>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
