@@ -73,3 +73,93 @@
 #dark .greeting{
     color: white;
 }
+
+.carousel-wrapper{
+    display: flex;
+    flex-direction: column;
+    height: auto;
+    min-height: 36vh;
+    width: 100vw;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    gap: 2vh;
+    background:#ffffff;
+    margin-top: 3vh;
+    border-top: 3px solid #F59E0B;
+    border-bottom: 3px solid #F59E0B;
+}
+
+.slide-container{
+    display: flex;
+    align-items: center;
+    align-content: center;
+    width: 88%;
+    margin-top: -1vh;
+    height: auto;
+    min-height: 28vh;
+}
+
+.slide-container .slick-slide{
+    display: flex !important;
+    justify-content: center !important;
+    justify-items: center !important;
+    align-items: center !important;
+    align-content: center !important;
+    height: 27vh !important;
+}
+
+.category-header{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 88%;
+    height: 4vh;
+    align-items: center;
+    align-content: center;
+}
+
+.category-button{
+    height: 3vh;
+    width: 3vh;
+    cursor: pointer !important;
+    color:#F59E0B;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    justify-items: center;
+    border: none;
+    background: none;
+}
+
+.category-name{
+    font-family: 'Nunito';
+    font-size: 20px;
+}
+
+.carousel-image{
+    object-fit: cover;
+    height: 22vh !important;
+    width: 19vh !important;
+    border-radius: 1vh;
+}
+
+.drink-name{
+    font-family: 'Nunito';
+    font-size: 14px;
+    width: 19vh;
+    text-align: center;
+}
+
+.carousel-drink{
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    justify-items: center;
+    gap: 0.6vh !important;
+    width: 19vh;
+    height: auto;
+    min-height: 28vh;
+}
