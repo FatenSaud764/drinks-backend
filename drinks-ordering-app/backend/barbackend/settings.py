@@ -77,7 +77,7 @@ WSGI_APPLICATION = "barbackend.wsgi.application"
 DATABASES = {
     "default": dj_database_url.config(
         default="postgresql://postgres.lrbmdxrikfwrxgsawgwi:barpasssamus@aws-1-eu-west-2.pooler.supabase.com:5432/postgres",
-        conn_max_age=600,  # reuse DB connections for 10 minutes
+        conn_max_age=0,  # reuse DB connections for 10 minutes
         ssl_require=True,
     )
 }
