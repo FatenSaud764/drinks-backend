@@ -20,26 +20,25 @@ const Home = () => {
   console.log('drinks', products)
 
   const settings = {
-    dots: false,
+    dots: true,
     swipeToSlide: true,
     infinite: true,
-    autoplay:false,
+    autoplay: true,
+    autoplaySpeed:3000,
     slidesToShow: 2,
     slidesToScroll: 1,
     arrows: false,
-    centerMode: false
+    centerMode: false,
+    draggable: true,
+    touchMove: true,
+    pauseOnDotsHover:false,
+    pauseOnHover: true
   };
 
   return (
     <div className='homewrapper' id={theme}>
       <NavBar />
-      <div className='greeting'>Welcome back, {user?.username}!</div>
-      <div className='buttonslist'>
-        {Object.values(DRINK_CATEGORIES).map((drink) => <button key={drink} className='categorybutton' onClick={() => {setCategory(drink); navigate('/products')}}>
-            <img src={getDrinkImage(drink)} className='drinkimg'/>
-            {drink.charAt(0).toUpperCase() + drink.slice(1).toLowerCase()}
-            </button>)}
-      </div>
+      <div className='greeting'>Welcome back {user?user.username:''}!</div>
       <div className='carousel-list'>
         {Object.values(DRINK_CATEGORIES).map(category => 
         <div className='carousel-wrapper' key={category}>
