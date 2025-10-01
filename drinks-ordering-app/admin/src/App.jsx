@@ -98,7 +98,7 @@ function App() {
               {/* Toast notifications for client-side */}
               <ToastContainer position="top-right" autoClose={5000} />
 
-              <NotificationMonitor/> {/* Notifications app-wide */}
+              <NotificationMonitor isStaff={true}/> {/* Notifications app-wide */}
 
               <Routes>
                 <Route path="/orders" element={<OrdersPage />} />

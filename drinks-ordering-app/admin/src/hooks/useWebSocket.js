@@ -13,37 +13,59 @@ export const useWebSocket = (url, options = {}) => {
     onError,
     reconnectAttempts = 5,
     reconnectInterval = 3000,
-    isAdmin = false,
+    isStaff = false,
     userId = null
   } = options;
 
   const ws = useRef(null);
   const reconnectCount = useRef(0);
   const reconnectTimeout = useRef(null);
+  const isConnecting = useRef(false);
+
+  // Store callbacks in refs to avoid recreating connect function
+  const onMessageRef = useRef(onMessage);
+  const onConnectRef = useRef(onConnect);
+  const onDisconnectRef = useRef(onDisconnect);
+  const onErrorRef = useRef(onError);
+
+  useEffect(() => {
+    onMessageRef.current = onMessage;
+    onConnectRef.current = onConnect;
+    onDisconnectRef.current = onDisconnect;
+    onErrorRef.current = onError;
+  }, [onMessage, onConnect, onDisconnect, onError]);
 
   const connect = useCallback(() => {
+    // Prevent multiple simultaneous connection attempts
+    if (isConnecting.current || (ws.current && ws.current.readyState === WebSocket.OPEN)) {
+      return;
+    }
+
     try {
+      isConnecting.current = true;
+      
       // Create WebSocket connection
       ws.current = new WebSocket(url);
 
       ws.current.onopen = () => {
         console.log('WebSocket connected');
+        isConnecting.current = false;
         reconnectCount.current = 0;
 
         // Authenticate after connection
         ws.current.send(JSON.stringify({
           type: 'authenticate',
-          isAdmin,
+          isStaff,
           userId
         }));
 
-        onConnect?.();
+        onConnectRef.current?.();
       };
 
       ws.current.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
-          onMessage?.(data);
+          onMessageRef.current?.(data);
         } catch (error) {
           console.error('Failed to parse message:', error);
         }
@@ -51,12 +73,14 @@ export const useWebSocket = (url, options = {}) => {
 
       ws.current.onerror = (error) => {
         console.error('WebSocket error:', error);
-        onError?.(error);
+        isConnecting.current = false;
+        onErrorRef.current?.(error);
       };
 
       ws.current.onclose = () => {
         console.log('WebSocket disconnected');
-        onDisconnect?.();
+        isConnecting.current = false;
+        onDisconnectRef.current?.();
 
         // Attempt to reconnect
         if (reconnectCount.current < reconnectAttempts) {
@@ -73,9 +97,10 @@ export const useWebSocket = (url, options = {}) => {
 
     } catch (error) {
       console.error('Failed to create WebSocket:', error);
-      onError?.(error);
+      isConnecting.current = false;
+      onErrorRef.current?.(error);
     }
-  }, [url, onMessage, onConnect, onDisconnect, onError, reconnectAttempts, reconnectInterval, isAdmin, userId]);
+  }, [url, reconnectAttempts, reconnectInterval, isStaff, userId]);
 
   const disconnect = useCallback(() => {
     if (reconnectTimeout.current) {
@@ -85,6 +110,7 @@ export const useWebSocket = (url, options = {}) => {
       ws.current.close();
       ws.current = null;
     }
+    isConnecting.current = false;
   }, []);
 
   const sendMessage = useCallback((message) => {
@@ -102,7 +128,7 @@ export const useWebSocket = (url, options = {}) => {
     return () => {
       disconnect();
     };
-  }, [connect, disconnect]);
+  }, [url, isStaff, userId]); // Only reconnect if URL or auth params change
 
   return {
     sendMessage,
