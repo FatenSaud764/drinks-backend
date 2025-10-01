@@ -39,7 +39,7 @@ def send_new_order_notification(order):
         
         # Send to all connected staff clients
         async_to_sync(channel_layer.group_send)(
-            'staff_notifications',  # Changed from 'admin_notifications'
+            'staff_notifications',
             {
                 'type': 'new_order',
                 'order': order_data,
@@ -83,7 +83,7 @@ def send_order_update_notification(order, old_status=None):
         
         # Send to all connected staff clients
         async_to_sync(channel_layer.group_send)(
-            'staff_notifications',  # Changed from 'admin_notifications'
+            'staff_notifications',
             {
                 'type': 'order_update',
                 'order_id': order.id,
