@@ -315,9 +315,7 @@ class OrderViewset(viewsets.ViewSet):
     def create(self, request):
         """
         POST /api/orders/
-        Submit current cart as a new order.
-        Copies cart note and items into the order and sets status to 'pending'.
-        Clears the cart after successful submission.
+        Submit current cart as a new order and send new_order message.
         """
         user = request.user if request.user.is_authenticated else User.objects.first()
         cart = get_object_or_404(Cart, user=user)
@@ -325,16 +323,25 @@ class OrderViewset(viewsets.ViewSet):
         order_data = {
             'user': user.id,
             'note': cart.note,
-            'items': [{'drink_id': item.drink.id, 'quantity': item.quantity} for item in cart.items.all()]
+            'items': [{'drink_id': item.drink.id, 'quantity': item.quantity} 
+                    for item in cart.items.all()]
         }
         serializer = self.serializer_class(data=order_data)
         if serializer.is_valid():
-            serializer.save()
+            order = serializer.save()  # Changed from serializer.save()
+            
+            # Send new_order message
+            Message.objects.create(
+                order=order,
+                sender=user,
+                message_type='new_order'
+            )
+            
             # Clear cart
             cart.items.all().delete()
             cart.note = ""
             cart.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(self.serializer_class(order).data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['patch'], url_path='status')
@@ -354,17 +361,34 @@ class OrderViewset(viewsets.ViewSet):
     def change_status(self, request, pk=None):
         """
         PATCH /api/orders/{id}/status/
-        - Admin only
-        Update the status of an order. Acceptable statuses: pending, preparing, ready, completed, cancelled.
+        Update the status of an order and automatically send appropriate message.
         """
-        #if not request.user.is_staff:
-        #    return Response({"detail": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
         order = get_object_or_404(Order, pk=pk)
         new_status = request.data.get('status')
+        
         if new_status not in dict(Order.STATUS_CHOICES):
             return Response({"detail": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        old_status = order.status
         order.status = new_status
         order.save()
+        
+        # Auto-create message based on status change
+        user = request.user if request.user.is_authenticated else User.objects.first()
+        status_to_message = {
+            'pending': 'order_received',
+            'preparing': 'preparing_order',
+            'ready': 'ready_for_pickup',
+            'cancelled': 'order_cancelled',
+        }
+        
+        if new_status in status_to_message and old_status != new_status:
+            Message.objects.create(
+                order=order,
+                sender=user,
+                message_type=status_to_message[new_status]
+            )
+        
         serializer = self.serializer_class(order)
         return Response(serializer.data)
 
@@ -458,6 +482,105 @@ class OrderViewset(viewsets.ViewSet):
             return Response({"detail": "Only pending orders can be cancelled"}, status=status.HTTP_400_BAD_REQUEST)
         order.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @action(detail=True, methods=['post'], url_path='messages')
+    @extend_schema(
+        tags=["Orders"],
+        summary="Send message about order",
+        request=CreateMessageSerializer,
+        responses={201: MessageSerializer, 400: OpenApiResponse(description="Invalid message")},
+        parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
+        description="Send a message related to an order. Authorization: Bearer JWT required.",
+    )
+    def send_message(self, request, pk=None):
+        """
+        POST /api/orders/{id}/messages/
+        Send a message about an order.
+        - Customers can send: cancel_request
+        - Staff can send: order_received, preparing_order, ready_for_pickup, order_cancelled, order_delayed
+        """
+        order = get_object_or_404(Order, pk=pk)
+        user = request.user if request.user.is_authenticated else User.objects.first()
+        
+        serializer = CreateMessageSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+        message_type = serializer.validated_data['message_type']
+        content = serializer.validated_data.get('content', '')
+        
+        # Permission checks
+        client_messages = ['cancel_request']
+        admin_messages = ['order_received', 'preparing_order', 'ready_for_pickup', 
+                        'order_cancelled', 'order_delayed']
+        
+        is_staff = getattr(user, 'is_staff', False)
+        
+        if message_type in client_messages:
+            # Customer can only message their own order
+            if order.user_id != user.id:
+                return Response({'detail': 'You can only message your own orders.'}, 
+                            status=status.HTTP_403_FORBIDDEN)
+        elif message_type in admin_messages:
+            # Only staff can send admin messages
+            if not is_staff:
+                return Response({'detail': 'Only staff can send this message type.'}, 
+                            status=status.HTTP_403_FORBIDDEN)
+        else:
+            return Response({'detail': 'Invalid message type.'}, 
+                        status=status.HTTP_400_BAD_REQUEST)
+        
+        # Create the message
+        message = Message.objects.create(
+            order=order,
+            sender=user,
+            message_type=message_type,
+            content=content
+        )
+        
+        return Response(MessageSerializer(message).data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['get'], url_path='messages')
+    @extend_schema(
+        tags=["Orders"],
+        summary="List messages for order",
+        responses={200: MessageSerializer(many=True)},
+        parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
+        description="Get all messages for an order. Authorization: Bearer JWT required.",
+    )
+    def list_messages(self, request, pk=None):
+        """
+        GET /api/orders/{id}/messages/
+        List all messages for an order.
+        - Customers see messages for their own orders
+        - Staff see messages for any order
+        """
+        order = get_object_or_404(self.get_queryset(request), pk=pk)
+        messages = order.messages.all()
+        serializer = MessageSerializer(messages, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['patch'], url_path='messages/(?P<message_id>[^/.]+)/read')
+    @extend_schema(
+        tags=["Orders"],
+        summary="Mark message as read",
+        responses={200: MessageSerializer},
+        parameters=[
+            OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH),
+            OpenApiParameter(name="message_id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)
+        ],
+        description="Mark a message as read. Authorization: Bearer JWT required.",
+    )
+    def mark_message_read(self, request, pk=None, message_id=None):
+        """
+        PATCH /api/orders/{id}/messages/{message_id}/read/
+        Mark a message as read.
+        """
+        order = get_object_or_404(self.get_queryset(request), pk=pk)
+        message = get_object_or_404(Message, pk=message_id, order=order)
+        message.is_read = True
+        message.save(update_fields=['is_read'])
+        return Response(MessageSerializer(message).data)
 
 
 class CartViewset(viewsets.GenericViewSet):
