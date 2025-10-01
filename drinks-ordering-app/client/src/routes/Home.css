@@ -10,41 +10,8 @@
     background: #f5f0eb;
     align-items: center;
     align-content: center;
+    margin-top: 1vh;
 }
-
-.buttonslist{
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-auto-rows: 25vh;
-    column-gap: 2vw;
-    row-gap: 5vh;
-    height: auto;
-    min-height: 50vh;
-    justify-content: center;
-    justify-items: center;
-    width: 95vw;
-
-}
-
-.categorybutton{
-    display: flex;
-    flex-direction: column;
-    gap: 2vh;
-    align-items: center;
-    align-content: center;
-    width: 42vw;
-    height: 25vh;
-    background: #F59E0B;
-    border: none;
-    border-radius: 2vh;
-    font-size: 21px;
-    color: white;
-    font-family: 'Roboto Slab';
-    font-weight: bolder;
-    box-shadow: inset;
-    box-shadow: #1F2937;
-}
-
 
 .drinkimg{
     object-fit: cover;
@@ -77,15 +44,13 @@
 .carousel-wrapper{
     display: flex;
     flex-direction: column;
+    padding-top: 1vh;
     height: auto;
-    min-height: 36vh;
+    min-height: 38vh;
     width: 100vw;
     align-items: center;
-    justify-content: center;
-    justify-items: center;
-    gap: 2vh;
-    background:#ffffff;
-    margin-top: 3vh;
+    gap: 2.5vh;
+    background:#f5f0eb;
     border-top: 3px solid #F59E0B;
     border-bottom: 3px solid #F59E0B;
 }
@@ -97,7 +62,9 @@
     width: 88%;
     margin-top: -1vh;
     height: auto;
-    min-height: 28vh;
+    min-height: 29vh;
+    pointer-events: auto !important;
+    touch-action: pan-y !important;
 }
 
 .slide-container .slick-slide{
@@ -106,7 +73,7 @@
     justify-items: center !important;
     align-items: center !important;
     align-content: center !important;
-    height: 27vh !important;
+    height: auto !important;
 }
 
 .category-header{
@@ -120,8 +87,8 @@
 }
 
 .category-button{
-    height: 3vh;
-    width: 3vh;
+    height: 4vh;
+    width: 4vh;
     cursor: pointer !important;
     color:#F59E0B;
     align-items: center;
@@ -134,19 +101,18 @@
 
 .category-name{
     font-family: 'Nunito';
-    font-size: 20px;
+    font-size: 25px;
 }
 
 .carousel-image{
     object-fit: cover;
     height: 22vh !important;
     width: 19vh !important;
-    border-radius: 1vh;
 }
 
 .drink-name{
     font-family: 'Nunito';
-    font-size: 14px;
+    font-size: 16px;
     width: 19vh;
     text-align: center;
 }
@@ -156,10 +122,17 @@
     flex-direction: column !important;
     align-items: center;
     align-content: center;
-    justify-content: center;
-    justify-items: center;
     gap: 0.6vh !important;
     width: 19vh;
     height: auto;
-    min-height: 28vh;
+    min-height: 29vh;
+    pointer-events: auto !important;
+}
+
+.carousel-list{
+    display: flex;
+    flex-direction: column;
+    gap: 5vh;
+    align-items: center;
+    align-content: center;
 }

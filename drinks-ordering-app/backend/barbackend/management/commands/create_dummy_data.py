@@ -90,6 +90,8 @@ class Command(BaseCommand):
             # Non-alcoholic
             ("Coca Cola", "CocoCola.jpg", Decimal('28.00'), "other", 30),
             ("Orange Juice", "OrangeJuice.jpg", Decimal('25.00'), "other", 30),
+            ("Zero Alcohol Bavaria Beer", "BavariaDrink.jpg", Decimal('35.00'), "non-alcoholic", 40),
+            ("Non-Alcoholic Guinness", "GuinnessNonAlcoholic.jpg", Decimal('45.00'), "non-alcoholic", 30),
             # Cocktails
             ("Espresso Martini", "espressomartini.png", Decimal('95.00'), "cocktail", 50),
             ("Gin & Tonic", "GinTonic.jpg", Decimal('90.00'), "cocktail", 40),
@@ -99,7 +101,9 @@ class Command(BaseCommand):
             ("Tequila Shot", "TequilaSour.png", Decimal('35.00'), "alcoholic", 60),
             ("Pina Colada", "PinaColada.jpg", Decimal('85.00'), "cocktail", 20),
             # Mocktails
-            ("Sunrise Mocktail", "SunriseMocktail.jpg", Decimal('60.00'), "mocktail", 30),
+            ("Sunrise Mocktail", "SunriseMocktail.jpg", Decimal('60.00'), "mocktail", 40),
+            ("Watermelon Mocktail", "WatermelonMocktail.jpg", Decimal('65.00'), "mocktail", 45),
+            ("Blue Mocktail", "BlueMocktail.jpg", Decimal('52.00'), "mocktail", 35),
             # Beers            
             ("Irish Ale", "irishale.jpeg", Decimal('49.00'), "beer", 80),
             ("Black Label Beer", "BlackLabelBeer.jpg", Decimal('45.00'), "beer", 20),
@@ -114,8 +118,14 @@ class Command(BaseCommand):
             ("Passionfruit Lemonade", "passionlemonade.jpeg", Decimal('25.00'), "other", 55),
             ("Switch Energy Drink", "switch.jpeg", Decimal('15.00'), "other", 25),
             ("Pear Cider", "pearcider.jpeg", Decimal('60.00'), "cider", 55),
-            ("Non-Alcoholic Beer", "nonalcoholbeer.jpeg", Decimal('40.00'), "non-alcoholic", 35),
-            ("Rosé Wine", "rosewine.jpeg", Decimal('120.00'), "wine", 55)
+            ("Heineken Non-Alcoholic Beer", "nonalcoholbeer.jpeg", Decimal('40.00'), "non-alcoholic", 35),
+            ("Rosé Wine", "rosewine.jpeg", Decimal('120.00'), "wine", 55),
+            ("Sparkling Water", "sparklingwater.jpg", Decimal('18.00'), "water", 25),
+            ("Sparkling Tea", "sparklingtea.jpeg", Decimal('42.00'), "other", 35),
+            ("Mango Rum Punch", "MangoRum.jpg", Decimal('50.00'), "alcoholic", 45),
+            ("Raspberry Tequila", "RaspberryTequila.jpg", Decimal('70.00'), "alcoholic", 55),
+            ("Apple Cider Vodka", "AppleCiderVodka.jpg", Decimal('60.00'), "cider", 40),
+            ("Lemon Drop", "LemonDrop.jpg", Decimal('45.00'), "shot", 40)
             ]
 
         def resolve_image(filename: str) -> str:
