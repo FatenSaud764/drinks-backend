@@ -8,4 +8,10 @@ pillow==11.3.0
 drf-spectacular==0.25.0
 setuptools==67.7.2
 djangorestframework-simplejwt==5.4.0
+# WebSocket Support
 channels==4.3.1
+channels-redis==4.1.0
+# ASGI Server (choose one)
+daphne==4.0.0
+# Redis (required for channel layers)
+redis==5.0.1
