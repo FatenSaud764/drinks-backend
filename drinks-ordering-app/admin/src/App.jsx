@@ -16,6 +16,7 @@ import './styles/Global.css';
 // Contexts
 import { ThemeProvider } from './contexts/ThemeContext';
 import { SnackbarProvider } from './contexts/SnackbarContext';
+import NotificationMonitor from './contexts/NotificationContext';
 // Toastify for Toast Alerts (client-side only)
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -96,6 +97,8 @@ function App() {
 
               {/* Toast notifications for client-side */}
               <ToastContainer position="top-right" autoClose={5000} />
+
+              <NotificationMonitor/> {/* Notifications app-wide */}
 
               <Routes>
                 <Route path="/orders" element={<OrdersPage />} />

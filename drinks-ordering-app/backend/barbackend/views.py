@@ -18,6 +18,7 @@ from drf_spectacular.utils import (
     inline_serializer,
 )
 from drf_spectacular.types import OpenApiTypes
+from .notification_utils import send_new_order_notification, send_order_update_notification
 
 CART_EXPIRY_SECONDS = 15*60  # 15 minutes  (added for expiry functionality)
 
@@ -313,10 +314,6 @@ class OrderViewset(viewsets.ViewSet):
         description="Create a new order from the current user's cart. Authorization: Bearer JWT required.",
     )
     def create(self, request):
-        """
-        POST /api/orders/
-        Submit current cart as a new order and send new_order message.
-        """
         user = request.user if request.user.is_authenticated else User.objects.first()
         cart = get_object_or_404(Cart, user=user)
 
@@ -328,14 +325,26 @@ class OrderViewset(viewsets.ViewSet):
         }
         serializer = self.serializer_class(data=order_data)
         if serializer.is_valid():
-            order = serializer.save()  # Changed from serializer.save()
+            order = serializer.save()
             
             # Send new_order message
-            Message.objects.create(
-                order=order,
-                sender=user,
-                message_type='new_order'
-            )
+            try:
+                Message.objects.create(
+                    order=order,
+                    sender=user,
+                    message_type='new_order'
+                )
+            except Exception as e:
+                print(f"Message creation failed: {e}")
+                # Continue anyway
+            
+            # SEND WEBSOCKET NOTIFICATION
+            try:
+                from .notification_utils import send_new_order_notification
+                send_new_order_notification(order)
+            except Exception as e:
+                print(f"WebSocket notification failed: {e}")
+                # Continue anyway - don't fail the order creation
             
             # Clear cart
             cart.items.all().delete()
@@ -388,6 +397,11 @@ class OrderViewset(viewsets.ViewSet):
                 sender=user,
                 message_type=status_to_message[new_status]
             )
+            
+            # SEND WEBSOCKET NOTIFICATION
+            print(f"About to send WebSocket notification for order {order.id}")
+            send_new_order_notification(order)
+            print("WebSocket notification sent")
         
         serializer = self.serializer_class(order)
         return Response(serializer.data)

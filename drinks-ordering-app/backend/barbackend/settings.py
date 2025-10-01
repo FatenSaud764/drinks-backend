@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'drf_spectacular',
+    'channels',
 ]
 
 MIDDLEWARE = [
@@ -74,7 +75,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'barbackend.wsgi.application'
+ASGI_APPLICATION = 'barbackend.asgi.application'
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],  # Redis host
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
