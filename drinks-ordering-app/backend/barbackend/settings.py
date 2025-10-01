@@ -76,7 +76,7 @@ WSGI_APPLICATION = "barbackend.wsgi.application"
 # Parse Supabase connection string or fallback to SQLite
 DATABASES = {
     "default": dj_database_url.config(
-        default="postgres://postgres.nkfxslosxjcltdavhgau:barpasssamus@aws-1-ap-southeast-2.pooler.supabase.com:6543/postgres",
+        default="postgresql://postgres.lrbmdxrikfwrxgsawgwi:barpasssamus@aws-1-eu-west-2.pooler.supabase.com:5432/postgres",
         conn_max_age=600,  # reuse DB connections for 10 minutes
         ssl_require=True,
     )

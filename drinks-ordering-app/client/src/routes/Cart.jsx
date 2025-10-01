@@ -38,20 +38,28 @@ const Cart = () => {
     }
   }
 
-  const PlaceOrder = async() => {
+const PlaceOrder = async() => {
     if (!isLoggedIn || !accessToken) return;
-    await updateNote();
+    
+    // Optimistic UI update
+    setOpen(true)
+    const previousItems = [...cartItems]
+    setCartItems([])
+    setOrderNote("")
     
     try {
-      const result = await AxiosInstance.post('/api/orders/', cartItems, orderNote, {
+      await AxiosInstance.post('/api/orders/', {}, {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
-      setOpen(true);
-      fetchdata()
+      // Success! UI already updated
     } catch (err) {
-      console.error(err);
+      console.error(err)
+      // Revert optimistic update on error
+      setOpen(false)
+      setCartItems(previousItems)
+      alert('Failed to place order. Please try again.')
     }
-  }
+}
 
   console.log('order', orderNote);
 
