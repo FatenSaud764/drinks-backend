@@ -104,3 +104,19 @@ Ensure virtual environment is activated.
    ```bash
    python manage.py create_dummy_data
    ```
+
+## Inventory Auto-Adjustment Logic
+
+As of latest changes, inventory (drink stock) is automatically adjusted based on order status transitions:
+
+- When an order leaves the `pending` state to any other status except `cancelled`, the quantities of each `OrderItem` are deducted from the corresponding `Drink.stock` exactly once.
+- If such an order is later moved to `cancelled`, the previously deducted stock is fully restored.
+- Direct cancellation while still `pending` does NOT change stock.
+
+Implementation details:
+- A Boolean field `Order.inventory_deducted` tracks whether stock has been deducted for that order to prevent double adjustments.
+- Adjustments are performed in a pre-save signal using atomic updates with `F()` expressions for concurrency safety.
+
+Testing:
+- New tests in `backend/tests.py` (`InventoryAdjustmentTest`) validate deduction, restocking, idempotency, and no-op on direct cancellation of pending orders.
+

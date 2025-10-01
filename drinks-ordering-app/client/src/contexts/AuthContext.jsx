@@ -79,8 +79,7 @@ export const AuthProvider = ({ children }) => {
         try {
           await AxiosInstance.post('/api/auth/logout/', { refresh: refreshToken });
         } catch (error) {
-          // Ignore logout endpoint errors since it might not exist
-          console.log('Logout endpoint not available or failed:', error);
+
         }
       }
     } catch (error) {

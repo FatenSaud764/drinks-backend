@@ -12,7 +12,6 @@ const SearchBar = () => {
     const {alcoholicfilter, setAlcoholicFilter} = useContext(AlcoholicFilter);
     const {category, setCategory} = useContext(DrinkCategory);
 
-    console.log('category', category);
 
   return (
     <>
@@ -23,7 +22,7 @@ const SearchBar = () => {
                 <select value={category} className='selectcategory' onChange={(e) => {setCategory(e.target.value)}}>
                   <option value='all'>All Drinks</option>
                   {Object.values(DRINK_CATEGORIES).map((drinkcategory) =>
-                    <option value={drinkcategory}>{drinkcategory.charAt(0).toUpperCase() + drinkcategory.slice(1).toLowerCase()}</option>
+                    <option key={drinkcategory} value={drinkcategory}>{drinkcategory.charAt(0).toUpperCase() + drinkcategory.slice(1).toLowerCase()}</option>
                   )}
                 </select>
             </div>

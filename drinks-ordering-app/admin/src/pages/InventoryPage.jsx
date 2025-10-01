@@ -229,10 +229,8 @@ const InventoryPage = () => {
         header: 'Status',
         size: 120,
         Cell: ({ row }) => {
-          const stock = row.original.stock || 0;
-          const unavailableThreshold = row.original.unavailable_threshold || 5;
-          const isAvailable = stock > unavailableThreshold;
-          
+          const isAvailable = row.original.available;
+    
           return (
             <span className={`status-badge ${isAvailable ? 'available' : 'unavailable'}`}>
               {isAvailable ? 'Available' : 'Unavailable'}

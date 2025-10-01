@@ -32,7 +32,6 @@ const DrinkInfo = () => {
     }
   }
 
-  console.log('modal', cartModal)
 
   return (
     <div className='drinkinfowrapper' id={theme}>

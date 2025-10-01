@@ -94,7 +94,7 @@ class Drink(models.Model):
     def save(self, *args, **kwargs):
         # Automatically set availability based on stock vs unavailable threshold
         threshold = self.unavailable_threshold if self.unavailable_threshold is not None else 5
-        if self.stock < threshold:
+        if self.stock <= threshold:
             self.available = False
         # Only auto-enable if stock is sufficient and not manually disabled
         elif self.stock >= threshold and not hasattr(self, '_manual_availability'):
@@ -143,6 +143,10 @@ class Order(models.Model):
     total_price = models.DecimalField(max_digits=8, decimal_places=2)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    # Tracks whether stock for this order's items has been deducted from inventory.
+    # Logic: we deduct when moving out of 'pending' into a non-cancelled state.
+    # If later cancelled we restock and set this False again.
+    inventory_deducted = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Order #{self.id} by {self.user.username} - {self.status}"

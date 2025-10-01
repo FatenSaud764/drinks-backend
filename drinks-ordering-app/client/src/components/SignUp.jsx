@@ -19,24 +19,31 @@ const SignUp = () => {
 
   return (
     <div className='signupwrapper' id={theme}>
-        <button className='closesignup' onClick={() => {setSignUpModal(false)}}><CloseIcon /></button>
-        <form className='signupform' onSubmit={() => {
+        <button className='closesignup' onClick={() => {setSignUpModal(false);}}><CloseIcon /></button>
+        <form className='signupform' onSubmit={(e) => {
+          e.preventDefault();
           if(user.current && mail.current && pass.current && confirmpass.current) {
             if(pass.current.value===confirmpass.current.value) {
             try{
               const signup = async () => {
-              await AxiosInstance.post('api/auth/register/', {"username": user.current.value.trim(), "email": mail.current.value.trim(), "role": "customer", "password": pass.current.value.trim()});}
-              signup();
+              try{
+              await AxiosInstance.post('api/auth/register/', {"username": user.current.value.trim(), "email": mail.current.value.trim(), "role": "customer", "password": pass.current.value.trim()});
               alert("User created successfully!");
+              }
+              catch(error) {
+                alert("Failed to create user, please try again!");
+                setSignUpModal(false); 
+              }
             }
-          
+              signup();
+            }
             catch(error){
               alert("Failed to create user, please try again!");
             }
           }
           else{alert("Passwords do not match!")}
-          }
-          setSignUpModal(false); }}>
+          e.preventDefault();
+          }}}>
            <h2>Create an account</h2> 
            
            <div className='inputrow'>

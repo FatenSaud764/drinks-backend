@@ -15,9 +15,7 @@ export default function NavBar() {
   // Use only the new AuthContext
   const { user, accessToken, refreshToken, isLoggedIn, login, logout } = useAuth();
 
-  if(menuRef.current){
-    console.log('open', menuRef.current.open);
-  }
+
 
   const closeMenu = () => {
     if (menuRef.current) menuRef.current.removeAttribute('open')

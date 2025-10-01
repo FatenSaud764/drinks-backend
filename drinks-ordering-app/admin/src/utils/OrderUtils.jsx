@@ -23,7 +23,7 @@ export const getCurrentStatusIndex = (status) => {
 /** Check if an order can move to the previous status. */
 export const canMoveToPrevious = (status) => {
   const currentIndex = getCurrentStatusIndex(status);
-  return currentIndex > 0 && status !== ORDER_STATUSES.CANCELLED;
+  return currentIndex > 0 && status !== ORDER_STATUSES.CANCELLED && status !== ORDER_STATUSES.PREPARING;
 };
 
 /** Check if an order can move to the next status. */

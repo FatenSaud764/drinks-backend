@@ -88,8 +88,7 @@ const AppContent = () => {
     localStorage.setItem('alcoholic filter', alcoholicfilter);
   }, [alcoholicfilter]);
 
-  console.log('access', accessToken);
-  console.log('logged', isLoggedIn)
+
 
   return (
     <DrinkCategory.Provider value={{category, setCategory}}>

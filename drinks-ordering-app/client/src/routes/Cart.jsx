@@ -22,7 +22,6 @@ const Cart = () => {
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
 
-  console.log('cart', cart);
 
   const fetchdata = async () => {
     if (!isLoggedIn || !accessToken) return;
@@ -34,7 +33,6 @@ const Cart = () => {
         },
       });
       setCartItems(res.data.items);
-      console.log('my cart', cartItems);
     } catch (err) {
       console.error(err);
     }
@@ -42,13 +40,12 @@ const Cart = () => {
 
   const PlaceOrder = async() => {
     if (!isLoggedIn || !accessToken) return;
-    updateNote();
+    await updateNote();
     
     try {
       const result = await AxiosInstance.post('/api/orders/', cartItems, orderNote, {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
-      console.log('order', result.data)
       setOpen(true);
       fetchdata()
     } catch (err) {
@@ -56,7 +53,8 @@ const Cart = () => {
     }
   }
 
-  console.log('open', open)
+  console.log('order', orderNote);
+
 
   const ClearCart = async() => {
     if (!isLoggedIn || !accessToken) return;
@@ -174,7 +172,6 @@ const Cart = () => {
   return (
     <div className="cartwrapper" id={theme}>
       <NavBar />
-      <Slide in={open} direction='right'>
         <Snackbar open={open} onClose={() => {setOpen(false)}} anchorOrigin={{vertical: 'bottom', horizontal: 'left'}} sx={{bottom: '4vh', left: '2vh'}}><Alert onClose={() => {setOpen(false)}} severity="success" sx={
           {
             display: 'flex',
@@ -195,7 +192,6 @@ const Cart = () => {
     }
           }
         }>Order placed! Please navigate to the "Orders" page to track your order!</Alert></Snackbar>
-      </Slide>
       <div className='cart-items'>
         <div className="cart-items-list">
           {cartItems.length === 0 ? (
@@ -226,7 +222,7 @@ const Cart = () => {
           <div className='add-note-wrapper'>
             <form className='add-note-form' onSubmit={updateNote}>
               <textarea 
-                maxlength="128"
+                maxLength="128"
                 className='new-note-text'
                 type='textarea'
                 value={orderNote}
