@@ -12,8 +12,7 @@ const NotificationMonitor = () => {
   const navigate = useNavigate();
   
   // Determine WebSocket URL
-  const wsUrl = import.meta.env.VITE_WS_URL || 
-                `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/notifications/`;
+  const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws/notifications/';
 
   const handleWebSocketMessage = useCallback((data) => {
     switch (data.type) {
