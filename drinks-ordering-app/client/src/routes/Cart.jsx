@@ -39,7 +39,9 @@ const Cart = () => {
   }
 
   const PlaceOrder = async() => {
+    await fetchdata()
     if (!isLoggedIn || !accessToken) return;
+    if(cartItems.length==1 && cartItems[0].quantity==0) {alert("You have no items in your cart!"); return}
     await updateNote();
     
     try {
@@ -70,7 +72,6 @@ const Cart = () => {
     }
   }
 
-  // Save to localStorage whenever cartItems changes
   useEffect(() => {
     fetchdata();
   }, [accessToken, isLoggedIn])
