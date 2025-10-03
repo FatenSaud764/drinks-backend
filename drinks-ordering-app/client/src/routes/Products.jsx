@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import './Products.css'
-import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct, CartModalBoolean, UserCart } from '../contexts/contexts';
+import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct, CartModalBoolean, CartItems } from '../contexts/contexts';
 import { useAuth } from '../contexts/AuthContext';
 import ThemeButton from '../components/ThemeButton';
 import { TiShoppingCart } from "react-icons/ti";
@@ -29,7 +29,7 @@ const Products = () => {
   const keys = ['name'];
   const [cartModal, setCartModal] = useState(false);
   const [drinkAdded, setDrinkAdded] = useState('');
-  const [cartItems, setCartItems] = useState([]);
+  const {cartItems, setCartItems} = useContext(CartItems);
 
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
@@ -51,7 +51,6 @@ const Products = () => {
 const addToCart = async (e) => {
     if(isLoggedIn && accessToken){
       // Show modal IMMEDIATELY (optimistic)
-      setCartModal(true)
       
       try {
         // Add to backend in background
@@ -61,7 +60,8 @@ const addToCart = async (e) => {
         )
         
         // Silently refetch to sync state (user already saw feedback)
-        await fetchdata()
+        fetchdata()
+        setCartModal(true)
         
       } catch (error) {
         console.error('Failed to add to cart:', error)

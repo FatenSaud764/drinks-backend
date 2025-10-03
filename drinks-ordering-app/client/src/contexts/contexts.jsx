@@ -13,3 +13,4 @@ export const SignUpModal = createContext(false);
 export const AccessTokens = createContext(null);
 export const RefreshTokens = createContext(null);
 export const CartModalBoolean = createContext(false);
+export const CartItems = createContext([])

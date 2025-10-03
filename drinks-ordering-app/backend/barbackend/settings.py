@@ -50,6 +50,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "barbackend.middleware.CloseConnectionMiddleware"
 ]
 
 ROOT_URLCONF = "barbackend.urls"
@@ -73,11 +74,11 @@ WSGI_APPLICATION = "barbackend.wsgi.application"
 
 
 # Database
-# Parse Supabase connection string or fallback to SQLite
 DATABASES = {
     "default": dj_database_url.config(
         default="postgresql://postgres.lrbmdxrikfwrxgsawgwi:barpasssamus@aws-1-eu-west-2.pooler.supabase.com:5432/postgres",
-        conn_max_age=0,  # reuse DB connections for 10 minutes
+        conn_max_age=600, 
+        conn_health_checks=True,
         ssl_require=True,
     )
 }
