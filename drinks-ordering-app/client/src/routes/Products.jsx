@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import './Products.css'
-import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct, CartModalBoolean, UserCart } from '../contexts/contexts';
+import { AlcoholicFilter, DrinkCategory, LightDark, ProductList, SelectedProduct, CartModalBoolean, CartItems } from '../contexts/contexts';
 import { useAuth } from '../contexts/AuthContext';
 import ThemeButton from '../components/ThemeButton';
 import { TiShoppingCart } from "react-icons/ti";
@@ -29,7 +29,7 @@ const Products = () => {
   const keys = ['name'];
   const [cartModal, setCartModal] = useState(false);
   const [drinkAdded, setDrinkAdded] = useState('');
-  const [cartItems, setCartItems] = useState([]);
+  const {cartItems, setCartItems} = useContext(CartItems);
 
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
@@ -48,20 +48,31 @@ const Products = () => {
     return (a.available === b.available) ? 0 : a.available ? -1 : 1;
   }).sort((a,b) => {if(a.available && b.available) {return a.name.localeCompare(b.name)}}).filter((a) => {return category.toLowerCase() == "all" ? true : a.category.toLowerCase() == category.toLowerCase()});
 
-  const addToCart = (e) => {
+const addToCart = async (e) => {
     if(isLoggedIn && accessToken){
-      const request = async () => {
+      // Show modal IMMEDIATELY (optimistic)
+      
+      try {
+        // Add to backend in background
         await AxiosInstance.post('/api/cart/items/', 
           {"drink_id": e, "quantity": 1}, 
           {headers:{Authorization: `Bearer ${accessToken}`}}
         )
+        
+        // Silently refetch to sync state (user already saw feedback)
+        fetchdata()
+        setCartModal(true)
+        
+      } catch (error) {
+        console.error('Failed to add to cart:', error)
+        // Revert optimistic update on error
+        setCartModal(false)
+        alert('Failed to add item to cart')
       }
-      request();
-      setCartModal(true)
-    } else{
+    } else {
       alert('Log in to add to cart and place orders')
     }
-  }
+}
 
   const fetchdata = async () => {
     if (!isLoggedIn || !accessToken) return;

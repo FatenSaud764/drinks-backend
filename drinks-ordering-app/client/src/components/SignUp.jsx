@@ -24,22 +24,26 @@ const SignUp = () => {
           e.preventDefault();
           if(user.current && mail.current && pass.current && confirmpass.current) {
             if(pass.current.value===confirmpass.current.value) {
-            try{
               const signup = async () => {
               try{
               await AxiosInstance.post('api/auth/register/', {"username": user.current.value.trim(), "email": mail.current.value.trim(), "role": "customer", "password": pass.current.value.trim()});
               alert("User created successfully!");
               }
-              catch(error) {
-                alert("Failed to create user, please try again!");
-                setSignUpModal(false); 
-              }
+              catch (error) {
+  const errors = error.response?.data;
+  let message = 'Failed to create user!';
+  
+  if (errors) {
+    message = Object.entries(errors)
+      .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+      .join('\n');
+  }
+
+  alert(message);
+  setSignUpModal(false); 
+}
             }
-              signup();
-            }
-            catch(error){
-              alert("Failed to create user, please try again!");
-            }
+            signup();
           }
           else{alert("Passwords do not match!")}
           e.preventDefault();
