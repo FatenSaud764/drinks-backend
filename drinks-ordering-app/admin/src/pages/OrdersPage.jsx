@@ -21,7 +21,7 @@ import { normaliseOrder } from '../utils/normaliseOrder';
 import { useActiveOrders } from '../hooks/useOrders';
 import "../styles/Loading.css";
 import { useSnackbar } from '../contexts/SnackbarContext';
-import { toast } from 'react-toastify';
+import { useInventory } from '../hooks/useInventory';
 
 const OrdersPage = () => {
   const {
@@ -33,6 +33,7 @@ const OrdersPage = () => {
     clearError
   } = useActiveOrders();
 
+  const { drinks, loading: drinksLoading } = useInventory();
   const { showSnackbar } = useSnackbar();
 
   const [filteredOrders, setFilteredOrders] = useState([]);
