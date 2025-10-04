@@ -91,8 +91,8 @@ const HistoryPage = () => {
       <div className="page">
         <div className="page-container">
           <div className="page-header">
-            <h1>Active Orders</h1>
-            <p>Loading orders...</p>
+            <h1>Order History</h1>
+            <p>Loading order history...</p>
           </div>
 
           <FilterControls
