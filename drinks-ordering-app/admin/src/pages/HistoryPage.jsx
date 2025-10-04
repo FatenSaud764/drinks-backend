@@ -7,6 +7,7 @@
 import { useState, useEffect } from 'react';
 import '../styles/Pages.css';
 import OrderCard from '../components/OrderCard';
+import SkeletonCard from '../components/SkeletonCard';
 import FilterControls from '../components/FilterControls';
 import {
   filterOrdersByStatus,
@@ -89,10 +90,25 @@ const HistoryPage = () => {
     return (
       <div className="page">
         <div className="page-container">
-          <div className="loading-indicator">
-          <div className="loading-spinner"></div>
-          <p>Loading Order History...</p>
-        </div>
+          <div className="page-header">
+            <h1>Order History</h1>
+            <p>Loading order history...</p>
+          </div>
+
+          <FilterControls
+            searchTerm=""
+            setSearchTerm={() => {}}
+            statusFilter="all"
+            setStatusFilter={() => {}}
+            statusCounts={{ all: 0, pending: 0, preparing: 0, ready: 0 }}
+            statusOptions={['all', 'pending', 'preparing', 'ready']}
+          />
+
+          <div className="orders-grid">
+            {[...Array(6)].map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
         </div>
       </div>
     );

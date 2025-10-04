@@ -89,4 +89,29 @@ export const ordersAPI = {
       throw new Error(errData?.message || errData?.detail || "Failed to verify OTP");
     }
   },
+
+  // Fetch recent orders for polling
+  fetchRecentOrders: async (since) => {
+    try {
+      const response = await api.get('/api/orders/recent/', {
+        params: { since }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Failed to fetch recent orders:', error);
+      return []; // Return empty array on error to prevent crashes
+    }
+  },
+
+  // Send a reminder to client for picking up their order
+  sendPickupReminder: async (orderId) => {
+    try {
+      const response = await api.post(`/api/orders/${orderId}/send-reminder/`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.detail || "Failed to send reminder");
+    }
+  },
 };
+
+export default ordersAPI;

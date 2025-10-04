@@ -39,6 +39,95 @@
   font-size: 0.9rem;
 }
 
+/* Loading state where drink id still gets converted to name */
+/* Skeleton loading container */
+.items-loading {
+  padding: 10px 0;
+}
+
+/* Individual skeleton item row */
+.item-row-skeleton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  gap: 12px;
+}
+
+/* Base skeleton text style */
+.skeleton-text {
+  height: 16px;
+  background: linear-gradient(
+    90deg,
+    var(--bg-muted) 0%,
+    var(--bg-secondary) 20%,
+    var(--bg-secondary) 40%,
+    var(--bg-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+  opacity: 0.6;
+}
+
+/* Different widths for different columns */
+.skeleton-item-name {
+  flex: 1;
+  max-width: 180px;
+}
+
+.skeleton-price {
+  width: 80px;
+}
+
+.skeleton-total {
+  width: 70px;
+}
+
+/* Total row skeleton */
+.total-row-skeleton {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  margin-top: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.skeleton-total-label {
+  width: 50px;
+  height: 18px;
+}
+
+.skeleton-total-amount {
+  width: 90px;
+  height: 18px;
+}
+
+/* Shimmer animation */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Add subtle pulse for better loading indication */
+.items-loading {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
 /* Responsiveness */
 @media (max-width: 768px) {
   .order-note {

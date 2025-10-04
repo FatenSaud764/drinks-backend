@@ -26,7 +26,7 @@ const OrderCard = ({
   isHistory = false 
 }) => {
   // Use the inventory hook to get drink data
-  const { drinks } = useInventory();
+  const { drinks, loading: drinksLoading } = useInventory();
 
   // Helper function to get drink details by ID
   const getDrinkById = (drinkId) => {
@@ -59,25 +59,43 @@ const OrderCard = ({
 
       <div className="order-items">
         <h4>Items:</h4>
-        <div className="items-list">
-          {order.items.map((item, index) => {
-            const drink = getDrinkById(item.drink_id);
-            const itemName = drink?.name || 'Unknown Item';
-            const itemPrice = Number(drink?.price) || 0;
-            
-            return (
-              <div key={index} className="item-row">
-                <span>{item.quantity}x {itemName}</span>
-                <span className='item-price'>@ {formatCurrency(itemPrice)}</span>
-                <span>{formatCurrency(itemPrice * item.quantity)}</span>
+        {drinksLoading ? (
+          <div className="items-loading">
+            {order.items.map((item, index) => (
+              <div key={index} className="item-row-skeleton">
+                <div className="skeleton-text skeleton-item-name"></div>
+                <div className="skeleton-text skeleton-price"></div>
+                <div className="skeleton-text skeleton-total"></div>
               </div>
-            );
-          })}
-        </div>
-        <div className="total-row">
-          <span><strong>Total:</strong></span>
-          <span className="total-amount"><strong>{formatCurrency(order.totalAmount)}</strong></span>
-        </div>
+            ))}
+            <div className="total-row-skeleton">
+              <div className="skeleton-text skeleton-total-label"></div>
+              <div className="skeleton-text skeleton-total-amount"></div>
+            </div>
+          </div>
+        ) : (
+          <>
+            <div className="items-list">
+              {order.items.map((item, index) => {
+                const drink = getDrinkById(item.drink_id);
+                const itemName = drink?.name || 'Unknown Item';
+                const itemPrice = Number(drink?.price) || 0;
+                
+                return (
+                  <div key={index} className="item-row">
+                    <span>{item.quantity}x {itemName}</span>
+                    <span className='item-price'>@ {formatCurrency(itemPrice)}</span>
+                    <span>{formatCurrency(itemPrice * item.quantity)}</span>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="total-row">
+              <span><strong>Total:</strong></span>
+              <span className="total-amount"><strong>{formatCurrency(order.totalAmount)}</strong></span>
+            </div>
+          </>
+        )}
         
         {/* Customer note to be displayed here */}
         {order.note && order.note.trim() && (
@@ -172,18 +190,6 @@ const HistoryOrderActions = ({ order, onUpdateStatus }) => {
         <span className="date-label">Date:</span>
         <span className="date-value">{formatDate(order.lastUpdated)}</span>
       </div>
-      
-      {/* Restore button - taking it out as I do not want staff to be able to restore an order and the client placing another one */}
-      {/* <div className="action-buttons-group">
-        {order.status === 'cancelled' && (
-          <button 
-            className="restore-button"
-            onClick={() => {onUpdateStatus(order.id);}}
-          >
-            Restore Order
-          </button>
-        )}
-      </div> */}
     </div>
   );
 };

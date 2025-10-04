@@ -5,6 +5,7 @@
 
 import { toast } from 'react-toastify';
 import { ORDER_STATUSES } from 'shared/types';
+import ordersAPI from "../api/orders.js";
 
 /** Defines the valid order status flow (from pending to completed). */
 export const STATUS_FLOW = [
@@ -188,7 +189,12 @@ export const notifyClient = (orderId, status) => {
 };
 
 /** Remind a client that their order is ready for collection. */
-export const notifyClientReminder = (orderId) => {
-  // Replace with actual notification system - API call (Message Passing)
-  toast.info(`Reminder sent: Order ${orderId} is ready for collection`);
+export const notifyClientReminder = async (orderId) => {
+  try {
+    toast.success(`Sending reminder to customer for Order #${orderId}`);
+    await ordersAPI.sendPickupReminder(orderId);
+  } catch (error) {
+    toast.error('Failed to send reminder');
+    console.error(error);
+  }
 };

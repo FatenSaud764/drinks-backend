@@ -4,9 +4,10 @@
  * It allows staff to view, filter, search, and update the status of orders in real-time.
 */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import '../styles/Pages.css';
 import OrderCard from '../components/OrderCard';
+import SkeletonCard from '../components/SkeletonCard';
 import FilterControls from '../components/FilterControls';
 import OTPModal from '../components/OTPModal';
 import { Lock as LockIcon } from '@mui/icons-material';
@@ -19,10 +20,8 @@ import {
 import { ORDER_STATUSES } from 'shared/types';
 import { normaliseOrder } from '../utils/normaliseOrder';
 import { useActiveOrders } from '../hooks/useOrders';
-import "../styles/Loading.css"; // Loading spinner
-// Notifications
+import "../styles/Loading.css";
 import { useSnackbar } from '../contexts/SnackbarContext';
-import { toast } from 'react-toastify'; // For client-side notifications
 
 const OrdersPage = () => {
   const {
@@ -40,15 +39,13 @@ const OrdersPage = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   
-  // PIN Authentication Modal state
   const [pinModalOpen, setPinModalOpen] = useState(false);
   const [pendingCompletionOrder, setPendingCompletionOrder] = useState(null);
-  const [pinModalMode, setPinModalMode] = useState('complete'); // 'complete' or 'find'
+  const [pinModalMode, setPinModalMode] = useState('complete');
 
-  // Custom sorting function: pending orders first, then oldest to newest
+  // Custom sorting function
   const sortOrders = (ordersToSort) => {
     return [...ordersToSort].sort((a, b) => {
-      // If one is pending and the other isn't, pending goes first
       if (a.status === ORDER_STATUSES.PENDING && b.status !== ORDER_STATUSES.PENDING) {
         return -1;
       }
@@ -56,16 +53,24 @@ const OrdersPage = () => {
         return 1;
       }
       
-      // If both are pending or both are not pending, sort by creation date (oldest first)
-      // Assuming orders have a createdAt field or similar timestamp
       const aDate = new Date(a.createdAt || a.created_at || a.orderTime || 0);
       const bDate = new Date(b.createdAt || b.created_at || b.orderTime || 0);
       
-      return aDate - bDate; // oldest first
+      return aDate - bDate;
     });
   };
 
-  // Filter orders based on status and search term - exclude completed and cancelled
+  // Scroll to and highlight order
+  const scrollToOrder = (orderId) => {
+    const element = document.getElementById(`order-${orderId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.classList.add('highlight-pulse');
+      setTimeout(() => element.classList.remove('highlight-pulse'), 2000);
+    }
+  };
+
+  // Filter orders
   useEffect(() => {
     let filtered = orders.filter(order => 
       ![ORDER_STATUSES.COMPLETED, ORDER_STATUSES.CANCELLED].includes(order.status)
@@ -73,8 +78,6 @@ const OrdersPage = () => {
 
     filtered = filterOrdersByStatus(filtered, statusFilter);
     filtered = filterOrdersBySearch(filtered, searchTerm);
-    
-    // Apply custom sorting: pending orders first, then oldest to newest
     filtered = sortOrders(filtered);
 
     setFilteredOrders(filtered);
@@ -82,39 +85,34 @@ const OrdersPage = () => {
 
   const handleUpdateOrderStatus = async (orderId, newStatus) => {
     try {
-      // If trying to complete an order (READY -> COMPLETED), show PIN modal
       if (newStatus === ORDER_STATUSES.COMPLETED) {
         const order = orders.find(o => o.id === parseInt(orderId));
         if (order && order.status === ORDER_STATUSES.READY) {
           setPendingCompletionOrder(order);
           setPinModalMode('complete');
           setPinModalOpen(true);
-          return; // Don't update status yet, wait for PIN confirmation
+          return;
         }
       }
       
-      // For all other status updates, proceed normally with global Snackbar
+      showSnackbar(`Updating Order #${orderId} to ${newStatus.toUpperCase()}`, 'success');
       await updateOrderStatus(parseInt(orderId), newStatus);
-      showSnackbar(`Order #${orderId} updated to ${newStatus.toUpperCase()}`, 'success');
       notifyClient(orderId, newStatus);
     } catch (err) {
       showSnackbar(`Failed to update order: ${err.message}`, 'error');
     }
   };
 
-  // Handle PIN authentication result
   const handlePinConfirmation = async (isConfirmed, order = null) => {
     if (isConfirmed) {
       try {
         if (pinModalMode === 'complete' && pendingCompletionOrder) {
-          // Complete the specific order that was pending
           await updateOrderStatus(pendingCompletionOrder.id, ORDER_STATUSES.COMPLETED);
           showSnackbar(
             `Order ${pendingCompletionOrder.orderNumber || `#${pendingCompletionOrder.id}`} completed successfully!`, 
             'success'
           );
         } else if (pinModalMode === 'find' && order) {
-          // Complete the order found by PIN
           await updateOrderStatus(order.id, ORDER_STATUSES.COMPLETED);
           showSnackbar(
             `Order ${order.orderNumber || `#${order.id}`} completed successfully!`, 
@@ -126,20 +124,17 @@ const OrdersPage = () => {
       }
     }
     
-    // Reset modal state
     setPinModalOpen(false);
     setPendingCompletionOrder(null);
     setPinModalMode('complete');
   };
 
-  // Handle "Complete Order by PIN" button
   const handleCompleteByPin = () => {
     setPendingCompletionOrder(null);
     setPinModalMode('find');
     setPinModalOpen(true);
   };
 
-  // Get ready orders for the PIN modal
   const getReadyOrders = () => {
     return orders.filter(order => order.status === ORDER_STATUSES.READY);
   };
@@ -148,14 +143,12 @@ const OrdersPage = () => {
   const statusOptions = ['all', 'pending', 'preparing', 'ready'];
   const readyOrdersCount = statusCounts.ready;
 
-  // Artificial loading state to showcase loading spinner on initial load
   const [artificialLoading, setArtificialLoading] = useState(true);
-  // Delay for showcasing the loading indicator
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       setArtificialLoading(false);
-    }, 500); // timeout just to showcase the loading state
-
+    }, 500);
     return () => clearTimeout(timer);
   }, []);
 
@@ -163,10 +156,25 @@ const OrdersPage = () => {
     return (
       <div className="page">
         <div className="page-container">
-          <div className="loading-indicator">
-          <div className="loading-spinner"></div>
-          <p>Loading Orders...</p>
-        </div>
+          <div className="page-header">
+            <h1>Active Orders</h1>
+            <p>Loading orders...</p>
+          </div>
+
+          <FilterControls
+            searchTerm=""
+            setSearchTerm={() => {}}
+            statusFilter="all"
+            setStatusFilter={() => {}}
+            statusCounts={{ all: 0, pending: 0, preparing: 0, ready: 0 }}
+            statusOptions={['all', 'pending', 'preparing', 'ready']}
+          />
+
+          <div className="orders-grid">
+            {[...Array(6)].map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -179,7 +187,6 @@ const OrdersPage = () => {
           <h1>Active Orders</h1>
           <p>Manage active orders and update status in real-time</p>
           
-          {/* Complete by PIN Button */}
           {readyOrdersCount > 0 && (
             <div className="page-actions">
               <button 
@@ -193,7 +200,6 @@ const OrdersPage = () => {
           )}
         </div>
 
-        {/* Error Display */}
         {error && (
           <div className="error-banner">
             <div className="error-content">
@@ -224,13 +230,6 @@ const OrdersPage = () => {
           statusOptions={statusOptions}
         />
 
-        {/* Loading indicator for updates */}
-        {loading && orders.length > 0 && (
-          <div className="loading-indicator">
-            <p>Updating orders...</p>
-          </div>
-        )}
-
         <div className="orders-grid">
           {filteredOrders.length === 0 ? (
             <div className="no-orders">
@@ -244,6 +243,7 @@ const OrdersPage = () => {
             filteredOrders.map(order => (
               <OrderCard
                 key={order.id}
+                id={`order-${order.id}`}
                 order={normaliseOrder(order)}
                 onUpdateStatus={handleUpdateOrderStatus}
                 isHistory={false}
@@ -252,7 +252,6 @@ const OrdersPage = () => {
           )}
         </div>
 
-        {/* PIN Authentication Modal */}
         <OTPModal
           open={pinModalOpen}
           onClose={() => {
