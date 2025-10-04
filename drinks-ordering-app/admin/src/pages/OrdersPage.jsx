@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef } from 'react';
 import '../styles/Pages.css';
 import OrderCard from '../components/OrderCard';
+import SkeletonCard from '../components/SkeletonCard';
 import FilterControls from '../components/FilterControls';
 import OTPModal from '../components/OTPModal';
 import { Lock as LockIcon } from '@mui/icons-material';
@@ -155,9 +156,24 @@ const OrdersPage = () => {
     return (
       <div className="page">
         <div className="page-container">
-          <div className="loading-indicator">
-            <div className="loading-spinner"></div>
-            <p>Loading Orders...</p>
+          <div className="page-header">
+            <h1>Active Orders</h1>
+            <p>Loading orders...</p>
+          </div>
+
+          <FilterControls
+            searchTerm=""
+            setSearchTerm={() => {}}
+            statusFilter="all"
+            setStatusFilter={() => {}}
+            statusCounts={{ all: 0, pending: 0, preparing: 0, ready: 0 }}
+            statusOptions={['all', 'pending', 'preparing', 'ready']}
+          />
+
+          <div className="orders-grid">
+            {[...Array(6)].map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
         </div>
       </div>

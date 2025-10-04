@@ -1,0 +1,159 @@
+.skeleton-card {
+  pointer-events: none;
+  user-select: none;
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-muted) 0%,
+    var(--bg-secondary) 20%,
+    var(--bg-secondary) 40%,
+    var(--bg-muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Order Header Section */
+.skeleton-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+
+.skeleton-order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.skeleton-order-number {
+  width: 100px;
+  height: 28px;
+}
+
+.skeleton-time {
+  width: 140px;
+  height: 16px;
+}
+
+.skeleton-status {
+  width: 95px;
+  height: 32px;
+  border-radius: 16px;
+}
+
+/* Order Items Section */
+.skeleton-items-section {
+  margin-bottom: 1.5rem;
+}
+
+.skeleton-items-title {
+  width: 60px;
+  height: 20px;
+  margin-bottom: 1rem;
+}
+
+.skeleton-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.skeleton-item-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.skeleton-item-name {
+  width: 140px;
+  height: 18px;
+}
+
+.skeleton-item-price {
+  width: 60px;
+  height: 18px;
+}
+
+.skeleton-item-total {
+  width: 50px;
+  height: 18px;
+}
+
+.skeleton-item-row.short .skeleton-item-name {
+  width: 100px;
+}
+
+/* Total Row */
+.skeleton-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+.skeleton-total-label {
+  width: 50px;
+  height: 20px;
+}
+
+.skeleton-total-amount {
+  width: 70px;
+  height: 22px;
+}
+
+/* Order Actions Section */
+.skeleton-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.skeleton-nav-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.skeleton-nav-button {
+  flex: 1;
+  height: 40px;
+  border-radius: 6px;
+}
+
+.skeleton-current-status {
+  flex: 1;
+  height: 50px;
+  border-radius: 8px;
+}
+
+.skeleton-action-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.skeleton-action-button {
+  flex: 1;
+  height: 38px;
+  border-radius: 6px;
+}
