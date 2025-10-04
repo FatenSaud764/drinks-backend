@@ -51,13 +51,12 @@ const Cart = () => {
   try {
     // Fire async work in parallel (don’t block UI)
     await Promise.all([
-      fetchdata(),
       updateNote(),
       AxiosInstance.post('/api/orders/', {}, {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
     ]);
-
+    fetchdata()
     // Success - UI already updated
   } catch (err) {
     console.error(err);
