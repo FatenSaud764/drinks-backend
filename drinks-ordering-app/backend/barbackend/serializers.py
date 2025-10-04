@@ -3,23 +3,6 @@ from rest_framework.validators import UniqueValidator
 from django.contrib.auth.models import BaseUserManager
 from .models import *
 
-class MessageSerializer(serializers.ModelSerializer):
-    sender_username = serializers.CharField(source='sender.username', read_only=True)
-    message_text = serializers.SerializerMethodField()
-    
-    class Meta:
-        model = Message
-        fields = ['id', 'order', 'sender', 'sender_username', 'message_type', 
-                  'content', 'message_text', 'created_at']
-        read_only_fields = ['id', 'sender', 'created_at']
-    
-    def get_message_text(self, obj):
-        return obj.get_default_content()
-
-class CreateMessageSerializer(serializers.Serializer):
-    message_type = serializers.ChoiceField(choices=Message.MESSAGE_TYPE_CHOICES)
-    content = serializers.CharField(required=False, allow_blank=True)
-
 class DrinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Drink
@@ -45,11 +28,9 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
-    messages = MessageSerializer(many=True, read_only=True)
-
     class Meta:
         model = Order
-        fields = ['id', 'user', 'note', 'status', 'total_price', 'items', 'created_at', 'updated_at', 'messages']
+        fields = ['id', 'user', 'note', 'status', 'total_price', 'items', 'created_at', 'updated_at']
         read_only_fields = ['status', 'total_price', 'created_at', 'updated_at']
 
     def create(self, validated_data):
