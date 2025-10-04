@@ -437,9 +437,6 @@ class OrderViewset(viewsets.ViewSet):
     )
     def send_reminder(self, request, pk=None):
         """POST /api/orders/{id}/send-reminder/ - Staff triggers a reminder"""
-        if not request.user.is_staff:
-            raise PermissionDenied("Staff only")
-        
         order = get_object_or_404(Order, pk=pk)
         
         if order.status != 'ready':
