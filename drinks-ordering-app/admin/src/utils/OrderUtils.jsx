@@ -191,8 +191,8 @@ export const notifyClient = (orderId, status) => {
 /** Remind a client that their order is ready for collection. */
 export const notifyClientReminder = async (orderId) => {
   try {
+    toast.success(`Sending reminder to customer for Order #${orderId}`);
     await ordersAPI.sendPickupReminder(orderId);
-    toast.success(`Reminder sent to customer for Order #${orderId}`);
   } catch (error) {
     toast.error('Failed to send reminder');
     console.error(error);

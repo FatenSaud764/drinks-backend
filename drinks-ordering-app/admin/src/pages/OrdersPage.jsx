@@ -21,7 +21,6 @@ import { normaliseOrder } from '../utils/normaliseOrder';
 import { useActiveOrders } from '../hooks/useOrders';
 import "../styles/Loading.css";
 import { useSnackbar } from '../contexts/SnackbarContext';
-import { useInventory } from '../hooks/useInventory';
 
 const OrdersPage = () => {
   const {
@@ -33,7 +32,6 @@ const OrdersPage = () => {
     clearError
   } = useActiveOrders();
 
-  const { drinks, loading: drinksLoading } = useInventory();
   const { showSnackbar } = useSnackbar();
 
   const [filteredOrders, setFilteredOrders] = useState([]);
@@ -96,8 +94,8 @@ const OrdersPage = () => {
         }
       }
       
+      showSnackbar(`Updating Order #${orderId} to ${newStatus.toUpperCase()}`, 'success');
       await updateOrderStatus(parseInt(orderId), newStatus);
-      showSnackbar(`Order #${orderId} updated to ${newStatus.toUpperCase()}`, 'success');
       notifyClient(orderId, newStatus);
     } catch (err) {
       showSnackbar(`Failed to update order: ${err.message}`, 'error');
