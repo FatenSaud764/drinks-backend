@@ -428,6 +428,30 @@ class OrderViewset(viewsets.ViewSet):
         
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
+    
+    @action(detail=True, methods=['post'], url_path='send-reminder')
+    @extend_schema(
+        tags=["Orders"],
+        summary="Send pickup reminder (triggers notification on client)",
+        responses={200: OpenApiResponse(description="Reminder triggered")}
+    )
+    def send_reminder(self, request, pk=None):
+        """POST /api/orders/{id}/send-reminder/ - Staff triggers a reminder"""
+        if not request.user.is_staff:
+            raise PermissionDenied("Staff only")
+        
+        order = get_object_or_404(Order, pk=pk)
+        
+        if order.status != 'ready':
+            return Response(
+                {'detail': 'Can only remind for ready orders'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Just update the order's updated_at timestamp to trigger polling
+        order.save(update_fields=['updated_at'])
+        
+        return Response({'detail': 'Reminder sent'})
 
 
 class CartViewset(viewsets.GenericViewSet):

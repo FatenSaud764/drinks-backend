@@ -102,4 +102,16 @@ export const ordersAPI = {
       return []; // Return empty array on error to prevent crashes
     }
   },
+
+  // Send a reminder to client for picking up their order
+  sendPickupReminder: async (orderId) => {
+    try {
+      const response = await api.post(`/api/orders/${orderId}/send-reminder/`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.detail || "Failed to send reminder");
+    }
+  },
 };
+
+export default ordersAPI;

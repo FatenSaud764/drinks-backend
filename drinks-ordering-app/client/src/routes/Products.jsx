@@ -54,14 +54,13 @@ const addToCart = async (e) => {
       
       try {
         // Add to backend in background
+        setCartModal(true)
         await AxiosInstance.post('/api/cart/items/', 
           {"drink_id": e, "quantity": 1}, 
           {headers:{Authorization: `Bearer ${accessToken}`}}
         )
-        
         // Silently refetch to sync state (user already saw feedback)
         fetchdata()
-        setCartModal(true)
         
       } catch (error) {
         console.error('Failed to add to cart:', error)
