@@ -1,6 +1,7 @@
 /** @author Kirsten Sanders */
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import AxiosInstance from '../components/Axios';
+import { setAuthContext } from '../components/Axios';
 
 // Create the context
 const AuthContext = createContext();
@@ -170,6 +171,15 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('loggedin', isLoggedIn.toString());
   }, [isLoggedIn]);
 
+  useEffect(() => {
+  setAuthContext({
+    refreshAccessToken,
+    logout,
+  });
+}, [refreshAccessToken, logout]);
+  
+  
+
   const value = {
     // State
     user,
@@ -191,6 +201,8 @@ export const AuthProvider = ({ children }) => {
     setIsLoggedIn,
   };
 
+  
+
   return (
     <AuthContext.Provider value={value}>
       {children}
@@ -206,3 +218,4 @@ export const useAuth = () => {
   }
   return context;
 };
+

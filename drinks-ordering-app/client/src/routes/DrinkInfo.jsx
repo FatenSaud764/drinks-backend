@@ -17,7 +17,7 @@ const DrinkInfo = () => {
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
 
-  const addToCart = (e, num) => {
+  const addToCart = async (e, num) => {
     if (isLoggedIn && accessToken && num>0) {
       const request = async () => {
         await AxiosInstance.post(
@@ -25,7 +25,7 @@ const DrinkInfo = () => {
           {"drink_id": e, "quantity": num},
           {headers:{Authorization: `Bearer ${accessToken}`}})
       }
-      request();
+      await request();
       setCartModal(true);
     } else {
       alert('Please select at least one drink to add to cart!');

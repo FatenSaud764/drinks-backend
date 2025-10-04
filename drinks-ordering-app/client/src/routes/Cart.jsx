@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from 'react'
 import NavBar from '../components/NavBar'
-import { LightDark, ProductList, UserCart } from '../contexts/contexts'
+import { LightDark, ProductList,CartItems } from '../contexts/contexts'
 import { useAuth } from '../contexts/AuthContext'
 import './Cart.css'
 import { useState } from 'react'
@@ -14,8 +14,7 @@ import Slide from '@mui/material/Slide'
 const Cart = () => {
   const { theme, setTheme } = useContext(LightDark)
   const { products, setProducts } = useContext(ProductList)
-  const { cart, setCart } = useContext(UserCart);
-  const [cartItems, setCartItems] = useState([]);
+  const {cartItems, setCartItems} = useContext(CartItems);
   const [open, setOpen] = useState(false);
   const [ orderNote, setOrderNote ] = useState("");
 
@@ -38,34 +37,51 @@ const Cart = () => {
     }
   }
 
-  const PlaceOrder = async() => {
-    await fetchdata()
-    if (!isLoggedIn || !accessToken) return;
-    if(cartItems.length==1 && cartItems[0].quantity==0) {alert("You have no items in your cart!"); return}
-    await updateNote();
-    
-    try {
-      const result = await AxiosInstance.post('/api/orders/', cartItems, orderNote, {
+  const PlaceOrder = async () => {
+  if (!isLoggedIn || !accessToken) return;
+  if (cartItems.length === 1 && cartItems[0].quantity === 0) {
+    alert("You have no items in your cart!");
+    return;
+  }
+
+  // Optimistic UI update first
+  setOpen(true);
+  const previousItems = [...cartItems];
+
+  try {
+    // Fire async work in parallel (don’t block UI)
+    await Promise.all([
+      updateNote(),
+      AxiosInstance.post('/api/orders/', {}, {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
-      setOpen(true);
-      fetchdata()
-    } catch (err) {
-      console.error(err);
-    }
+    ]);
+    fetchdata()
+    // Success - UI already updated
+  } catch (err) {
+    console.error(err);
+    // Revert optimistic update on error
+    setOpen(false);
+    setCartItems(previousItems);
+    alert('Failed to place order. Please try again.');
   }
+};
+
 
   console.log('order', orderNote);
 
 
   const ClearCart = async() => {
     if (!isLoggedIn || !accessToken) return;
-    
+    setCartItems([]);
     try{
-      await AxiosInstance.delete('/api/cart/', {
+      await Promise.all([
+        await AxiosInstance.delete('/api/cart/', {
         headers: { Authorization: `Bearer ${accessToken}` }
-      })
-      fetchdata();
+      }),
+      fetchdata()
+      ])
+  
     }
     catch(err) {
       console.error(err);
@@ -236,7 +252,7 @@ const Cart = () => {
         {cartItems.length>0 && 
           <div className='clearcart'>
             <span className='clearcarttext'>Clear Cart</span>
-            <button className='clearcartbutton' onClick={() => {ClearCart()}}><FaRegTrashCan className='clearicon'/></button>
+            <button className='clearcartbutton' onClick={() => {ClearCart(); setCartItems([]);}}><FaRegTrashCan className='clearicon'/></button>
           </div>
         }
       </div>
