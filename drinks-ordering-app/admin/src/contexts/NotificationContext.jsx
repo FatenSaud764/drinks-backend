@@ -22,7 +22,7 @@ const NotificationMonitor = ({ isStaff = false }) => {
         <strong>New Order Received!</strong>
         <p style={{ margin: '4px 0' }}>Order #{order.id}</p>
         <p style={{ margin: '4px 0', fontSize: '0.9em' }}>
-          Total: ${order.total_price}
+          Total: R{order.total_price}
         </p>
       </div>,
       {

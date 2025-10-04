@@ -50,7 +50,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "barbackend.middleware.CloseConnectionMiddleware"
+    # "barbackend.middleware.CloseConnectionMiddleware"
 ]
 
 ROOT_URLCONF = "barbackend.urls"
@@ -80,6 +80,15 @@ DATABASES = {
         conn_health_checks=True,
         ssl_require=True,
     )
+}
+
+# Add connection options separately
+DATABASES['default']['OPTIONS'] = {
+    'connect_timeout': 10,
+    'keepalives': 1,
+    'keepalives_idle': 30,
+    'keepalives_interval': 10,
+    'keepalives_count': 5,
 }
 
 # Use SQLite for tests to avoid external DB dependency
