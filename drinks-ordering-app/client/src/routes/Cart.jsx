@@ -89,7 +89,7 @@ const Cart = () => {
     fetchdata();
   }, [accessToken, isLoggedIn])
 
-  const increment = (quantity, drink_id) => {
+  const increment = async (quantity, drink_id) => {
     if (!isLoggedIn || !accessToken) return;
     
     const new_quantity = quantity + 1;
@@ -101,7 +101,7 @@ const Cart = () => {
           )
         );
         const res = await AxiosInstance.patch(`/api/cart/`, { 
-          items: [{ "id": cart.id, "drink_id": drink_id, quantity: new_quantity }] 
+          items: [{"drink_id": drink_id, quantity: new_quantity }] 
         }, { 
           headers: { Authorization: `Bearer ${accessToken}` } 
         });
@@ -110,10 +110,10 @@ const Cart = () => {
         console.error(err);
       }
     }
-    update();
+    await update();
   };
 
-  const decrement = (quantity, drink_id) => {
+  const decrement = async (quantity, drink_id) => {
     if (!isLoggedIn || !accessToken) return;
     
     const new_quantity = quantity - 1;
@@ -128,7 +128,7 @@ const Cart = () => {
 
         // Send update to backend
         const res = await AxiosInstance.patch(`/api/cart/`, {
-          items: [{ "id": cart.id, "drink_id": drink_id, quantity: new_quantity }]
+          items: [{"drink_id": drink_id, quantity: new_quantity }]
         }, {
           headers: { Authorization: `Bearer ${accessToken}` }
         });
@@ -137,7 +137,7 @@ const Cart = () => {
         console.error(err);
       }
     }
-    update();
+    await update();
   };
 
 
