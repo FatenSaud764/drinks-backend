@@ -47,17 +47,16 @@ const Cart = () => {
   // Optimistic UI update first
   setOpen(true);
   const previousItems = [...cartItems];
+  setCartItems([]);
 
   try {
     // Fire async work in parallel (don’t block UI)
     await Promise.all([
-      updateNote(),
-      AxiosInstance.post('/api/orders/', {}, {
+      await updateNote(),
+      await AxiosInstance.post('/api/orders/', {}, orderNote, {
         headers: { Authorization: `Bearer ${accessToken}` }
       })
     ]);
-    fetchdata()
-    // Success - UI already updated
   } catch (err) {
     console.error(err);
     // Revert optimistic update on error
@@ -67,8 +66,6 @@ const Cart = () => {
   }
 };
 
-
-  console.log('order', orderNote);
 
 
   const ClearCart = async() => {
@@ -143,9 +140,6 @@ const Cart = () => {
     update();
   };
 
-  const removeItem = (id) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
-  };
 
   useEffect(() => {
   if (open) {
@@ -168,7 +162,6 @@ const Cart = () => {
       }, {
         headers: { Authorization: `Bearer ${accessToken}` }
       });
-      fetchdata();
     } catch (error) {
       console.error('Error updating note:', error);
     }
@@ -237,7 +230,7 @@ const Cart = () => {
         </div>
         {cartItems.length > 0 && 
           <div className='add-note-wrapper'>
-            <form className='add-note-form' onSubmit={updateNote}>
+            <form className='add-note-form'>
               <textarea 
                 maxLength="128"
                 className='new-note-text'
