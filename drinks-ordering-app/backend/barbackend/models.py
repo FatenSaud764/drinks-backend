@@ -7,6 +7,7 @@ from django.contrib.auth.models import (
     PermissionsMixin,
     BaseUserManager,
 )
+from barbackend import storage_backends
 
 class UserManager(BaseUserManager):
     """Custom user manager for our User model."""
@@ -80,7 +81,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class Drink(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
-    image = models.ImageField(upload_to='assets/')
+    image = models.ImageField(upload_to='assets/', storage=storage_backends.SupabaseStorage, blank=True, null=True)
     price = models.DecimalField(max_digits=6, decimal_places=2)
     category = models.CharField(max_length=50, blank=True)
     available = models.BooleanField(default=True)
