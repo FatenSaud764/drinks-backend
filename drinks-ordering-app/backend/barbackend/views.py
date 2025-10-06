@@ -437,7 +437,7 @@ class OrderViewset(viewsets.ViewSet):
     )
     def send_reminder(self, request, pk=None):
         """POST /api/orders/{id}/send-reminder/ - Staff triggers a reminder"""
-        order = get_object_or_404(Order, pk=pk)
+        order = get_object_or_404(self.get_queryset(request), pk=pk) # Use queryset (clients only get reminders for their own orders)
         
         if order.status != 'ready':
             return Response(
@@ -449,7 +449,6 @@ class OrderViewset(viewsets.ViewSet):
         order.save(update_fields=['updated_at'])
         
         return Response({'detail': 'Reminder sent'})
-
 
 class CartViewset(viewsets.GenericViewSet):
     """Shopping cart endpoints for the current user."""
