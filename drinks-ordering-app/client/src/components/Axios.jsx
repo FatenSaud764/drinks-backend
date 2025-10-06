@@ -1,7 +1,7 @@
 // components/Axios.js
 import axios from 'axios';
 
-const baseUrl = 'http://127.0.0.1:8000/'
+const baseUrl = 'https://drinks-backend-ojv2.onrender.com/'
 
 const AxiosInstance = axios.create({
     baseURL: baseUrl,

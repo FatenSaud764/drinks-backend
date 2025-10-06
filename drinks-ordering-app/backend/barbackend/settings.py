@@ -20,12 +20,12 @@ SECRET_KEY = config("DJANGO_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=True, cast=bool)
 
-ALLOWED_HOSTS = config(
-    "ALLOWED_HOSTS", 
-    default="localhost,127.0.0.1,[::1],testserver", 
-    cast=lambda v: [s.strip() for s in v.split(",")]
-)
-
+ALLOWED_HOSTS = [
+    "drinks-backend-ojv2.onrender.com",  # No https://, no trailing /
+    "localhost",
+    "127.0.0.1",
+    "[::1]",
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -123,12 +123,19 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # CORS
-CORS_ALLOW_ALL_ORIGINS = config("CORS_ALLOW_ALL_ORIGINS", default=True, cast=bool)
-CORS_ALLOWED_ORIGINS = config(
-    "CORS_ALLOWED_ORIGINS",
-    default="http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173",
-    cast=lambda v: [s.strip() for s in v.split(",")],
-)
+CORS_ALLOW_ALL_ORIGINS = False
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://drinks-backend-ojv2.onrender.com",
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://drinks-backend-ojv2.onrender.com",
+    "http://localhost:5173",
+]
 
 # OTP
 OTP_CODE_LENGTH = 6

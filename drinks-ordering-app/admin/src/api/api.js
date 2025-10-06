@@ -6,7 +6,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:8000/",
+  baseURL: "https://drinks-backend-ojv2.onrender.com/",
   timeout: 50000,
   headers: {
     accept: "application/json"
