@@ -7,6 +7,8 @@ class DrinkSerializer(serializers.ModelSerializer):
     class Meta:
         model = Drink
         fields = '__all__'
+        image = serializers.ImageField(use_url=True)
+
 
     def update(self, instance, validated_data):
         if 'available' in validated_data and 'stock' not in validated_data:
