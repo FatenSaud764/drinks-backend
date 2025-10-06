@@ -161,7 +161,7 @@ const InventoryPage = () => {
             <div className="image-cell">
               {imageUrl ? (
                 <img 
-                  src={`http://localhost:8000${imageUrl}`}
+                  src={`${imageUrl}`}
                   alt={row.original.name}
                   className="drink-image"
                   onError={(e) => {
@@ -762,8 +762,8 @@ const InventoryPage = () => {
                               formData.imagePreview && formData.imagePreview.startsWith('blob:') 
                                 ? formData.imagePreview 
                                 : formData.imagePreview 
-                                  ? `http://localhost:8000${formData.imagePreview}`
-                                  : `http://localhost:8000${formData.image}`
+                                  ? `${formData.imagePreview}`
+                                  : `${formData.image}`
                             } 
                             alt="Preview" 
                             className="image-preview"

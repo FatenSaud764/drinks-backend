@@ -48,7 +48,7 @@ const Home = () => {
         </div>
         <Slider {...settings} className='slide-container'>
           {products.filter(drink => drink.category==category).map(drink => <div className='carousel-drink'>
-            <img className='carousel-image' src={`http://127.0.0.1:8000${drink.image}`} />
+            <img className='carousel-image' src={`${drink.image}`} />
             <h5 className='drink-name'>{drink.name}</h5>
             </div>)}
         </Slider>

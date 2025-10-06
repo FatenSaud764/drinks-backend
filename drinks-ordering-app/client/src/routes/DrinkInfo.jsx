@@ -40,7 +40,7 @@ const DrinkInfo = () => {
         <NavBar />
           {cartModal && <CartModal />}
         </CartModalBoolean.Provider>
-        <img src= {`http://127.0.0.1:8000${selecteddrink.image}`} className='drinkimage' />
+        <img src= {`${selecteddrink.image}`} className='drinkimage' />
         <div className='drinkname'>
           {selecteddrink.name}
         </div>
