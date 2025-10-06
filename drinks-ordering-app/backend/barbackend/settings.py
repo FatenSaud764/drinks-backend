@@ -201,8 +201,4 @@ SUPABASE_KEY = config("SUPABASE_KEY", default="")
 SUPABASE_BUCKET_NAME = config("SUPABASE_BUCKET_NAME", default="drink-images")
 
 # Use Supabase Storage for media files in production
-if SUPABASE_URL and SUPABASE_KEY:
-    DEFAULT_FILE_STORAGE = "barbackend.storage_backends.SupabaseStorage"
-else:
-    # Fallback to local storage for local development
-    DEFAULT_FILE_STORAGE = "django.core.files.storage.FileSystemStorage"
+DEFAULT_FILE_STORAGE = "barbackend.storage_backends.SupabaseStorage"
