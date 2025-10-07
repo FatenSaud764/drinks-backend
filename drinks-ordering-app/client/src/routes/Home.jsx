@@ -18,8 +18,13 @@ const Home = () => {
   const navigate = useNavigate();
   const {products, setProducts} = useContext(ProductList);
   const {orders, setOrders} = useContext(Orders);
+  const {isLoggedIn, accessToken} = useAuth();
 
   const GetOrderData = async () => {
+    if(!isLoggedIn || !accessToken) {
+      setOrders([]);
+      return;
+    }
     // Abort previous request if still running
     try {
       const res = await AxiosInstance.get('api/orders/');
@@ -34,7 +39,7 @@ const Home = () => {
   useEffect(() => {
     GetOrderData(); // Always fetch products
     const interval = setInterval(() => {
-      GetData();
+      GetOrderData();
     }, 5000)
     return () => clearInterval(interval);
   }, [])
@@ -50,7 +55,6 @@ const Home = () => {
     slidesToShow: 2,
     slidesToScroll: 1,
     arrows: false,
-    centerMode: false,
     draggable: true,
     touchMove: true,
     pauseOnDotsHover:false,
@@ -81,18 +85,15 @@ const Home = () => {
         return '#F59E0B'
     }
   }
-  var statusColor = getStatusColor('preparing');
+  const statusColor = sortedOrders.length>0 ? getStatusColor(sortedOrders[0].status) : getStatusColor('preparing');
 
-  if(sortedOrders.length>0){
-    let statusColor = getStatusColor(sortedOrders[0].status)
-  }
 
 
   return (
     <div className='homewrapper' id={theme}>
       <NavBar />
       <div className='greeting'>Welcome back {user?user.username:''}!</div>
-      <div className='orderwrapper'>
+      <div className='orderwrapper' role='button' tabIndex={0}>
         <div className='orderrow'>
           <div style={{fontFamily:'Nunito', fontSize:'20px', fontWeight: '800'}}>Your latest order:</div>
         </div>

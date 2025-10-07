@@ -46,7 +46,7 @@ export default function NavBar() {
   }
 
   return (
-    <header ref={navRef} className="nav" id={theme}>
+    <nav ref={navRef} className="nav" id={theme}>
       <div className="nav-left">
         <details className="hamburger" ref={menuRef} role="navigation">
           <summary aria-label="Menu" aria-expanded={menuRef.current?.open ? 'true' : 'false'} aria-controls="hamburger-sidebar" role="button">
@@ -107,6 +107,6 @@ export default function NavBar() {
           )}
         </div>
       </div>
-    </header>
+    </nav>
   )
 }

@@ -95,6 +95,8 @@ const AppContent = () => {
     return () => clearInterval(interval);
   }, [])
 
+  
+
   useEffect(() => {
   const interval = setInterval(async () => {
     try {

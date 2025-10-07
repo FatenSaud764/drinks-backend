@@ -13,18 +13,32 @@
     margin-top: 1vh;
 }
 
+@keyframes initHover {
+  from { opacity: 0.999; }
+  to { opacity: 1; }
+}
+
+
+
 .orderwrapper{
     display: flex;
     flex-direction: column;
     gap: 1vh;
     border: 2px solid rgb(221, 209, 209);
-    width: 85%;
+    width: 80%;
     height: auto;
     min-height: 12vh;
-    padding-top: 2vh;
+    padding-top: 1vh;
     border-radius: 1.5vh;
     padding-left: 2.5vh;
+    padding-right: 2vh;
+    background: transparent;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    pointer-events: auto;
 }
+
+
 
 .orderrow{
     display: flex;
@@ -35,6 +49,10 @@
     height: 4vh;
     width: 93%;
     font-family: 'Nunito' !important;
+}
+
+#dark .orderrow{
+    color: white;
 }
 
 .drinkimg{
@@ -101,6 +119,11 @@
     height: auto !important;
 }
 
+.slick-slide {
+  pointer-events: auto !important;
+}
+
+
 
 .category-header{
     display: flex;
@@ -125,6 +148,11 @@
     background: none;
 }
 
+.category-button:hover{
+    color:#d1880a;
+}
+
+
 .category-name{
     font-family: 'Nunito';
     font-size: 25px;
@@ -139,10 +167,6 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
-.carousel-image:hover{
-    transform: scale(1.5);
-    border: 1px solid #F59E0B;
-}
 
 .drink-name{
     font-family: 'Nunito';
@@ -169,4 +193,14 @@
     gap: 5vh;
     align-items: center;
     align-content: center;
+}
+
+#light .orderwrapper:hover{
+    transform: scale(1.02) !important; /* Grows from center, very visible */
+    border: 2px solid rgb(170, 161, 161) !important;
+}
+
+#dark .orderwrapper:hover{
+   transform: scale(1.02) !important; /* Grows from center, very visible */
+    border: 2px solid rgb(170, 161, 161) !important; 
 }
