@@ -18,8 +18,6 @@ from drf_spectacular.utils import (
     inline_serializer,
 )
 from drf_spectacular.types import OpenApiTypes
-from django.db import transaction
-import logging
 from django.http import JsonResponse
 
 CART_EXPIRY_SECONDS = 15*60  # 15 minutes
@@ -206,11 +204,6 @@ class DrinkViewset(viewsets.ViewSet):
         return Response({"updated": updated})
 
 
-
-
-logger = logging.getLogger(__name__)
-
-
 class OrderViewset(viewsets.ViewSet):
     """Order endpoints for customers and staff."""
 
@@ -271,21 +264,9 @@ class OrderViewset(viewsets.ViewSet):
         user = request.user if request.user.is_authenticated else User.objects.first()
         
         # OPTIMIZATION: Prefetch cart items with drinks
-        try:
-            cart = Cart.objects.prefetch_related(
-                Prefetch('items', queryset=CartItem.objects.select_related('drink'))
-            ).get(user=user)
-        except Cart.DoesNotExist:
-            return Response(
-                {'detail': 'Cart not found'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
-        if not cart.items.exists():
-            return Response(
-                {'detail': 'Cart is empty'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+        cart = Cart.objects.prefetch_related(
+            Prefetch('items', queryset=CartItem.objects.select_related('drink'))
+        ).get(user=user)
 
         order_data = {
             'user': user.id,
@@ -302,10 +283,7 @@ class OrderViewset(viewsets.ViewSet):
             cart.items.all().delete()
             cart.note = ""
             cart.save()
-            
-            logger.info(f"Order {order.id} created for user {user.id}")
             return Response(self.serializer_class(order).data, status=status.HTTP_201_CREATED)
-        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=True, methods=['patch'], url_path='status')
@@ -327,28 +305,15 @@ class OrderViewset(viewsets.ViewSet):
         PATCH /api/orders/{id}/status/
         Update the status of an order and automatically send appropriate message.
         """
+        order = get_object_or_404(Order, pk=pk)
         new_status = request.data.get('status')
         
         if new_status not in dict(Order.STATUS_CHOICES):
-            return Response(
-                {"detail": "Invalid status"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"detail": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST)
         
-        try:
-            # Use select_for_update to prevent race conditions
-            with transaction.atomic():
-                order = Order.objects.select_for_update().get(pk=pk)
-                old_status = order.status
-                order.status = new_status
-                order.save(update_fields=['status', 'updated_at'])
-                
-                logger.info(f"Order {pk} status changed: {old_status} -> {new_status}")
-        except Order.DoesNotExist:
-            return Response(
-                {"detail": "Order not found"}, 
-                status=status.HTTP_404_NOT_FOUND
-            )
+        old_status = order.status
+        order.status = new_status
+        order.save() 
 
         # OPTIMIZATION: Refetch with prefetch for serialization
         order = Order.objects.prefetch_related(
@@ -375,148 +340,64 @@ class OrderViewset(viewsets.ViewSet):
         """GET /api/orders/{id}/otp/ - Retrieve OTP if order is ready"""
         order = get_object_or_404(self.get_queryset(request), pk=pk)
         req_user = request.user if getattr(request, 'user', None) and request.user.is_authenticated else User.objects.first()
-        
         if order.user_id != getattr(req_user, 'id', None):
             return Response({'detail': 'Forbidden'}, status=status.HTTP_403_FORBIDDEN)
-        
         if order.status != 'ready':
-            return Response(
-                {'detail': 'OTP available only when order is ready.'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+            return Response({'detail': 'OTP available only when order is ready.'}, status=status.HTTP_400_BAD_REQUEST)
         try:
             otp = order.otp
         except OrderOTP.DoesNotExist:
             return Response({'detail': 'No OTP yet.'}, status=status.HTTP_404_NOT_FOUND)
-        
         if otp.is_used:
-            return Response(
-                {'detail': 'OTP already used.'}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+            return Response({'detail': 'OTP already used.'}, status=status.HTTP_400_BAD_REQUEST)
         return Response({'code': otp.code_plain})
 
+    @action(detail=True, methods=['post'], url_path='otp/verify')
     @extend_schema(
         tags=["Orders"],
         summary="Verify OTP and complete order",
-        request=inline_serializer(
-            name='VerifyOTPRequest', 
-            fields={'code': drf_serializers.CharField()}
-        ),
+        request=inline_serializer(name='VerifyOTPRequest', fields={'code': drf_serializers.CharField()}),
         responses={
-            200: inline_serializer(
-                name='VerifyOTPResponse', 
-                fields={'detail': drf_serializers.CharField()}
-            ),
+            200: inline_serializer(name='VerifyOTPResponse', fields={'detail': drf_serializers.CharField()}),
             400: OpenApiResponse(description="Invalid code or already used"),
-            404: OpenApiResponse(description="Order or OTP not found"),
-            409: OpenApiResponse(description="Order is being processed by another request"),
+            404: OpenApiResponse(description="No OTP"),
         },
         parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
         description="Verify the OTP using JSON body { code: '123456' }. Authorization: Bearer JWT required.",
     )
-    @action(detail=True, methods=['post'], url_path='otp/verify')
     def verify_otp(self, request, pk=None):
         """POST /api/orders/{id}/otp/verify/ - Verify OTP and complete order"""
-        start_time = timezone.now()
-        logger.info(f"OTP verification started for order {pk}")
-        
+        order = get_object_or_404(self.get_queryset(request), pk=pk)
+        code = str(request.data.get('code', '')).strip()
+        if not code:
+            return Response({'detail': 'Code is required.'}, status=status.HTTP_400_BAD_REQUEST)
         try:
-            code = str(request.data.get('code', '')).strip()
-            if not code:
-                return Response(
-                    {'detail': 'Code is required.'}, 
-                    status=status.HTTP_400_BAD_REQUEST
-                )
+            otp = order.otp
+        except OrderOTP.DoesNotExist:
+            return Response({'detail': 'No OTP for this order.'}, status=status.HTTP_400_BAD_REQUEST)
+        if otp.is_used:
+            return Response({'detail': 'OTP already used.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not otp.check_code(code):
+            return Response({'detail': 'Invalid code.'}, status=status.HTTP_400_BAD_REQUEST)
+        otp.is_used = True
+        otp.save(update_fields=['is_used', 'updated_at'])
+        order.status = 'completed'
+        order.save(update_fields=['status'])
+        return Response({'detail': 'OTP verified. Order completed.'})
 
-            with transaction.atomic():
-                # FIXED: Single optimized query with row locking
-                try:
-                    order = Order.objects.select_related('otp').select_for_update(
-                        nowait=True  # Fail fast instead of waiting for lock
-                    ).get(pk=pk)
-                except Order.DoesNotExist:
-                    logger.warning(f"Order {pk} not found during OTP verification")
-                    return Response(
-                        {'detail': 'Order not found.'}, 
-                        status=status.HTTP_404_NOT_FOUND
-                    )
-                except DatabaseError as e:
-                    # Lock already held by another request
-                    logger.warning(f"Order {pk} is locked by another request: {e}")
-                    return Response(
-                        {'detail': 'Order is being processed. Please try again.'}, 
-                        status=status.HTTP_409_CONFLICT
-                    )
-
-                # Access OTP (already loaded via select_related)
-                try:
-                    otp = order.otp
-                except OrderOTP.DoesNotExist:
-                    logger.warning(f"No OTP found for order {pk}")
-                    return Response(
-                        {'detail': 'No OTP for this order.'}, 
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-
-                if otp.is_used:
-                    logger.warning(f"OTP already used for order {pk}")
-                    return Response(
-                        {'detail': 'OTP already used.'}, 
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-
-                # Verify code
-                try:
-                    valid = otp.check_code(code)
-                except Exception as e:
-                    logger.exception(f"Error checking OTP for order {pk}: {e}")
-                    return Response(
-                        {'detail': 'Internal error verifying code.'}, 
-                        status=status.HTTP_500_INTERNAL_SERVER_ERROR
-                    )
-
-                if not valid:
-                    logger.warning(f"Invalid OTP code provided for order {pk}")
-                    return Response(
-                        {'detail': 'Invalid code.'}, 
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-
-                # Mark used & complete atomically
-                otp.is_used = True
-                otp.save(update_fields=['is_used', 'updated_at'])
-
-                order.status = 'completed'
-                order.save(update_fields=['status', 'updated_at'])
-
-            elapsed = (timezone.now() - start_time).total_seconds()
-            logger.info(f"OTP verification completed for order {pk} in {elapsed:.2f}s")
-            
-            return Response({'detail': 'OTP verified. Order completed.'})
-            
-        except Exception as exc:
-            elapsed = (timezone.now() - start_time).total_seconds()
-            logger.exception(f"Unexpected error verifying OTP for order {pk} after {elapsed:.2f}s: {exc}")
-            return Response(
-                {'detail': 'Internal server error.'}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-
+    @extend_schema(
+        tags=["Orders"],
+        summary="Cancel pending order",
+        responses={204: OpenApiResponse(description="Cancelled"), 400: OpenApiResponse(description="Only pending can be cancelled")},
+        parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
+        description="Delete an order only if it is pending. Authorization: Bearer JWT required.",
+    )
     def destroy(self, request, pk=None):
         """DELETE /api/orders/{id}/ - Cancel a pending order"""
         order = get_object_or_404(Order, pk=pk)
-        
         if order.status != 'pending':
-            return Response(
-                {"detail": "Only pending orders can be cancelled"}, 
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+            return Response({"detail": "Only pending orders can be cancelled"}, status=status.HTTP_400_BAD_REQUEST)
         order.delete()
-        logger.info(f"Order {pk} deleted")
         return Response(status=status.HTTP_204_NO_CONTENT)
     
     @action(detail=False, methods=['get'], url_path='recent')
@@ -539,14 +420,14 @@ class OrderViewset(viewsets.ViewSet):
         if since_param:
             try:
                 since = timezone.datetime.fromisoformat(since_param.replace('Z', '+00:00'))
-            except (ValueError, AttributeError):
+            except:
                 since = timezone.now() - timedelta(seconds=30)
         else:
             since = timezone.now() - timedelta(seconds=30)
         
         # Check BOTH created_at AND updated_at
         queryset = self.get_queryset(request).filter(
-            Q(created_at__gt=since) | Q(updated_at__gt=since)
+            models.Q(created_at__gt=since) | models.Q(updated_at__gt=since)
         )
         
         serializer = self.serializer_class(queryset, many=True)
@@ -556,26 +437,21 @@ class OrderViewset(viewsets.ViewSet):
     @extend_schema(
         tags=["Orders"],
         summary="Send pickup reminder (triggers notification on client)",
-        responses={
-            200: OpenApiResponse(description="Reminder triggered"),
-            400: OpenApiResponse(description="Order not ready"),
-            404: OpenApiResponse(description="Order not found")
-        }
+        responses={200: OpenApiResponse(description="Reminder triggered")}
     )
     def send_reminder(self, request, pk=None):
         """POST /api/orders/{id}/send-reminder/ - Staff triggers a reminder"""
-        order = get_object_or_404(self.get_queryset(request), pk=pk)
+        order = get_object_or_404(self.get_queryset(request), pk=pk) # Use queryset (clients only get reminders for their own orders)
         
         if order.status != 'ready':
             return Response(
-                {'detail': 'Can only send reminders for ready orders'},
+                {'detail': 'Can only remind for ready orders'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Update the order's updated_at timestamp to trigger polling
+        # Just update the order's updated_at timestamp to trigger polling
         order.save(update_fields=['updated_at'])
         
-        logger.info(f"Reminder sent for order {pk}")
         return Response({'detail': 'Reminder sent'})
 
 class CartViewset(viewsets.GenericViewSet):
