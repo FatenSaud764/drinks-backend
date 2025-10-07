@@ -379,7 +379,7 @@
   padding: 0.125rem 0.5rem;
   border-radius: 12px;
   width: fit-content;
-  border: 1px solid var(--border-color);
+  border: none;
 }
 
 .price-cell {

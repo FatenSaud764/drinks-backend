@@ -92,7 +92,7 @@ const OrdersPage = () => {
 
       intervalRef.current = setInterval(() => {
         fetchOrders(false)
-      }, 5000)
+      }, 6000)
 
       return () => {
         if (intervalRef.current) {

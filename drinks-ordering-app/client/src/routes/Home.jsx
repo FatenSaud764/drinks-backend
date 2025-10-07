@@ -31,10 +31,13 @@ const Home = () => {
     }
   };
 
-  useEffect(()=>{
-    GetOrderData();
-  },[]
-  )
+  useEffect(() => {
+    GetOrderData(); // Always fetch products
+    const interval = setInterval(() => {
+      GetData();
+    }, 5000)
+    return () => clearInterval(interval);
+  }, [])
 
   console.log('drinks', products)
 
@@ -81,7 +84,7 @@ const Home = () => {
   var statusColor = getStatusColor('preparing');
 
   if(sortedOrders.length>0){
-  let statusColor = getStatusColor(sortedOrders[0].status)
+    let statusColor = getStatusColor(sortedOrders[0].status)
   }
 
 
@@ -95,7 +98,7 @@ const Home = () => {
         </div>
         {sortedOrders.length<=0 ? <h3 style={{fontFamily: 'Nunito'}}>You have no active orders!</h3> : <div className='orderrow'>
           <div style={{fontFamily: 'Nunito', fontSize: '17px', fontWeight:'700'}}>Order #{sortedOrders[0].id}</div>
-          <div style={{fontFamily: 'Nunito', fontSize: '17px', border: 'none', borderRadius: '2vh', background: `${statusColor}`, width: '11vh', height: '3vh', display:'flex', justifyContent:'center', justifyItems:'center', color:'white'}}>{sortedOrders[0].status}</div>
+          <div style={{fontFamily: 'Nunito', fontSize: '17px', border: 'none', borderRadius: '2vh', background: `${statusColor}`, width: '11vh', height: '3vh', display:'flex', justifyContent:'center', justifyItems:'center', color:'white', alignContent: 'center', alignItems: 'center'}}>{sortedOrders[0].status}</div>
           </div>}
       </div>
       <div className='carousel-list'>

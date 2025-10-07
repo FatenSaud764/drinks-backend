@@ -5,7 +5,7 @@ import Products from './routes/Products';
 import Cart from './routes/Cart';
 import OrdersPage from './routes/Orders';
 import './index.css';
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useEffect, useState, useRef } from 'react';
 import { LightDark, ProductList, Search, SelectedProduct, Orders, AlcoholicFilter, DrinkCategory, UserCart, SignUpModal, CartItems, LoggedIn } from './contexts/contexts';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { setAuthContext } from './components/Axios';
@@ -42,24 +42,29 @@ const AppContent = () => {
   const [orders, setOrders] = useState([{}]);
   const [cartItems, setCartItems] = useState([])
 
-  let fetchController = null;
+  const fetchControllerRef = useRef(null);
 
   const GetData = async () => {
     // Abort previous request if still running
-    if (fetchController) fetchController.abort();
+    if (fetchControllerRef.current) {
+      fetchControllerRef.current.abort();
+    }
 
-    fetchController = new AbortController();
+    const controller = new AbortController();
+    fetchControllerRef.current = controller;
+
     try {
       const res = await AxiosInstance.get('api/drink/', {
-        signal: fetchController.signal
+        signal: controller.signal,
       });
       setProducts(res.data);
     } catch (err) {
-      if (err.name !== 'CanceledError') {
+      if (err.name !== 'CanceledError' && err.name !== 'AbortError') {
         console.error('Error fetching products:', err);
       }
     }
   };
+
 
 
   const GetCartData = async () => {
@@ -90,6 +95,21 @@ const AppContent = () => {
     return () => clearInterval(interval);
   }, [])
 
+  useEffect(() => {
+  const interval = setInterval(async () => {
+    try {
+      await fetch('https://drinks-backend-ojv2.onrender.com/api/ping/')
+  .then(res => res.text())
+  .then(console.log)
+  .catch(console.error);
+      // console.log('Pinged backend to stay awake');
+    } catch (err) {
+      console.error('Ping failed:', err);
+    }
+  }, 5000); // every 5 minutes
+
+  return () => clearInterval(interval);
+}, []);
 
   useEffect(() => {
     if (isLoggedIn && accessToken && accessToken !== 'null') {

@@ -61,6 +61,19 @@ function App() {
     };
   }, [isMobile, isSidebarOpen]);
 
+  useEffect(() => {
+  const interval = setInterval(async () => {
+    try {
+      await fetch('https://drinks-backend-ojv2.onrender.com/api/ping/');
+      // console.log('Pinged backend to stay awake');
+    } catch (err) {
+      console.error('Ping failed:', err);
+    }
+  }, 5 * 60 * 1000); // every 5 minutes
+
+  return () => clearInterval(interval);
+}, []);
+
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };

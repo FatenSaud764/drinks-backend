@@ -76,19 +76,17 @@ WSGI_APPLICATION = 'barbackend.wsgi.application'
 DATABASES = {
     "default": dj_database_url.config(
         default="postgresql://postgres.lrbmdxrikfwrxgsawgwi:barpasssamus@aws-1-eu-west-2.pooler.supabase.com:5432/postgres",
-        conn_max_age=600, 
+        conn_max_age=0,  # ← CHANGED: Don't persist connections (critical for pooler)
         conn_health_checks=True,
         ssl_require=True,
     )
 }
 
-# Add connection options separately
+# Improved connection options
 DATABASES['default']['OPTIONS'] = {
     'connect_timeout': 10,
-    'keepalives': 1,
-    'keepalives_idle': 30,
-    'keepalives_interval': 10,
-    'keepalives_count': 5,
+    'options': '-c statement_timeout=30000',  # 30 second query timeout
+    # Remove keepalives - they conflict with Supabase's pooler
 }
 
 # Use SQLite for tests to avoid external DB dependency

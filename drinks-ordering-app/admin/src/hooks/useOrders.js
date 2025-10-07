@@ -161,7 +161,7 @@ export const useActiveOrders = () => {
     // Set up polling every 2 seconds
     intervalRef.current = setInterval(() => {
       fetchActiveOrders(false); // Don't show loading for background polls
-    }, 2000);
+    }, 5000);
 
     // Cleanup interval on unmount
     return () => {

@@ -16,7 +16,6 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import *
 from rest_framework.routers import DefaultRouter
 from django.conf import settings
 from django.conf.urls.static import static
@@ -25,6 +24,8 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from .views import ping, DrinkViewset, OrderViewset, CartViewset, AuthViewset, StaffUserViewset
+
 
 router = DefaultRouter()
 router.register('drink', DrinkViewset, basename='drink')
@@ -45,6 +46,7 @@ urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('api/ping/', ping, name='ping'),
 ]
 
 if settings.DEBUG:
