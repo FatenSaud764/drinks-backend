@@ -13,6 +13,30 @@
     margin-top: 1vh;
 }
 
+.orderwrapper{
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+    border: 2px solid rgb(221, 209, 209);
+    width: 85%;
+    height: auto;
+    min-height: 12vh;
+    padding-top: 2vh;
+    border-radius: 1.5vh;
+    padding-left: 2.5vh;
+}
+
+.orderrow{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    align-content: center;
+    height: 4vh;
+    width: 93%;
+    font-family: 'Nunito' !important;
+}
+
 .drinkimg{
     object-fit: cover;
     width: 100%;
@@ -60,7 +84,7 @@
     display: flex;
     align-items: center;
     align-content: center;
-    width: 88%;
+    width: 98%;
     margin-top: -1vh;
     height: auto;
     min-height: 29vh;
@@ -77,6 +101,7 @@
     height: auto !important;
 }
 
+
 .category-header{
     display: flex;
     flex-direction: row;
@@ -88,8 +113,8 @@
 }
 
 .category-button{
-    height: 4vh;
-    width: 4vh;
+    height: 3.5vh;
+    width: 3.5vh;
     cursor: pointer !important;
     color:#F59E0B;
     align-items: center;
@@ -109,6 +134,8 @@
     object-fit: cover;
     height: 22vh !important;
     width: 19vh !important;
+    border-radius: 2vh;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
 }
 
 .drink-name{

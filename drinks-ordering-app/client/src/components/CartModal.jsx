@@ -20,7 +20,7 @@ const CartModal = () => {
 
   return (
     <div className='cartmodalwrapper'>
-        <SiTicktick />
+      <SiTicktick />
       <div className='addednotif'>Successfully added drink(s) to cart!</div>
     </div>
   )

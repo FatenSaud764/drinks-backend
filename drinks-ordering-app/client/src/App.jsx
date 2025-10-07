@@ -61,6 +61,7 @@ const AppContent = () => {
     }
   };
 
+
   const GetCartData = async () => {
     if (!accessToken || accessToken === 'null') return;
 
@@ -85,9 +86,10 @@ const AppContent = () => {
     GetData(); // Always fetch products
     const interval = setInterval(() => {
       GetData();
-    }, 5000)
+    }, 7000)
     return () => clearInterval(interval);
   }, [])
+
 
   useEffect(() => {
     if (isLoggedIn && accessToken && accessToken !== 'null') {

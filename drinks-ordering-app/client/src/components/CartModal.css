@@ -1,25 +1,26 @@
 .cartmodalwrapper {
-  display: grid;
-  grid-template-columns: 3vh 70vw;
-  column-gap: 0.1vh;
+  display: flex;
+  flex-direction: row;
+  gap: 1vh;
   position: fixed;
-  position: top;
-  left: 50%;
-  /* Center horizontally */
-  transform: translateX(-50%);
-  /* Center adjustment */
+  top: 0vh;
+  left: 0;
+  right: 0;
   width: 88vw;
-  height: 3.5vh;
+  height: 4vh;
   background: #2563EB;
   align-items: center;
   text-align: center;
   color: white;
   border: 2px solid white;
-  border-radius: 1vw;
+  border-radius: 1vh;
   margin-top: 11vh;
   align-content: center;
   align-items: center;
   padding-left: 2.4vh;
+  margin-left: auto;
+  margin-right: auto;
+  background-clip: padding-box;
 }
 
 .addednotif {
@@ -30,11 +31,12 @@
   font-family: 'Roboto Slab';
   width: 70vw;
   height: 4vh;
-  font-size: 2vh;
+  font-size: 16px;
+  font-weight: 500;
 }
 
 @media (max-width: 768px) {
   .addednotif {
-    font-size: 0.8rem;
+    font-size: 16px;
   }
 }

@@ -151,7 +151,7 @@ const OrdersPage = () => {
       case 'preparing':
         return '#3b82f6'
       case 'ready':
-        return '#10b981'
+        return '#28a745'
       default:
         return '#6b7280'
     }
