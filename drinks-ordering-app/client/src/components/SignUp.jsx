@@ -28,6 +28,7 @@ const SignUp = () => {
               try{
               await AxiosInstance.post('api/auth/register/', {"username": user.current.value.trim(), "email": mail.current.value.trim(), "role": "customer", "password": pass.current.value.trim()});
               alert("User created successfully!");
+              setSignUpModal(false);
               }
               catch (error) {
   const errors = error.response?.data;

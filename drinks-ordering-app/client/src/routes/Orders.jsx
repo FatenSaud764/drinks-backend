@@ -4,6 +4,7 @@ import { LightDark, ProductList } from '../contexts/contexts'
 import { useAuth } from '../contexts/AuthContext'
 import './Orders.css'
 import AxiosInstance from '../components/Axios'
+import { useCallback } from 'react'
 
 const OrdersPage = () => {
   const { theme } = useContext(LightDark)
@@ -29,6 +30,7 @@ const OrdersPage = () => {
       setError(null)
       
       const res = await AxiosInstance.get('/api/orders/')
+      console.log('Fetched orders:', res.data)
       
       const sortedOrders = res.data.sort((a, b) => {
         const dateA = new Date(a.created_at || a.date)
@@ -46,17 +48,18 @@ const OrdersPage = () => {
   }
 
   // This function fetches the OTP for a given order ID
-  const fetchOrderOtp = async (orderId) => {
+  const fetchOrderOtp = useCallback(async (orderId) => {
     try {
+      setSelectedOrderId(orderId)
+      setOtpVisible(true)
       setOtpLoading(true)
       setOtpError(null)
-      
+      setFetchedOtp(null)
+
       const res = await AxiosInstance.get(`/api/orders/${orderId}/otp/`)
   
 
       setFetchedOtp(res.data.code)
-      setSelectedOrderId(orderId)
-      setOtpVisible(true)
 
       return res.data
     } catch (err) {
@@ -66,7 +69,7 @@ const OrdersPage = () => {
     } finally {
       setOtpLoading(false)
     }
-  }
+  },[])
 
   const cancelOrder = async (orderId) => {
     try {
@@ -104,7 +107,14 @@ const OrdersPage = () => {
         clearInterval(intervalRef.current)
       }
     }
-  }, [isLoggedIn])
+  }, [isLoggedIn, selectedOrderId, otpVisible])
+
+  useEffect(() => {
+    const order = orders.find(order => order.id === selectedOrderId)
+    if(order) {
+      if(order.status?.toLowerCase()==='completed'){setOtpVisible(false)}
+    }
+  }, [orders, selectedOrderId])
 
   useEffect(() => {
     return () => {
@@ -113,6 +123,8 @@ const OrdersPage = () => {
       }
     }
   }, [])
+
+  console.log('visible', otpVisible);
 
   const getProductName = (drinkId) => {
     if (!products || products.length === 0) {
