@@ -61,15 +61,18 @@ function App() {
     };
   }, [isMobile, isSidebarOpen]);
 
-  useEffect(() => {
-  const interval = setInterval(async () => {
-    try {
-      await fetch('https://drinks-backend-ojv2.onrender.com/api/ping/');
-      // console.log('Pinged backend to stay awake');
-    } catch (err) {
-      console.error('Ping failed:', err);
-    }
-  }, 5 * 60 * 1000); // every 5 minutes
+   useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        await fetch('https://drinks-backend-ojv2.onrender.com/api/ping/')
+    .then(res => res.text())
+    .then(console.log)
+    .catch(console.error);
+        // console.log('Pinged backend to stay awake');
+      } catch (err) {
+        console.error('Ping failed:', err);
+      }
+    }, 5000);
 
   return () => clearInterval(interval);
 }, []);

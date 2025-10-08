@@ -34,6 +34,7 @@ const Products = () => {
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
 
+
   const fuse = useMemo(() => {
     return new Fuse(products, {
       keys: keys,
@@ -88,10 +89,14 @@ const addToCart = async (e) => {
     }
   }
 
-  // Save to localStorage whenever cartItems changes
+
   useEffect(() => {
     fetchdata();
   }, [accessToken, isLoggedIn])
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   return (
     <div className='prodwrapper' id={theme}>

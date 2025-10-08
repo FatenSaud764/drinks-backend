@@ -35,3 +35,7 @@
     border: none;
     font-family: 'Lilita One';
 }
+
+.selectcategory:focus{
+    outline: none;
+}
