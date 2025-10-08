@@ -93,7 +93,7 @@ const Home = () => {
     <div className='homewrapper' id={theme}>
       <NavBar />
       <div className='greeting'>Welcome back {user?user.username:''}!</div>
-      <div className='orderwrapper' role='button' tabIndex={0}>
+      <div className='orderwrapper' role='button' tabIndex={0} onClick={() => {navigate('/orders')}}>
         <div className='orderrow'>
           <div style={{fontFamily:'Nunito', fontSize:'20px', fontWeight: '800'}}>Your latest order:</div>
         </div>
