@@ -1,0 +1,27 @@
+.notification-motion-div {
+  position: absolute;
+  background: white;
+  border: solid 2px #2563EB;
+  border-radius: 30vh;
+  top: 100px;
+  left: 10vw;
+  width: 80vw;
+  height: 4vh;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.close-notif-btn {
+  position: absolute;
+  right: 1vw;
+  top: 0.5vh;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.close-notif-btn:hover {
+  color: #F59E0B;
+}
