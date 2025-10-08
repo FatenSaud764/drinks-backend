@@ -78,7 +78,7 @@
 
 .item-name {
   font-weight: bold;
-  font-size: 2.2vh;
+  font-size: 19px !important;
   margin-bottom: 1vh;
   font-family: 'Roboto Slab', serif;
 }
@@ -282,7 +282,8 @@
   width: 80vw;
   height:13vh;
   cursor: pointer;
-  font-family: 'Lalita One';
+  font-family: 'Nunito';
+  font-size: 18px;
   resize: none;
 }
 

@@ -11,7 +11,7 @@
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: 12px;
+  gap: 20px;
   padding: var(--nav-py, 10px) var(--nav-px, 16px) !important;
 }
 
@@ -22,13 +22,12 @@
 .brand {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-weight: 800;
-  font-size: 1.15rem;
-  letter-spacing: 0.2px;
+  font-weight: 500;
+  font-size: 19px;
+  letter-spacing: 0.3px;
   color: white;
   text-decoration: none;
-  margin-left: 60px;
+  margin-left: -20px !important;
 }
 
 .nav-left {

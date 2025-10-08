@@ -4,7 +4,7 @@ import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { DrinkCategory, LightDark, Orders, ProductList } from '../contexts/contexts'
 import NavBar from '../components/NavBar';
 import { useAuth } from '../contexts/AuthContext';
-import { getDrinkImage , DRINK_CATEGORIES, DRINK_CATEGORY_IMAGES} from '../../../packages/shared/types';
+import {DRINK_CATEGORIES} from '../../../packages/shared/types';
 import AxiosInstance from '../components/Axios';
 import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
@@ -51,7 +51,7 @@ const Home = () => {
     swipeToSlide: true,
     infinite: true,
     autoplay: true,
-    autoplaySpeed:3000,
+    autoplaySpeed:2000,
     slidesToShow: 2,
     slidesToScroll: 1,
     arrows: false,
