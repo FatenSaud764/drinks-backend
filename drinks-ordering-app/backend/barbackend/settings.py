@@ -126,16 +126,19 @@ CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5173",     # Client app
-    "http://localhost:5174",     # Admin app - ADD THIS
+    "http://localhost:5174", 
+    "http://localhost:5179",     # Admin app - ADD THIS
     "http://127.0.0.1:5173",
-    "http://127.0.0.1:5174",     # Admin app - ADD THIS
+    "http://127.0.0.1:5174",  
+    "http://127.0.0.1:5179",   # Admin app - ADD THIS
     "https://drinks-backend-ojv2.onrender.com",
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     "https://drinks-backend-ojv2.onrender.com",
     "http://localhost:5173",
-    "http://localhost:5174",     # Admin app - ADD THIS
+    "http://localhost:5174",
+    "http://localhost:5179",     # Admin app - ADD THIS
 ]
 # OTP
 OTP_CODE_LENGTH = 6
