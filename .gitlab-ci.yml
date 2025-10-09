@@ -35,5 +35,31 @@ backend-django-tests:
       -e SUPABASE_BUCKET_NAME=${SUPABASE_BUCKET_NAME:-dummy-bucket} \
       barbackend-tests:ci
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-    - if: $CI_COMMIT_BRANCH
+    # Only attempt DinD when not running under Kubernetes (where privileged DinD might be disabled)
+    - if: $KUBERNETES_SERVICE_HOST == null
+
+
+# Fallback: Run Django tests directly without Docker build/run (works on Kubernetes executors)
+backend-django-tests-direct:
+  image: python:3.13-slim
+  stage: test
+  tags:
+    - shared-docker-runner
+  variables:
+    DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-dummy-secret}
+    DJANGO_SETTINGS_MODULE: barbackend.settings_test
+    USE_SQLITE_FOR_TESTS: "1"
+    USE_LOCAL_FILE_STORAGE: "1"
+    PIP_DISABLE_PIP_VERSION_CHECK: "1"
+    PYTHONDONTWRITEBYTECODE: "1"
+    PYTHONUNBUFFERED: "1"
+  before_script:
+    - set -euo pipefail
+    - apt-get update && apt-get install -y --no-install-recommends build-essential libpq-dev && rm -rf /var/lib/apt/lists/*
+    - pip install --no-cache-dir -r drinks-ordering-app/backend/requirements.txt
+  script:
+    - cd drinks-ordering-app/backend
+    - python manage.py test -v 2
+  rules:
+    # Prefer this path on Kubernetes (no Docker daemon needed)
+    - if: $KUBERNETES_SERVICE_HOST
