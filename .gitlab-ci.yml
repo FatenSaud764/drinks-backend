@@ -1,65 +1,42 @@
-image: docker:25.0.3
-
-services:
-  - name: docker:25.0.3-dind
-    command: ["--tls=false"]
+image: python:3.13-slim
 
 variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
-  DOCKER_HOST: tcp://docker:2375
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_NO_CACHE_DIR: "0"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
 stages:
   - test
 
-# Runs Django tests using the backend's Dockerfile
+# Runs Django tests directly in a Python environment (no Docker-in-Docker)
 backend-django-tests:
   stage: test
   tags:
     - shared-docker-runner
-  script:
-    - set -euo pipefail
-    - cd drinks-ordering-app/backend
-    # Build the test image from backend context using the Dockerfile in barbackend/
-    - docker build -f barbackend/Dockerfile -t barbackend-tests:ci .
-    # Run tests inside the container. We pass minimal env so settings load without external deps.
-    - >-
-      docker run --rm \
-      -e DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dummy-secret} \
-      -e DEBUG=1 \
-      -e DJANGO_SETTINGS_MODULE=barbackend.settings_test \
-      -e USE_LOCAL_FILE_STORAGE=1 \
-      -e USE_SQLITE_FOR_TESTS=1 \
-      -e SUPABASE_URL=${SUPABASE_URL:-http://example.invalid} \
-      -e SUPABASE_KEY=${SUPABASE_KEY:-dummy-key} \
-      -e SUPABASE_BUCKET_NAME=${SUPABASE_BUCKET_NAME:-dummy-bucket} \
-      barbackend-tests:ci
-  rules:
-    # Only attempt DinD when not running under Kubernetes (where privileged DinD might be disabled)
-    - if: $KUBERNETES_SERVICE_HOST == null
-
-
-# Fallback: Run Django tests directly without Docker build/run (works on Kubernetes executors)
-backend-django-tests-direct:
-  image: python:3.13-slim
-  stage: test
-  tags:
-    - shared-docker-runner
-  variables:
-    DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-dummy-secret}
-    DJANGO_SETTINGS_MODULE: barbackend.settings_test
-    USE_SQLITE_FOR_TESTS: "1"
-    USE_LOCAL_FILE_STORAGE: "1"
-    PIP_DISABLE_PIP_VERSION_CHECK: "1"
-    PYTHONDONTWRITEBYTECODE: "1"
-    PYTHONUNBUFFERED: "1"
+  cache:
+    key: "$CI_JOB_NAME"
+    paths:
+      - .cache/pip
   before_script:
     - set -euo pipefail
-    - apt-get update && apt-get install -y --no-install-recommends build-essential libpq-dev && rm -rf /var/lib/apt/lists/*
-    - pip install --no-cache-dir -r drinks-ordering-app/backend/requirements.txt
+    - python --version
+    - pip --version
+    - python -m pip install --upgrade pip setuptools wheel
+    - pip install -r drinks-ordering-app/backend/requirements.txt
   script:
     - cd drinks-ordering-app/backend
+    - export DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dummy-secret}
+    - export DJANGO_SETTINGS_MODULE=barbackend.settings_test
+    - export USE_SQLITE_FOR_TESTS=1
+    - export USE_LOCAL_FILE_STORAGE=1
     - python manage.py test -v 2
+  artifacts:
+    when: always
+    paths:
+      - drinks-ordering-app/backend/test_db.sqlite3
+    expire_in: 1 week
   rules:
-    # Prefer this path on Kubernetes (no Docker daemon needed)
-    - if: $KUBERNETES_SERVICE_HOST
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: on_success
+    - if: $CI_COMMIT_BRANCH
+      when: on_success
