@@ -1,0 +1,39 @@
+image: docker:25.0.3
+
+services:
+  - name: docker:25.0.3-dind
+    command: ["--tls=false"]
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+  DOCKER_HOST: tcp://docker:2375
+
+stages:
+  - test
+
+# Runs Django tests using the backend's Dockerfile
+backend-django-tests:
+  stage: test
+  tags:
+    - shared-docker-runner
+  script:
+    - set -euo pipefail
+    - cd drinks-ordering-app/backend
+    # Build the test image from backend context using the Dockerfile in barbackend/
+    - docker build -f barbackend/Dockerfile -t barbackend-tests:ci .
+    # Run tests inside the container. We pass minimal env so settings load without external deps.
+    - >-
+      docker run --rm \
+      -e DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dummy-secret} \
+      -e DEBUG=1 \
+      -e DJANGO_SETTINGS_MODULE=barbackend.settings_test \
+      -e USE_LOCAL_FILE_STORAGE=1 \
+      -e USE_SQLITE_FOR_TESTS=1 \
+      -e SUPABASE_URL=${SUPABASE_URL:-http://example.invalid} \
+      -e SUPABASE_KEY=${SUPABASE_KEY:-dummy-key} \
+      -e SUPABASE_BUCKET_NAME=${SUPABASE_BUCKET_NAME:-dummy-bucket} \
+      barbackend-tests:ci
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
