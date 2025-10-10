@@ -17,6 +17,7 @@ import {
 } from '../utils/OrderUtils';
 import { ORDER_STATUSES } from 'shared/types';
 import { useOrderHistory } from '../hooks/useOrders';
+import { useInventory } from '../hooks/useInventory';
 // Notifications
 import { useSnackbar } from '../contexts/SnackbarContext'; // Snackbar notifications
 import { toast } from 'react-toastify'; // Keep for client-side notifications
@@ -30,6 +31,8 @@ const HistoryPage = () => {
     restoreOrder,
     clearError
   } = useOrderHistory();
+
+  const { drinks, loading: drinksLoading } = useInventory();
 
   const { showSnackbar } = useSnackbar();
 
@@ -75,13 +78,13 @@ const HistoryPage = () => {
   ));
   const statusOptions = ['all', 'completed', 'cancelled'];
 
-  if (loading) {
+  if (loading || drinksLoading) {
     return (
       <div className="page">
         <div className="page-container">
           <div className="page-header">
             <h1>Order History</h1>
-            <p>Loading order history...</p>
+            <p>Loading {loading && drinksLoading ? 'order history and menu items' : loading ? 'order history' : 'menu items'}...</p>
           </div>
 
           <FilterControls
@@ -180,6 +183,8 @@ const HistoryPage = () => {
                 onUpdateStatus={handleRestoreOrder}
                 isHistory={true}
                 loading={loading}
+                drinks={drinks}
+                drinksLoading={drinksLoading}
               />
             ))
           )}
