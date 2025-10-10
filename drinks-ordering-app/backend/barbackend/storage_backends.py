@@ -1,7 +1,9 @@
 """
 Production-ready custom storage backend for Supabase Storage
+Falls back to local FileSystemStorage when USE_LOCAL_FILE_STORAGE=1 (for tests/CI).
 """
-from django.core.files.storage import Storage
+import os
+from django.core.files.storage import Storage, FileSystemStorage
 from django.core.files.base import ContentFile
 from supabase import create_client, Client
 from decouple import config
@@ -14,8 +16,13 @@ class SupabaseStorage(Storage):
     """
 
     def __init__(self):
-        self.supabase_url = config("SUPABASE_URL")
-        self.supabase_key = config("SUPABASE_KEY")
+        self.use_local = os.getenv("USE_LOCAL_FILE_STORAGE") == "1"
+        if self.use_local:
+            self.local_storage = FileSystemStorage()
+            return
+        # Only read Supabase config if not using local storage
+        self.supabase_url = config("SUPABASE_URL", default="http://example.invalid")
+        self.supabase_key = config("SUPABASE_KEY", default="invalid-key")
         self.bucket_name = config("SUPABASE_BUCKET_NAME", default="drink-images")
         self.supabase: Client = create_client(self.supabase_url, self.supabase_key)
 
@@ -27,6 +34,9 @@ class SupabaseStorage(Storage):
         Return the file URL.
         If signed=True, generate a temporary signed URL (for private buckets)
         """
+        if self.use_local:
+            # Local storage just returns a path; during tests URLs are not critical
+            return self.local_storage.url(name)
         if signed:
             data = self.supabase.storage.from_(self.bucket_name).create_signed_url(name, expires_in)
             return data.get('signedUrl')
@@ -35,6 +45,12 @@ class SupabaseStorage(Storage):
 
     def _file_exists(self, name):
         """Check if a file exists in Supabase Storage"""
+        if self.use_local:
+            try:
+                # FileSystemStorage 'exists' is available
+                return self.local_storage.exists(name)
+            except Exception:
+                return False
         try:
             files = self.supabase.storage.from_(self.bucket_name).list()
             return any(file['name'] == name for file in files)
@@ -48,6 +64,9 @@ class SupabaseStorage(Storage):
         """Save file to Supabase Storage"""
         file_content = content.read()
         content_type = getattr(content, 'content_type', 'application/octet-stream')
+
+        if self.use_local:
+            return self.local_storage._save(name, ContentFile(file_content))
 
         try:
             # Delete if exists to avoid upload conflict
@@ -66,6 +85,8 @@ class SupabaseStorage(Storage):
 
     def _open(self, name, mode='rb'):
         """Retrieve file from Supabase Storage"""
+        if self.use_local:
+            return self.local_storage._open(name, mode)
         try:
             data = self.supabase.storage.from_(self.bucket_name).download(name)
             return ContentFile(data)
@@ -74,6 +95,13 @@ class SupabaseStorage(Storage):
 
     def delete(self, name):
         """Delete file from Supabase Storage"""
+        if self.use_local:
+            try:
+                if self.local_storage.exists(name):
+                    self.local_storage.delete(name)
+            except Exception as e:
+                print(f"Failed to delete file '{name}': {str(e)}")
+            return
         try:
             if self._file_exists(name):
                 self.supabase.storage.from_(self.bucket_name).remove([name])
@@ -82,14 +110,26 @@ class SupabaseStorage(Storage):
 
     def exists(self, name):
         """Check if file exists"""
+        if self.use_local:
+            try:
+                return self.local_storage.exists(name)
+            except Exception:
+                return False
         return self._file_exists(name)
 
     def url(self, name):
         """Return public URL for the file"""
+        if self.use_local:
+            return self.local_storage.url(name)
         return self._get_file_url(name, signed=False)
 
     def size(self, name):
         """Return size of file (bytes)"""
+        if self.use_local:
+            try:
+                return self.local_storage.size(name)
+            except Exception:
+                return 0
         try:
             files = self.supabase.storage.from_(self.bucket_name).list()
             for file in files:

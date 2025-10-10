@@ -1,0 +1,42 @@
+image: python:3.13-slim
+
+variables:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_NO_CACHE_DIR: "0"
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+
+stages:
+  - test
+
+# Runs Django tests directly in a Python environment (no Docker-in-Docker)
+backend-django-tests:
+  stage: test
+  tags:
+    - shared-docker-runner
+  cache:
+    key: "$CI_JOB_NAME"
+    paths:
+      - .cache/pip
+  before_script:
+    - set -euo pipefail
+    - python --version
+    - pip --version
+    - python -m pip install --upgrade pip setuptools wheel
+    - pip install -r drinks-ordering-app/backend/requirements.txt
+  script:
+    - cd drinks-ordering-app/backend
+    - export DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY:-dummy-secret}
+    - export DJANGO_SETTINGS_MODULE=barbackend.settings_test
+    - export USE_SQLITE_FOR_TESTS=1
+    - export USE_LOCAL_FILE_STORAGE=1
+    - python manage.py test -v 2
+  artifacts:
+    when: always
+    paths:
+      - drinks-ordering-app/backend/test_db.sqlite3
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: on_success
+    - if: $CI_COMMIT_BRANCH
+      when: on_success
