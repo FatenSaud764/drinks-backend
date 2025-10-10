@@ -28,7 +28,6 @@ const HistoryPage = () => {
     loading,
     error,
     refetch,
-    restoreOrder,
     clearError
   } = useOrderHistory();
 
@@ -53,25 +52,6 @@ const HistoryPage = () => {
 
     setFilteredOrders(filtered);
   }, [historyOrders, statusFilter, searchTerm, dateFilter]);
-
-  const handleRestoreOrder = async (orderId) => {
-    try {
-      const order = historyOrders.find(o => o.id === parseInt(orderId));
-      
-      // Only allow restoring cancelled orders
-      if (!order || order.status !== ORDER_STATUSES.CANCELLED) {
-        showSnackbar('Only cancelled orders can be restored', 'error');
-        return;
-      }
-
-      if (window.confirm(`Are you sure you want to restore order ${order.orderNumber || `#${order.id}`} back to active orders?`)) {
-        await restoreOrder(parseInt(orderId));
-        showSnackbar(`Order ${order.orderNumber || `#${order.id}`} restored to active orders`, 'success');
-      }
-    } catch (err) {
-      showSnackbar(`Failed to restore order: ${err.message}`, 'error');
-    }
-  };
 
   const statusCounts = getHistoryOrderStatusCounts(historyOrders.filter(order => 
     [ORDER_STATUSES.COMPLETED, ORDER_STATUSES.CANCELLED].includes(order.status)
@@ -177,10 +157,7 @@ const HistoryPage = () => {
                   completedAt: order.completedAt ? new Date(order.completedAt) : null,
                   cancelledAt: order.cancelledAt ? new Date(order.cancelledAt) : null,
                   orderNumber: order.orderNumber || `#${order.id}`,
-                  // Show restore button only for cancelled orders
-                  canRestore: order.status === ORDER_STATUSES.CANCELLED
                 }}
-                onUpdateStatus={handleRestoreOrder}
                 isHistory={true}
                 loading={loading}
                 drinks={drinks}

@@ -49,21 +49,6 @@ export const useOrders = (filters = {}) => {
     }
   };
 
-  // Restore order
-  const restoreOrder = async (orderId) => {
-    try {
-      setError(null);
-      const restoredOrder = await ordersAPI.restoreOrder(orderId);
-      setOrders(prev => prev.map(order => 
-        order.id === orderId ? { ...order, ...restoredOrder } : order
-      ));
-      return restoredOrder;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  };
-
   // Clear error
   const clearError = () => setError(null);
 
@@ -73,7 +58,6 @@ export const useOrders = (filters = {}) => {
     error,
     refetch: fetchOrders,
     updateOrderStatus,
-    restoreOrder,
     clearError
   };
 };
@@ -243,19 +227,6 @@ export const useOrderHistory = () => {
     };
   }, [fetchOrderHistory]);
 
-  const restoreOrder = async (orderId) => {
-    try {
-      setError(null);
-      const restoredOrder = await ordersAPI.restoreOrder(orderId);
-      // Remove from history since it's now active
-      setOrders(prev => prev.filter(order => order.id !== orderId));
-      return restoredOrder;
-    } catch (err) {
-      setError(err.message);
-      throw err;
-    }
-  };
-
   const clearError = () => setError(null);
 
   return {
@@ -263,7 +234,6 @@ export const useOrderHistory = () => {
     loading,
     error,
     refetch: () => fetchOrderHistory(true), // Manual refresh shows loading
-    restoreOrder,
     clearError
   };
 };
