@@ -11,8 +11,6 @@ const NotificationMonitor = ({ isStaff = false }) => {
     // Prevent duplicate notifications
     if (notifiedOrders.current.has(order.id)) return;
     notifiedOrders.current.add(order.id);
-
-    console.log('New order notification:', order);
     
     toast.info(
       <div 
