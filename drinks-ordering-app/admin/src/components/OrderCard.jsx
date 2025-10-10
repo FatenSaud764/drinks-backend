@@ -179,7 +179,7 @@ const ActiveOrderActions = ({ order, onUpdateStatus }) => {
 };
 
 // ===================================================
-// HISTORY order actions (restore cancelled orders)
+// HISTORY order actions
 // ===================================================
 const HistoryOrderActions = ({ order, onUpdateStatus }) => {
   return (
