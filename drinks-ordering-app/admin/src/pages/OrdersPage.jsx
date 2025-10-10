@@ -143,16 +143,7 @@ const OrdersPage = () => {
   const statusOptions = ['all', 'pending', 'preparing', 'ready'];
   const readyOrdersCount = statusCounts.ready;
 
-  const [artificialLoading, setArtificialLoading] = useState(true);
-  
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setArtificialLoading(false);
-    }, 500);
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (loading || artificialLoading) {
+  if (loading) {
     return (
       <div className="page">
         <div className="page-container">
