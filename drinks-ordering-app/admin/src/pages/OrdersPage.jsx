@@ -20,6 +20,7 @@ import {
 import { ORDER_STATUSES } from 'shared/types';
 import { normaliseOrder } from '../utils/normaliseOrder';
 import { useActiveOrders } from '../hooks/useOrders';
+import { useInventory } from '../hooks/useInventory';
 import "../styles/Loading.css";
 import { useSnackbar } from '../contexts/SnackbarContext';
 
@@ -32,6 +33,8 @@ const OrdersPage = () => {
     updateOrderStatus,
     clearError
   } = useActiveOrders();
+
+  const { drinks, loading: drinksLoading } = useInventory();
 
   const { showSnackbar } = useSnackbar();
 
@@ -51,6 +54,16 @@ const OrdersPage = () => {
       
       return bDate - aDate; // Latest first
     });
+  };
+
+  // Scroll to and highlight order
+  const scrollToOrder = (orderId) => {
+    const element = document.getElementById(`order-${orderId}`);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      element.classList.add('highlight-pulse');
+      setTimeout(() => element.classList.remove('highlight-pulse'), 2000);
+    }
   };
 
   // Filter orders
@@ -126,13 +139,13 @@ const OrdersPage = () => {
   const statusOptions = ['all', 'pending', 'preparing', 'ready'];
   const readyOrdersCount = statusCounts.ready;
 
-  if (loading) {
+  if (loading || drinksLoading) {
     return (
       <div className="page">
         <div className="page-container">
           <div className="page-header">
             <h1>Active Orders</h1>
-            <p>Loading orders...</p>
+            <p>Loading {loading && drinksLoading ? 'orders and menu items' : loading ? 'orders' : 'menu items'}...</p>
           </div>
 
           <FilterControls
@@ -221,6 +234,8 @@ const OrdersPage = () => {
                 order={normaliseOrder(order)}
                 onUpdateStatus={handleUpdateOrderStatus}
                 isHistory={false}
+                drinks={drinks}
+                drinksLoading={drinksLoading}
               />
             ))
           )}

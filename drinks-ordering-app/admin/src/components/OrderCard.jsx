@@ -14,7 +14,6 @@ import {
   getStatusOptions,
   notifyClientReminder
 } from '../utils/OrderUtils';
-import { useInventory } from '../hooks/useInventory';
 import '../styles/OrderCard.css';
 
 // ===================================================
@@ -23,11 +22,10 @@ import '../styles/OrderCard.css';
 const OrderCard = ({ 
   order, 
   onUpdateStatus, 
-  isHistory = false 
+  isHistory = false,
+  drinks = [],
+  drinksLoading = false
 }) => {
-  // Use the inventory hook to get drink data
-  const { drinks, loading: drinksLoading } = useInventory();
-
   // Helper function to get drink details by ID
   const getDrinkById = (drinkId) => {
     return drinks.find(drink => drink.id === drinkId);
