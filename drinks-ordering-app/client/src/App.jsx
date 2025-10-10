@@ -8,6 +8,7 @@ import './index.css';
 import { createContext, useEffect, useState, useRef } from 'react';
 import { LightDark, ProductList, Search, SelectedProduct, Orders, AlcoholicFilter, DrinkCategory, UserCart, SignUpModal, CartItems, LoggedIn } from './contexts/contexts';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { NotificationProvider } from './contexts/NotificationContext';
 import { setAuthContext } from './components/Axios';
 import AxiosInstance from './components/Axios';
 import DrinkInfo from './routes/DrinkInfo';
@@ -140,28 +141,30 @@ const AppContent = () => {
                   <UserCart.Provider value={{ cart, setCart }}>
                     <SignUpModal.Provider value={{ signupmodal, setSignUpModal }}>
                       <CartItems.Provider value={{ cartItems, setCartItems }}>
-                        <Routes>
-                          <Route path='/' element={<Navigate to="/products" replace />} />
-                          <Route path='/login' element={!isLoggedIn || !accessToken || accessToken === 'null' ? <Login /> : <Navigate to="/products" />} />
-                          <Route path='/products' element={<Products />} />
-                          <Route path='/cart' element={
-                            <ProtectedRoute>
-                              <Cart />
-                            </ProtectedRoute>
-                          } />
-                          <Route path='/drinkinfo' element={
-                            <ProtectedRoute>
-                              <DrinkInfo />
-                            </ProtectedRoute>
-                          } />
-                          <Route path='/orders' element={
-                            <ProtectedRoute>
-                              <OrdersPage />
-                            </ProtectedRoute>
-                          } />
-                          <Route path='/home' element={<Home />} />
-                          <Route path='*' element={<NotFound />} />
-                        </Routes>
+                        <NotificationProvider>
+                          <Routes>
+                            <Route path='/' element={<Navigate to="/products" replace />} />
+                            <Route path='/login' element={!isLoggedIn || !accessToken || accessToken === 'null' ? <Login /> : <Navigate to="/products" />} />
+                            <Route path='/products' element={<Products />} />
+                            <Route path='/cart' element={
+                              <ProtectedRoute>
+                                <Cart />
+                              </ProtectedRoute>
+                            } />
+                            <Route path='/drinkinfo' element={
+                              <ProtectedRoute>
+                                <DrinkInfo />
+                              </ProtectedRoute>
+                            } />
+                            <Route path='/orders' element={
+                              <ProtectedRoute>
+                                <OrdersPage />
+                              </ProtectedRoute>
+                            } />
+                            <Route path='/home' element={<Home />} />
+                            <Route path='*' element={<NotFound />} />
+                          </Routes>
+                        </NotificationProvider>
                       </CartItems.Provider>
                     </SignUpModal.Provider>
                   </UserCart.Provider>

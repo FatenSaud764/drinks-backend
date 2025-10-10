@@ -1,19 +1,22 @@
 .notification-motion-div {
-  position: absolute;
-  background: white;
+  position: fixed;
+  color: white;
+  background: #2563EB;
   border: solid 2px #2563EB;
   border-radius: 30vh;
   top: 100px;
-  left: 10vw;
-  width: 80vw;
+  left: 4vw;
+  width: 92vw;
   height: 4vh;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
+  z-index: 900;
 }
 
 .close-notif-btn {
+  color: white;
   position: absolute;
   right: 1vw;
   top: 0.5vh;
