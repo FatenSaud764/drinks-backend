@@ -133,11 +133,15 @@
   padding: 40px 20px;
   font-size: 4.5vw;
   color: #666;
-  font-family: 'Roboto Slab';
+  font-family: 'Nunito' !important;
 }
 
 #dark .loading, #dark .login-message, #dark .no-orders {
   color: white !important;
+}
+
+.no-orders p{
+  font-family: 'Nunito';
 }
 
 .login-message {
