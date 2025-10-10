@@ -43,31 +43,14 @@ const OrdersPage = () => {
   const [pendingCompletionOrder, setPendingCompletionOrder] = useState(null);
   const [pinModalMode, setPinModalMode] = useState('complete');
 
-  // Custom sorting function
+  // Custom sorting function - latest to oldest
   const sortOrders = (ordersToSort) => {
     return [...ordersToSort].sort((a, b) => {
-      if (a.status === ORDER_STATUSES.PENDING && b.status !== ORDER_STATUSES.PENDING) {
-        return -1;
-      }
-      if (b.status === ORDER_STATUSES.PENDING && a.status !== ORDER_STATUSES.PENDING) {
-        return 1;
-      }
-      
       const aDate = new Date(a.createdAt || a.created_at || a.orderTime || 0);
       const bDate = new Date(b.createdAt || b.created_at || b.orderTime || 0);
       
-      return aDate - bDate;
+      return bDate - aDate; // Latest first
     });
-  };
-
-  // Scroll to and highlight order
-  const scrollToOrder = (orderId) => {
-    const element = document.getElementById(`order-${orderId}`);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      element.classList.add('highlight-pulse');
-      setTimeout(() => element.classList.remove('highlight-pulse'), 2000);
-    }
   };
 
   // Filter orders
