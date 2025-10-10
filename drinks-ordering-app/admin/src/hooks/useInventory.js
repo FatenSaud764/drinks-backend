@@ -17,9 +17,6 @@ export const useInventory = () => {
     try {
       const data = await inventoryAPI.fetchAllDrinks();
       setDrinks(data);
-
-      const unavailable = data.filter(drink => drink.available===true && drink.stock<=drink.unavailable_threshold)
-      unavailable?.map(drink => toggleAvailability(drink.id, false))
     } catch (err) {
       setError(err.message);
     } finally {
