@@ -61,7 +61,7 @@ export default function Notification({ isDisplaying, onClose, orderStatus, order
         >
           <div>
             {orderNumber && <strong>Order #{orderNumber}: </strong>}
-            Your order's status is now <strong>{formatStatus(orderStatus)}</strong>
+            Your order is now <strong>{formatStatus(orderStatus)}</strong>
           </div>
           <button className="close-notif-btn" onClick={onClose} aria-label="Close notification">
             <X size={24} />
