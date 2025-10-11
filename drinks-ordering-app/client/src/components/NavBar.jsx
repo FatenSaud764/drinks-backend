@@ -1,21 +1,38 @@
-import React, { useContext, useRef, useEffect } from 'react'
-import { LightDark } from '../contexts/contexts'
-import './NavBar.css'
-import ThemeButton from './ThemeButton'
+import React, { useContext, useState, useRef, useEffect } from 'react';
+import { LightDark } from '../contexts/contexts';
+import './NavBar.css';
+import ThemeButton from './ThemeButton';
 import { TiShoppingCart } from "react-icons/ti";
 import { useNavigate, NavLink, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext.jsx'
+import { useAuth } from '../contexts/AuthContext.jsx';
+import Notification from './Notification.jsx';
+import { useNotifications } from '../contexts/NotificationContext.jsx';
 
 export default function NavBar() {
   const {theme, setTheme} = useContext(LightDark);
   const navigate = useNavigate();
-  const menuRef = useRef(null)
-  const navRef = useRef(null)
+  const menuRef = useRef(null);
+  const navRef = useRef(null);
+
+  const { notifications, removeNotification } = useNotifications();
+  const [displayedNotification, setDisplayedNotification] = useState(null);
 
   // Use only the new AuthContext
   const { user, accessToken, refreshToken, isLoggedIn, login, logout } = useAuth();
 
+  useEffect(() => {
+    if (notifications.length > 0) {
+      const latest = notifications[notifications.length - 1];
+      setDisplayedNotification(latest);
+    }
+  }, [notifications]);
 
+  const handleCloseNotification = () => {
+    if (displayedNotification) {
+      removeNotification(displayedNotification.id);
+      setDisplayedNotification(null);
+    }
+  };
 
   const closeMenu = () => {
     if (menuRef.current) menuRef.current.removeAttribute('open')
@@ -46,6 +63,13 @@ export default function NavBar() {
   }
 
   return (
+    <>
+      <Notification 
+        isDisplaying={!!displayedNotification}
+        onClose={handleCloseNotification}
+        orderStatus={displayedNotification?.newStatus}
+        orderNumber={displayedNotification?.orderNumber}
+      />
     <nav ref={navRef} className="nav" id={theme}>
       <div className="nav-left">
         <details className="hamburger" ref={menuRef} role="navigation">
@@ -108,5 +132,6 @@ export default function NavBar() {
         </div>
       </div>
     </nav>
+    </>
   )
 }
