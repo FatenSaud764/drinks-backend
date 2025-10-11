@@ -97,7 +97,7 @@ const Home = () => {
         <div className='orderrow'>
           <div style={{fontFamily:'Nunito', fontSize:'20px', fontWeight: '800'}}>Your latest order:</div>
         </div>
-        {sortedOrders.length<=0 ? <h3 style={{fontFamily: 'Nunito'}}>You have no active orders!</h3> : <div className='orderrow'>
+        {sortedOrders.length<=0 ? <h3 className='no_orders'>You have no active orders!</h3> : <div className='orderrow'>
           <div style={{fontFamily: 'Nunito', fontSize: '17px', fontWeight:'700'}}>Order #{sortedOrders[0].id}</div>
           <div style={{fontFamily: 'Nunito', fontSize: '17px', border: 'none', borderRadius: '2vh', background: `${statusColor}`, width: '11vh', height: '3vh', display:'flex', justifyContent:'center', justifyItems:'center', color:'white', alignContent: 'center', alignItems: 'center'}}>{sortedOrders[0].status}</div>
           </div>}

@@ -29,6 +29,23 @@
     width: 80%;
 }
 
+#dark .return{
+    color: white !important;
+}
+
+.cart_section{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    justify-items: center;
+    height: 23vh;
+    gap: 2vh;
+
+
+}
+
 .return_button{
     color:#F59E0B;
     height: 3vh;
@@ -36,6 +53,7 @@
 
 .drinkname{
     font-size: 25px !important;
+    width: 75%;
     font-family: 'DM Serif Text';
 }
 
@@ -47,6 +65,10 @@
     min-height: 2vh;
     text-align: left;
     color: rgb(97, 97, 97);
+}
+
+#dark .drinkdesc{
+   color: rgb(166, 166, 166); 
 }
 
 .drinkprice{
@@ -67,10 +89,6 @@
     border-bottom: 1px solid #F59E0B;
 }
 
-.space{
-    width: 100%;
-    height: 6vh;
-}
 
 #dark .drinkname{
     color: white !important;

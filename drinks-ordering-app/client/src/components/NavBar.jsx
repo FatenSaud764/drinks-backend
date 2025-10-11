@@ -101,7 +101,7 @@ export default function NavBar() {
           </aside>
         </details>
         
-        <Link to="/" className="brand" aria-label="SwiftServe">
+        <Link to="/home" className="brand" aria-label="SwiftServe">
           <span className="brand-text">SwiftServe</span>
         </Link>
       </div>

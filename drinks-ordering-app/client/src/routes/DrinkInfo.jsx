@@ -7,6 +7,7 @@ import AddItems from '../components/AddItems';
 import AxiosInstance from '../components/Axios.jsx';
 import CartModal from '../components/CartModal.jsx';
 import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 const DrinkInfo = () => {
   const { selecteddrink, setSelectedDrink } = useContext(SelectedProduct);
@@ -14,7 +15,7 @@ const DrinkInfo = () => {
   const [num, setNum] = useState(0);
   const [cartModal, setCartModal] = useState(false);
   const [selectedSize, setSelectedSize] = useState(null);
-
+  const navigate = useNavigate();
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
 
@@ -42,8 +43,8 @@ const DrinkInfo = () => {
           {cartModal && <CartModal />}
         </CartModalBoolean.Provider>
         <div className='return'>
-          <FaArrowLeft className='return_button'/>
-          <div>Return to products page</div>
+          <FaArrowLeft className='return_button' onClick={()=>{navigate('/products')}}/>
+          <div style={{fontFamily:'Nunito', fontWeight:'600'}}>Return to products page</div>
         </div>
         <img src= {`${selecteddrink.image}`} className='drinkimage' />
         <div className='drink_name_price'>
@@ -57,10 +58,10 @@ const DrinkInfo = () => {
         <div className='drinkdesc'>
           {selecteddrink.description}
         </div>
-        <div className='space'></div>
+        <div className='cart_section'>
         <AddItems prod={selecteddrink} num={num} setNum={setNum} />
         <button className='addtocart' onClick={() => {addToCart(selecteddrink.id, num)}}>Add to cart</button>
-        <br />
+        </div>
     </div>
   )
 }
