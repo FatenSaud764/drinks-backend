@@ -46,12 +46,18 @@ const DrinkInfo = () => {
           <div>Return to products page</div>
         </div>
         <img src= {`${selecteddrink.image}`} className='drinkimage' />
-        <div className='drinkname'>
-          {selecteddrink.name}
+        <div className='drink_name_price'>
+          <div className='drinkname'>
+            {selecteddrink.name}
+          </div>  
+          <div className='drinkprice'>
+            R{selecteddrink.price}
+          </div>
         </div>
-        <div className='drinkprice'>
-          R{selecteddrink.price}
+        <div className='drinkdesc'>
+          {selecteddrink.description}
         </div>
+        <div className='space'></div>
         <AddItems prod={selecteddrink} num={num} setNum={setNum} />
         <button className='addtocart' onClick={() => {addToCart(selecteddrink.id, num)}}>Add to cart</button>
         <br />
