@@ -42,6 +42,7 @@ const InventoryPage = () => {
     sorting: [],
     globalFilter: ''
   });
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all', 'available', 'unavailable', 'low-stock'
   const [formData, setFormData] = useState({
     id: null,
     name: '',
@@ -485,6 +486,37 @@ const InventoryPage = () => {
     };
   }, [drinks]);
 
+  // Filter drinks based on active filter
+  const filteredDrinks = useMemo(() => {
+    if (activeFilter === 'all') return drinks;
+    
+    return drinks.filter(d => {
+      const stock = d.stock || 0;
+      const lowThreshold = d.low_stock_threshold || 10;
+      const unavailableThreshold = d.unavailable_threshold || 5;
+      
+      switch (activeFilter) {
+        case 'available':
+          return stock > unavailableThreshold;
+        case 'unavailable':
+          return stock <= unavailableThreshold;
+        case 'low-stock':
+          return stock > unavailableThreshold && stock <= lowThreshold;
+        default:
+          return true;
+      }
+    });
+  }, [drinks, activeFilter]);
+
+  const handleFilterClick = (filter) => {
+    setActiveFilter(filter);
+    // Reset to first page when filter changes
+    setTableState(prev => ({
+      ...prev,
+      pagination: { ...prev.pagination, pageIndex: 0 }
+    }));
+  };
+
   if (loading) {
     return (
       <div className="page">
@@ -535,19 +567,35 @@ const InventoryPage = () => {
 
         {/* Summary Stats */}
         <div className="inventory-stats">
-          <div className="stat-card">
+          <div 
+            className={`stat-card ${activeFilter === 'all' ? 'active' : ''}`}
+            onClick={() => handleFilterClick('all')}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="stat-value total">{stats.total}</div>
             <div className="stat-label">Total Items</div>
           </div>
-          <div className="stat-card">
+          <div 
+            className={`stat-card ${activeFilter === 'available' ? 'active' : ''}`}
+            onClick={() => handleFilterClick('available')}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="stat-value available">{stats.available}</div>
             <div className="stat-label">Available</div>
           </div>
-          <div className="stat-card">
+          <div 
+            className={`stat-card ${activeFilter === 'unavailable' ? 'active' : ''}`}
+            onClick={() => handleFilterClick('unavailable')}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="stat-value unavailable">{stats.unavailable}</div>
             <div className="stat-label">Unavailable</div>
           </div>
-          <div className="stat-card">
+          <div 
+            className={`stat-card ${activeFilter === 'low-stock' ? 'active' : ''}`}
+            onClick={() => handleFilterClick('low-stock')}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="stat-value low-stock">{stats.lowStock}</div>
             <div className="stat-label">Low Stock</div>
           </div>
@@ -576,7 +624,7 @@ const InventoryPage = () => {
         <div className="orders-controls table-container">
           <MaterialReactTable
             columns={columns}
-            data={drinks}
+            data={filteredDrinks}
             enableGlobalFilter={true}
             enableColumnFilters={false}
             enableSorting={true}
