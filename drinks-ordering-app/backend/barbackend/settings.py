@@ -131,6 +131,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5174",  
     "http://127.0.0.1:5179",   # Admin app - ADD THIS
+    "http://127.0.0.1:5203",
     "https://drinks-backend-ojv2.onrender.com",
 ]
 
@@ -138,7 +139,8 @@ CSRF_TRUSTED_ORIGINS = [
     "https://drinks-backend-ojv2.onrender.com",
     "http://localhost:5173",
     "http://localhost:5174",
-    "http://localhost:5179",     # Admin app - ADD THIS
+    "http://localhost:5179", 
+    "http://127.0.0.1:5203"    # Admin app - ADD THIS
 ]
 # OTP
 OTP_CODE_LENGTH = 6
