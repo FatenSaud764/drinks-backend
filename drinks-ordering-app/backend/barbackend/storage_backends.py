@@ -69,15 +69,11 @@ class SupabaseStorage(Storage):
             return self.local_storage._save(name, ContentFile(file_content))
 
         try:
-            # Delete if exists to avoid upload conflict
-            if self._file_exists(name):
-                self.supabase.storage.from_(self.bucket_name).remove([name])
-
-            # Upload the file
+            # Use upsert=True to replace existing files instead of throwing a 409 error
             self.supabase.storage.from_(self.bucket_name).upload(
                 path=name,
                 file=file_content,
-                file_options={"content-type": content_type}
+                file_options={"content-type": content_type, "upsert": True}
             )
             return name
         except Exception as e:
