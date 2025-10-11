@@ -33,7 +33,8 @@
     color: white;
     border-radius: 2vw;
     border: none;
-    font-family: 'Lilita One';
+    font-family: 'Nunito';
+    font-weight: 800;
 }
 
 .selectcategory:focus{

@@ -6,6 +6,8 @@ import './DrinkInfo.css'
 import AddItems from '../components/AddItems';
 import AxiosInstance from '../components/Axios.jsx';
 import CartModal from '../components/CartModal.jsx';
+import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from 'react-router-dom';
 
 const DrinkInfo = () => {
   const { selecteddrink, setSelectedDrink } = useContext(SelectedProduct);
@@ -13,7 +15,7 @@ const DrinkInfo = () => {
   const [num, setNum] = useState(0);
   const [cartModal, setCartModal] = useState(false);
   const [selectedSize, setSelectedSize] = useState(null);
-
+  const navigate = useNavigate();
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
 
@@ -40,30 +42,26 @@ const DrinkInfo = () => {
         <NavBar />
           {cartModal && <CartModal />}
         </CartModalBoolean.Provider>
+        <div className='return'>
+          <FaArrowLeft className='return_button' onClick={()=>{navigate('/products')}}/>
+          <div style={{fontFamily:'Nunito', fontWeight:'600'}}>Return to products page</div>
+        </div>
         <img src= {`${selecteddrink.image}`} className='drinkimage' />
-        <div className='drinkname'>
-          {selecteddrink.name}
+        <div className='drink_name_price'>
+          <div className='drinkname'>
+            {selecteddrink.name}
+          </div>  
+          <div className='drinkprice'>
+            R{selecteddrink.price}
+          </div>
         </div>
-        <div className='drinkprice'>
-          R{selecteddrink.price}
+        <div className='drinkdesc'>
+          {selecteddrink.description}
         </div>
-        <div className='radiobuttons'>
-          <label className='sizeselect'>
-          <input type='radio' value='small' onChange={(e) => setSelectedSize(e.target.value)} checked={selectedSize==='small'}/>
-          Small drink
-        </label>
-        <label className='sizeselect'>
-          <input type='radio' value='medium' onChange={(e) => setSelectedSize(e.target.value)} checked={selectedSize==='medium'}/>
-          Medium drink
-        </label>
-        <label className='sizeselect'>
-          <input type='radio' value='large' onChange={(e) => setSelectedSize(e.target.value)} checked={selectedSize==='large'}/>
-          Large drink
-        </label>
-        </div>
+        <div className='cart_section'>
         <AddItems prod={selecteddrink} num={num} setNum={setNum} />
         <button className='addtocart' onClick={() => {addToCart(selecteddrink.id, num)}}>Add to cart</button>
-        <br />
+        </div>
     </div>
   )
 }
