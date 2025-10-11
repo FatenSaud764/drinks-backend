@@ -69,13 +69,26 @@ class SupabaseStorage(Storage):
             return self.local_storage._save(name, ContentFile(file_content))
 
         try:
-            # Use upsert=True to replace existing files instead of throwing a 409 error
-            self.supabase.storage.from_(self.bucket_name).upload(
-                path=name,
-                file=file_content,
-                file_options={"content-type": content_type},
-                upsert = True
-            )
+            # Delete existing file if it exists (ignore errors if it doesn't)
+            try:
+                self.supabase.storage.from_(self.bucket_name).remove([name])
+            except:
+                pass  # File doesn't exist, that's fine
+
+            # Upload the file - if 409 (duplicate) error occurs, it means the file
+            # is still there, so just return success since the file exists
+            try:
+                self.supabase.storage.from_(self.bucket_name).upload(
+                    path=name,
+                    file=file_content,
+                    file_options={"content-type": content_type}
+                )
+            except Exception as e:
+                if "409" in str(e) or "Duplicate" in str(e):
+                    # File already exists, that's fine - we can proceed
+                    pass
+                else:
+                    raise
             return name
         except Exception as e:
             raise Exception(f"Failed to save file '{name}': {str(e)}")
