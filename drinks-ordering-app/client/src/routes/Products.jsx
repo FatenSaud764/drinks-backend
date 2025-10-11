@@ -15,7 +15,6 @@ import AddItems from '../components/AddItems.jsx';
 import CartModal from '../components/CartModal.jsx';
 import NavBar from '../components/NavBar'
 import AxiosInstance from '../components/Axios.jsx';
-import { useLocation } from 'react-router-dom';
 
 
 const Products = () => {
@@ -34,22 +33,12 @@ const Products = () => {
   // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
 
-  const location = useLocation();
-
   const fuse = useMemo(() => {
     return new Fuse(products, {
       keys: keys,
       threshold: 0.4
     });
   }, [products, keys]);
-
-  useEffect(() => {
-    if (location.state?.reset) {
-      // clear search, show full list, etc.
-      setSearch(""); // example
-      setSelectedDrink(products);
-    }
-  }, [location.state]);
 
 
   const filtered = search === '' ? products : fuse.search(search).map(result => result.item);
