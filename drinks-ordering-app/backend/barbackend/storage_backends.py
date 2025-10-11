@@ -73,7 +73,8 @@ class SupabaseStorage(Storage):
             self.supabase.storage.from_(self.bucket_name).upload(
                 path=name,
                 file=file_content,
-                file_options={"content-type": content_type, "upsert": True}
+                file_options={"content-type": content_type},
+                upsert = True
             )
             return name
         except Exception as e:
