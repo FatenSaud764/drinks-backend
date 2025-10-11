@@ -37,6 +37,11 @@ const InventoryPage = () => {
   const [thresholdModalOpen, setThresholdModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add'); // 'add' or 'edit'
   const [validationErrors, setValidationErrors] = useState({});
+  const [tableState, setTableState] = useState({
+    pagination: { pageSize: 10, pageIndex: 0 },
+    sorting: [],
+    globalFilter: ''
+  });
   const [formData, setFormData] = useState({
     id: null,
     name: '',
@@ -78,7 +83,7 @@ const InventoryPage = () => {
       errors.name = 'Drink name is required';
     }
 
-    if (!data.price || parseFloat(data.price) <= 0) {
+    if (!data.price || parseFloat(data.price) < 0) {
       errors.price = 'Valid price is required';
     }
 
@@ -582,9 +587,31 @@ const InventoryPage = () => {
             enableColumnActions={false}
             enableTopToolbar={true}
             enableBottomToolbar={true}
+            manualPagination={false}
+            autoResetPageIndex={false}
             initialState={{
-              pagination: { pageSize: 10, pageIndex: 0 },
+              pagination: tableState.pagination,
+              sorting: tableState.sorting,
+              globalFilter: tableState.globalFilter,
               showGlobalFilter: true,
+            }}
+            onPaginationChange={(updater) => {
+              setTableState(prev => ({
+                ...prev,
+                pagination: typeof updater === 'function' ? updater(prev.pagination) : updater
+              }));
+            }}
+            onSortingChange={(updater) => {
+              setTableState(prev => ({
+                ...prev,
+                sorting: typeof updater === 'function' ? updater(prev.sorting) : updater
+              }));
+            }}
+            onGlobalFilterChange={(filter) => {
+              setTableState(prev => ({
+                ...prev,
+                globalFilter: filter
+              }));
             }}
             muiSearchTextFieldProps={{
               placeholder: 'Search drinks...',
@@ -605,6 +632,9 @@ const InventoryPage = () => {
             )}
             state={{
               isLoading: loading,
+              pagination: tableState.pagination,
+              sorting: tableState.sorting,
+              globalFilter: tableState.globalFilter,
             }}
           />
         </div>
