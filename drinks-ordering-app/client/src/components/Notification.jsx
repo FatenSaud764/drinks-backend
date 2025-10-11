@@ -2,9 +2,11 @@ import { X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import './Notification.css';
 import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Notification({ isDisplaying, onClose, orderStatus, orderNumber }) {
   const timerRef = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (timerRef.current) {
@@ -24,15 +26,20 @@ export default function Notification({ isDisplaying, onClose, orderStatus, order
     };
   }, [isDisplaying]);
 
-  const formatStatus = (status) => {
+  const handleClick = () => {
+    onClose();
+    navigate('/orders');
+  };
+
+  const formatStatusMessage = (status) => {
     if (!status) return '';
 
     const statusMap = {
       'pending': 'Pending',
-      'preparing': 'Being Prepared',
-      'ready': 'Ready for Pickup',
-      'completed': 'Completed',
-      'cancelled': 'Cancelled'
+      'preparing': 'Your order is now being prepared',
+      'ready': 'You order is ready for pickup at the bar',
+      'completed': 'Your order has been completed',
+      'cancelled': 'Your order has been cancelled'
     };
 
     return statusMap[status.toLowerCase()] || status;
@@ -58,10 +65,11 @@ export default function Notification({ isDisplaying, onClose, orderStatus, order
           exit={{ y: "-300%" }}
           transition={{ type: "tween", duration: 0.3 }}
           className={`notification-motion-div ${getStatusClass(orderStatus)}`}
+          onClick={handleClick}
         >
-          <div>
+          <div className="notification-text">
             {orderNumber && <strong>Order #{orderNumber}: </strong>}
-            Your order is now <strong>{formatStatus(orderStatus)}</strong>
+            <strong>{formatStatusMessage(orderStatus)}</strong>
           </div>
           <button className="close-notif-btn" onClick={onClose} aria-label="Close notification">
             <X size={24} />

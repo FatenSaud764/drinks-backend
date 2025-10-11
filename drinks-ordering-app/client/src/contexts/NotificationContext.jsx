@@ -63,15 +63,13 @@ export const NotificationProvider = ({ children }) => {
       recentOrders.forEach(order => {
         const previousOrder = previousOrdersRef.current.get(order.id);
 
-        if (previousOrder && previousOrder.status !== order.status) {
-          addNotification({
-            orderId: order.id,
-            orderNumber: order.order_number || order.id,
-            oldStatus: previousOrder.status,
-            newStatus: order.status,
-            timestamp: new Date()
-          });
-        }
+        addNotification({
+          orderId: order.id,
+          orderNumber: order.order_number || order.id,
+          oldStatus: previousOrder.status,
+          newStatus: order.status,
+          timestamp: new Date()
+        });
 
         previousOrdersRef.current.set(order.id, {
           status: order.status,

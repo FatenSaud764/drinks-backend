@@ -2,17 +2,23 @@
   position: fixed;
   color: white;
   background: #2563EB;
-  border: solid 2px #2563EB;
-  border-radius: 30vh;
+  border: solid 2px white;
+  border-radius: 1vh;
+  padding-left: 2.4vh;
   top: 100px;
-  left: 4vw;
-  width: 92vw;
-  height: 4vh;
+  left: 3vw;
+  width: 88vw;
+  height: 6vh;
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   z-index: 900;
+}
+
+.notification-text {
+  margin-right: 14px;
+  margin-left: 10px;
 }
 
 .close-notif-btn {
@@ -27,4 +33,10 @@
 
 .close-notif-btn:hover {
   color: #F59E0B;
+}
+
+@media (max-width: 768px) {
+  .notification-text {
+    font-size: 16px;
+  }
 }
