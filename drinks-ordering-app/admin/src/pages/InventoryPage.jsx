@@ -140,7 +140,9 @@ const InventoryPage = () => {
     return errors;
   };
 
-  const getStockStatus = (stock, lowThreshold, unavailableThreshold) => {
+  const getStockStatus = (stock, lowThreshold, unavailableThreshold, available) => {
+    // If manually marked as unavailable, show that regardless of stock
+    if (!available) return 'unavailable';
     if (stock <= unavailableThreshold) return 'unavailable';
     if (stock <= lowThreshold) return 'low-stock';
     return '';
@@ -216,7 +218,8 @@ const InventoryPage = () => {
           const stock = row.original.stock || 0;
           const lowThreshold = row.original.low_stock_threshold || 10;
           const unavailableThreshold = row.original.unavailable_threshold || 5;
-          const statusClass = getStockStatus(stock, lowThreshold, unavailableThreshold);
+          const available = row.original.available;
+          const statusClass = getStockStatus(stock, lowThreshold, unavailableThreshold, available);
           
           return (
             <div className="stock-info">
@@ -497,11 +500,11 @@ const InventoryPage = () => {
       
       switch (activeFilter) {
         case 'available':
-          return stock > unavailableThreshold;
+          return d.available;
         case 'unavailable':
-          return stock <= unavailableThreshold;
+          return !d.available;
         case 'low-stock':
-          return stock > unavailableThreshold && stock <= lowThreshold;
+          return d.available && stock > unavailableThreshold && stock <= lowThreshold;
         default:
           return true;
       }
