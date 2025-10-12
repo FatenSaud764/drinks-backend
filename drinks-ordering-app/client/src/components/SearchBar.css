@@ -1,4 +1,4 @@
-.searchwrap{
+.searchwrap {
     display: flex;
     align-items: center;
     margin-top: 3vh;
@@ -8,22 +8,22 @@
     margin-left: 0vh;
 }
 
-.search{
+.search {
     border: 2px solid #F59E0B;
     border-radius: 30vh;
     padding-left: 4vw;
     width: 50vw;
-    height:3.4vh;
+    height: 3.4vh;
     cursor: pointer;
     font-family: 'Lalita One';
-
+    font-size: 12px;
 }
 
-.search:focus{
+.search:focus {
     outline: none;
 }
 
-.selectcategory{
+.selectcategory {
     margin-left: 13vw;
     text-align: center;
     width: 28vw;
@@ -37,6 +37,50 @@
     font-weight: 800;
 }
 
-.selectcategory:focus{
+.selectcategory:focus {
     outline: none;
+}
+
+/*  Responsive for Tablets  */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .searchwrap {
+        margin-top: 4vh;
+        height: 5vh;
+    }
+
+    .search {
+        width: 45vw;
+        height: 4.2vh;
+        font-size: 15px;
+        padding-left: 3vw;
+    }
+
+    .selectcategory {
+        width: 25vw;
+        height: 3.8vh;
+        font-size: 15px;
+        margin-left: 10vw;
+    }
+}
+
+/*  Responsive for Laptops and Desktops */
+@media (min-width: 1025px) {
+    .searchwrap {
+        margin-top: 4vh;
+        height: 6vh;
+    }
+
+    .search {
+        width: 40vw;
+        height: 4.5vh;
+        font-size: 17px;
+        padding-left: 2vw;
+    }
+
+    .selectcategory {
+        width: 22vw;
+        height: 4.2vh;
+        font-size: 17px;
+        margin-left: 8vw;
+    }
 }

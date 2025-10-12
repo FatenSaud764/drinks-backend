@@ -290,3 +290,32 @@
 .new-note-text:focus{
   outline: none;
 }
+/* --- Large laptops (1440px and below) --- */
+@media (max-width: 1440px) {
+  .cart-header h2 { font-size: 2.3vh; }
+  .cart-count { font-size: 1.9vh; }
+  .checkout-btn, .save-note-btn { font-size: 1.7vh; }
+  .item-name { font-size: 18px !important; }
+}
+
+/* --- Medium laptops / small desktops (1200px and below) --- */
+@media (max-width: 1200px) {
+  .cart-items-list { width: 94vw; }
+  .clearcart { width: 92vw; }
+  .checkout-btn, .save-note-btn { padding: 1.5vh 2.5vw; width: 11vh; }
+  .item-controls { gap: 1.5vw; }
+}
+
+/* --- Tablets (1024px and below) --- */
+@media (max-width: 1024px) {
+  .cart-header { padding: 2vh 3vw; }
+  .cart-header h2 { font-size: 2.2vh; }
+  .cart-count { font-size: 1.8vh; }
+  .cart-items-list { width: 95vw; }
+  .item-name { font-size: 17px !important; }
+  .item-price { font-size: 1.6vh; }
+  .checkout-btn, .save-note-btn { font-size: 1.6vh; width: 10vh; height: 4.5vh; }
+  .cart-footer { height: 8vh; }
+  .cart-footer span { font-size: 2vh; }
+  .new-note-text { width: 88vw; height: 11vh; }
+}

@@ -27,8 +27,6 @@
   to { opacity: 1; }
 }
 
-
-
 .orderwrapper{
     display: flex;
     flex-direction: column;
@@ -46,8 +44,6 @@
     cursor: pointer;
     pointer-events: auto;
 }
-
-
 
 .orderrow{
     display: flex;
@@ -85,8 +81,6 @@
     margin-top: 13vh;
     width: 90vw;
 }
-
-
 
 #dark .greeting{
     color: white;
@@ -144,8 +138,6 @@
   pointer-events: auto !important;
 }
 
-
-
 .category-header{
     display: flex;
     flex-direction: row;
@@ -173,7 +165,6 @@
     color:#d1880a;
 }
 
-
 .category-name{
     font-family: 'Roboto Slab';
     font-size: 22px;
@@ -187,7 +178,6 @@
     border-radius: 2vh;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
 }
-
 
 .drink-name{
     font-family: 'Nunito';
@@ -216,12 +206,112 @@
     align-content: center;
 }
 
-#light .orderwrapper:hover{
-    transform: scale(1.02) !important; /* Grows from center, very visible */
+#light .orderwrapper:hover,
+#dark .orderwrapper:hover{
+    transform: scale(1.02) !important;
     border: 2px solid rgb(170, 161, 161) !important;
 }
 
-#dark .orderwrapper:hover{
-   transform: scale(1.02) !important; /* Grows from center, very visible */
-    border: 2px solid rgb(170, 161, 161) !important; 
+/*  RESPONSIVE DESIGN */
+
+/* Tablets */
+@media (min-width: 600px) and (max-width: 1024px) {
+  .greeting {
+    font-size: 28px;
+    margin-top: 10vh;
+  }
+
+  .orderwrapper {
+    width: 70%;
+    min-height: 14vh;
+    padding: 2vh;
+  }
+
+  .category-name {
+    font-size: 26px;
+  }
+
+  .drink-name {
+    font-size: 18px;
+  }
+
+  .carousel-image {
+    height: 26vh !important;
+    width: 23vh !important;
+  }
+
+  .carousel-wrapper {
+    width: 85vw;
+    min-height: 42vh;
+  }
+
+  .orderrow {
+    font-size: 18px;
+  }
+}
+
+/* Laptops */
+@media (min-width: 1025px) and (max-width: 1439px) {
+  .greeting {
+    font-size: 32px;
+    margin-top: 10vh;
+  }
+
+  .orderwrapper {
+    width: 65%;
+    min-height: 15vh;
+    padding: 2.5vh;
+  }
+
+  .category-name {
+    font-size: 28px;
+  }
+
+  .drink-name {
+    font-size: 19px;
+  }
+
+  .carousel-image {
+    height: 27vh !important;
+    width: 24vh !important;
+  }
+
+  .carousel-wrapper {
+    width: 80vw;
+  }
+}
+
+/* Desktops / Large screens */
+@media (min-width: 1440px) {
+  .greeting {
+    font-size: 36px;
+    margin-top: 10vh;
+  }
+
+  .orderwrapper {
+    width: 55%;
+    min-height: 16vh;
+    padding: 3vh;
+  }
+
+  .category-name {
+    font-size: 30px;
+  }
+
+  .drink-name {
+    font-size: 20px;
+  }
+
+  .carousel-image {
+    height: 29vh !important;
+    width: 26vh !important;
+  }
+
+  .carousel-wrapper {
+    width: 70vw;
+  }
+
+  .orderrow {
+    font-size: 20px;
+  }
 }

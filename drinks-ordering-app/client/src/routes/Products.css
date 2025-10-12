@@ -172,3 +172,162 @@
     margin-top: 10vh;
   }
 }
+
+/* Tablet styles (601px - 1024px) */
+@media (min-width: 601px) and (max-width: 1024px) {
+    .prodlist{
+        grid-template-columns: repeat(3, 28vw);
+        grid-auto-rows: 42vw;
+        column-gap: 3vw;
+        row-gap: 12vw;
+        width: 90vw;
+        margin-top: 3vh;
+    }
+    
+    .productdisplay{
+        width: 28vw;
+        min-height: 50vw;
+        grid-template-rows: 35vw 4vw 6vw;
+        row-gap: 2vw;
+        border: 0.5vw solid #F59E0B;
+        border-radius: 2vw;
+    }
+    
+    .drinkcard{
+        height: 35vw;
+        border-radius: 1.8vw;
+    }
+    
+    .productbutton{
+        height: 35vw;
+        border-radius: 1.8vw;
+    }
+    
+    .productdesc{
+        width: 27vw;
+        font-size: 2.2vw;
+    }
+    
+    .productprice{
+        font-size: 2vw;
+    }
+    
+    .additemwrapper{
+        width: 16vw;
+        height: 5vw;
+        margin-left: 10vw;
+    }
+    
+    .additem{
+        height: 5vw;
+        width: 5vw;
+        margin-top: -1.5vw;
+        font-size: 18px;
+    }
+}
+
+/* Laptop styles (1025px and above) */
+@media (min-width: 1025px) {
+    .prodlist{
+        grid-template-columns: repeat(4, 22vw);
+        grid-auto-rows: 34vw;
+        column-gap: 2vw;
+        row-gap: 8vw;
+        width: 92vw;
+        margin-top: 4vh;
+    }
+    
+    .productdisplay{
+        width: 22vw;
+        min-height: 40vw;
+        grid-template-rows: 28vw 3.5vw 5vw;
+        row-gap: 1.5vw;
+        border: 0.4vw solid #F59E0B;
+        border-radius: 1.5vw;
+    }
+    
+    .drinkcard{
+        height: 28vw;
+        border-radius: 1.3vw;
+    }
+    
+    .productbutton{
+        height: 28vw;
+        border-radius: 1.3vw;
+    }
+    
+    .productdesc{
+        width: 21vw;
+        font-size: 1.6vw;
+    }
+    
+    .productprice{
+        font-size: 1.5vw;
+    }
+    
+    .additemwrapper{
+        width: 12vw;
+        height: 4vw;
+        margin-left: 8vw;
+    }
+    
+    .additem{
+        height: 4vw;
+        width: 4vw;
+        margin-top: -1vw;
+        font-size: 16px;
+    }
+}
+
+/* Large Desktop (1440px and above) */
+@media (min-width: 1440px) {
+    .prodlist{
+        grid-template-columns: repeat(5, 17vw);
+        grid-auto-rows: 27vw;
+        column-gap: 1.5vw;
+        row-gap: 6vw;
+        width: 92vw;
+        margin-top: 5vh;
+    }
+    
+    .productdisplay{
+        width: 17vw;
+        min-height: 32vw;
+        grid-template-rows: 22vw 2.8vw 4vw;
+        row-gap: 1.2vw;
+        border: 0.3vw solid #F59E0B;
+        border-radius: 1.2vw;
+    }
+    
+    .drinkcard{
+        height: 22vw;
+        border-radius: 1vw;
+    }
+    
+    .productbutton{
+        height: 22vw;
+        border-radius: 1vw;
+    }
+    
+    .productdesc{
+        width: 16vw;
+        font-size: 1.2vw;
+    }
+    
+    .productprice{
+        font-size: 1.1vw;
+    }
+    
+    .additemwrapper{
+        width: 9vw;
+        height: 3vw;
+        margin-left: 6vw;
+    }
+    
+    .additem{
+        height: 3vw;
+        width: 3vw;
+        margin-top: -0.8vw;
+        font-size: 14px;
+    }
+}

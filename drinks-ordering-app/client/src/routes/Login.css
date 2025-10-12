@@ -146,3 +146,95 @@
     color: #F59E0B;
 }
 
+/*  Responsive for Tablets (768px - 1024px)  */
+@media (min-width: 768px) {
+    .swiftserve {
+        font-size: 50px !important;
+    }
+
+    .content {
+        width: 70%;
+        gap: 3vh;
+    }
+
+    .login {
+        font-size: 18px;
+        height: 40px;
+    }
+
+    .signup {
+        font-size: 16px;
+        height: 20px;
+    }
+
+    .content h4 {
+        font-size: 20px;
+    }
+
+    .username, .password {
+        font-size: 16px;
+        height: 35px;
+    }
+}
+
+/*  Responsive for Laptops/Small Desktops (1025px - 1440px)  */
+@media (min-width: 1025px) {
+    .swiftserve {
+        font-size: 60px !important;
+    }
+
+    .content {
+        width: 50%;
+        gap: 4vh;
+    }
+
+    .login {
+        font-size: 20px;
+        height: 45px;
+    }
+
+    .signup {
+        font-size: 18px;
+        height: 25px;
+    }
+
+    .content h4 {
+        font-size: 22px;
+    }
+
+    .username, .password {
+        font-size: 18px;
+        height: 40px;
+    }
+}
+
+/*  Responsive for Large Desktops (1441px and above) */
+@media (min-width: 1441px) {
+    .swiftserve {
+        font-size: 70px !important;
+    }
+
+    .content {
+        width: 40%;
+        gap: 5vh;
+    }
+
+    .login {
+        font-size: 22px;
+        height: 50px;
+    }
+
+    .signup {
+        font-size: 20px;
+        height: 30px;
+    }
+
+    .content h4 {
+        font-size: 24px;
+    }
+
+    .username, .password {
+        font-size: 20px;
+        height: 45px;
+    }
+}

@@ -170,3 +170,81 @@
     backdrop-filter: blur(4px);
     transition: all 0.3s ease;
 }
+
+/* Tablets (768px - 1024px) */
+@media screen and (min-width: 768px) and (max-width: 1024px){
+    .drinkname{
+        font-size: 28px !important;
+        width: 70%;
+    }
+
+    .drinkdesc{
+        font-size: 18px !important;
+        width: 75%;
+    }
+
+    .drinkprice{
+        font-size: 22px !important;
+    }
+
+    .addtocart{
+        width: 18vh;
+        height: 6.5vh;
+        font-size: 16px;
+        margin-top: -1vh;
+    }
+
+    .drinkimage{
+        width: 70%;
+        height: auto;
+        aspect-ratio: 4/3;
+    }
+
+    .drink_name_price{
+        width: 75%;
+    }
+}
+
+/* Laptops/Desktops (1025px +) */
+@media screen and (min-width: 1025px) {
+    .drinkinfowrapper{
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: space-around;
+        align-items: flex-start;
+        gap: 4vh;
+        padding: 2vh 0;
+    }
+
+    .drinkname{
+        font-size: 30px !important;
+        width: 45%;
+    }
+
+    .drinkdesc{
+        font-size: 19px !important;
+        width: 45%;
+    }
+
+    .drinkprice{
+        font-size: 24px !important;
+    }
+
+    .addtocart{
+        width: 17vh;
+        height: 7vh;
+        font-size: 16px;
+        margin-top: -2vh; /* shift button closer to price */
+    }
+
+    .drinkimage{
+        width: 45%;
+        height: auto;
+        max-height: 60vh; /* prevent image from getting too tall */
+        aspect-ratio: 4/3;
+    }
+
+    .drink_name_price{
+        width: 45%;
+    }
+}

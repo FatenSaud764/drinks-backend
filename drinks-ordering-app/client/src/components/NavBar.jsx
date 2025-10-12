@@ -107,7 +107,7 @@ export default function NavBar() {
       </div>
 
       <nav className="nav-center" aria-label="Primary">
-        <NavLink to="/" end>Home</NavLink>
+        <NavLink to="/home" className="menu-btn" onClick={closeMenu}>Home</NavLink>
         <NavLink to="/products">Products</NavLink>
         {user && <NavLink to="/orders" className="hide-sm">Previous Orders</NavLink>}
       </nav>
@@ -127,7 +127,7 @@ export default function NavBar() {
               <button className="user-btn hide-sm" onClick={handleLogout}>Logout</button>
             </>
           ) : (
-            <button className="user-btn hide-sm" onClick={() => login('guest')}>Login</button>
+            <button className="user-btn hide-sm" onClick={handleLogin}>Login</button>
           )}
         </div>
       </div>
