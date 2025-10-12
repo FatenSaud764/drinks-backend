@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext'
 import './Orders.css'
 import AxiosInstance from '../components/Axios'
 import { useCallback } from 'react'
+import Receipt from './Receipt'
 
 const OrdersPage = () => {
   const { theme } = useContext(LightDark)
@@ -31,6 +32,9 @@ const OrdersPage = () => {
   const [otpError, setOtpError] = useState(null)
   const [otpVisible, setOtpVisible] = useState(false)
   const [fetchedOtp, setFetchedOtp] = useState(null)
+
+  // Receipt state
+  const [selectedReceiptOrder, setSelectedReceiptOrder] = useState(null)
 
   const fetchOrders = async (showLoading = true) => {
     try {
@@ -65,8 +69,6 @@ const OrdersPage = () => {
       setFetchedOtp(null)
 
       const res = await AxiosInstance.get(`/api/orders/${orderId}/otp/`)
-  
-
       setFetchedOtp(res.data.code)
 
       return res.data
@@ -254,10 +256,21 @@ const OrdersPage = () => {
     )
   )
 
+  // Receipt Modal Component
+  const ReceiptModal = () => (
+    selectedReceiptOrder && (
+      <Receipt 
+        order={selectedReceiptOrder} 
+        onClose={() => setSelectedReceiptOrder(null)}
+      />
+    )
+  )
+
   return (
     <div className="orderswrapper" id={theme}>
       <NavBar />
       <OtpVisiblity />
+      <ReceiptModal />
       <div className="orders-content">
         <h1 className="orders-title">My Orders</h1>
         
@@ -430,6 +443,17 @@ const OrdersPage = () => {
                             : '0.00'
                       }
                     </span>
+                    
+                    {(order.status?.toLowerCase() === 'completed' || 
+                      order.status?.toLowerCase() === 'ready' || 
+                      order.status?.toLowerCase() === 'cancelled') && (
+                      <button 
+                        className="view-receipt-btn"
+                        onClick={() => setSelectedReceiptOrder(order)}
+                      >
+                        View Receipt
+                      </button>
+                    )}
                   </div>
                 </div>
               ))
