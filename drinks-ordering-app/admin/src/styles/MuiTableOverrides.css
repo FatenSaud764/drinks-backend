@@ -1,0 +1,191 @@
+/**
+ * @author Kirsten Sanders
+ * @description Styles and overrides for the MUI Table
+*/
+
+/* Table Container */
+.table-container {
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color) !important;
+  transition: none !important;
+  box-shadow: var(--shadow);
+}
+
+/* Material React Table Theme Integration */
+.table-container .MuiPaper-root {
+  background: var(--bg-primary) !important;
+  box-shadow: none !important;
+  transition: none !important; /* Remove transition */
+}
+
+.table-container .MuiTableContainer-root {
+  background: var(--bg-primary) !important;
+  transition: none !important; /* Remove transition */
+}
+
+.table-container .MuiTable-root {
+  background: var(--bg-primary) !important;
+  transition: none !important; /* Remove transition */
+}
+
+/* Search Field */
+.table-container .MuiTextField-root .MuiOutlinedInput-root {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  transition: border-color 0.2s ease !important; /* Keep only border transition */
+}
+
+.table-container .MuiTextField-root .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
+  border-color: var(--border-color) !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.table-container .MuiTextField-root .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
+  border-color: var(--accent-color) !important;
+}
+
+.table-container .MuiTextField-root .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
+  border-color: var(--accent-color) !important;
+}
+
+.table-container .MuiTextField-root .MuiInputLabel-root {
+  color: var(--text-secondary) !important;
+  transition: color 0.2s ease !important;
+}
+
+.table-container .MuiTextField-root .MuiOutlinedInput-input {
+  color: var(--text-primary) !important;
+}
+
+/* Header Row - Force Theme Colors */
+.table-container .MuiTableHead-root .MuiTableCell-head {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.025em !important;
+  border-bottom: 2px solid var(--border-color) !important;
+  padding: 1.25rem 0.75rem !important;
+  transition: none !important; /* Remove transition */
+}
+
+/* Body Cells */
+.table-container .MuiTableBody-root .MuiTableCell-body {
+  background: var(--bg-card) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 1.25rem 0.75rem !important;
+  transition: none !important; /* Remove transition */
+}
+
+/* Row Hover */
+.table-container .MuiTableBody-root .MuiTableRow-root:hover .MuiTableCell-body {
+  background: var(--hover-secondary) !important;
+}
+
+/* Top Toolbar */
+.table-container .MuiToolbar-root {
+  background: var(--bg-primary) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 1rem !important;
+  min-height: auto !important;
+  transition: none !important; /* Remove transition */
+}
+
+/* Additional toolbar targeting for stubborn cases */
+.table-container [role="toolbar"],
+.table-container .css-1rlnsa2,
+.table-container .css-1rlnsa2-MuiToolbar-root {
+  background: var(--bg-primary) !important;
+  transition: none !important; /* Remove transition */
+}
+
+/* Bottom Pagination */
+.table-container .MuiTablePagination-root {
+  background: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+  transition: none !important; /* Remove transition */
+}
+
+/* Additional pagination targeting */
+.table-container .MuiTablePagination-toolbar {
+  background: var(--bg-primary) !important;
+  transition: none !important; /* Remove transition */
+}
+
+/* Pagination text colors - Fix "Rows per page" */
+.table-container .MuiTablePagination-selectLabel,
+.table-container .MuiTablePagination-displayedRows,
+.table-container .MuiTablePagination-caption {
+  color: var(--text-muted) !important;
+}
+
+/* Custom empty state styling */
+.custom-empty-state {
+  color: var(--text-muted) !important;
+  font-style: italic;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* Pagination select dropdown */
+.table-container .MuiTablePagination-select {
+  color: var(--text-primary) !important;
+  transition: none !important; /* Remove transition */
+}
+
+.table-container .MuiIconButton-root {
+  color: var(--text-muted) !important;
+  transition: background-color 0.15s ease !important; /* Keep only hover transition */
+}
+
+.table-container .MuiIconButton-root:hover {
+  background: var(--bg-muted) !important;
+}
+
+/* No Records Display Message */
+.table-container .MuiTableBody-root .MuiTableCell-body {
+  background: var(--bg-card) !important;
+  color: var(--text-muted) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  padding: 1.25rem 0.75rem !important;
+  transition: none !important;
+}
+
+/* Override for regular data cells to keep primary text color */
+.table-container .MuiTableBody-root .MuiTableRow-root:not([data-empty="true"]) .MuiTableCell-body {
+  color: var(--text-primary) !important;
+}
+
+/* Target the "no records" message specifically */
+.table-container .MuiTableBody-root .MuiTableCell-body[colspan] {
+  color: var(--text-muted) !important;
+  text-align: center !important;
+  font-style: italic !important;
+}
+
+/* Additional global toolbar/header targeting - Nuclear option */
+.table-container > div > div:first-child,
+.table-container .MuiPaper-root > div:first-child {
+  background: var(--bg-primary) !important;
+  transition: none !important; /* Remove transition */
+}
+
+/* Bottom pagination container - Nuclear option */
+.table-container > div > div:last-child,
+.table-container .MuiPaper-root > div:last-child {
+  background: var(--bg-primary) !important;
+  transition: none !important; /* Remove transition */
+}
+
+/* Loading Progress */
+.table-container .MuiLinearProgress-root {
+  background: var(--bg-muted) !important;
+}
+
+.table-container .MuiLinearProgress-bar {
+  background: var(--accent-color) !important;
+}
