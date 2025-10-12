@@ -12,9 +12,7 @@ from django.db import IntegrityError
 from .otp_utils import generate_numeric_code
 
 
-# ============================================================================
-# EXISTING CODE (keep as is)
-# ============================================================================
+
 
 def recalc_order_total(order: Order) -> None:
     """Recalculate an order's total from its current items and drink prices."""
@@ -41,11 +39,6 @@ def ensure_order_otp(order: Order) -> None:
             continue
 
 
-
-
-# ============================================================================
-# EXISTING SIGNALS (keep as is)
-# ============================================================================
 
 @receiver(pre_save, sender=Order)
 def on_order_status_change_generate_otp(sender, instance: Order, **kwargs):
@@ -135,15 +128,6 @@ def update_order_total_on_item_delete(sender, instance: OrderItem, **kwargs):
     recalc_order_total(instance.order)
 
 
-# ============================================================================
-# NEW: AUTOMATIC AVAILABILITY SWITCHING
-# ============================================================================
-
-
-
-# ============================================================================
-# BULK SYNC HELPER
-# ============================================================================
 
 def sync_all_drink_availability():
     """
