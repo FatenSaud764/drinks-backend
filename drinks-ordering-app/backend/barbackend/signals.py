@@ -1,5 +1,3 @@
-# Add these to your existing signals.py file
-
 from decimal import Decimal
 from django.db.models.signals import post_save, post_delete, pre_save
 from django.dispatch import receiver
@@ -12,21 +10,25 @@ from django.db import IntegrityError
 from .otp_utils import generate_numeric_code
 
 
-
-
 def recalc_order_total(order: Order) -> None:
     """Recalculate an order's total from its current items and drink prices."""
     total = Decimal('0.00')
+    # Sum using current drink prices times quantities
     for item in order.items.select_related('drink').all():
         total += (item.drink.price or Decimal('0.00')) * item.quantity
+    # Assign and save only if changed to minimize writes
     if order.total_price != total:
         order.total_price = total
         order.save(update_fields=['total_price', 'updated_at'])
 
 
 def ensure_order_otp(order: Order) -> None:
-    """Create or refresh OTP for an order now in 'ready' state."""
+    """Create or refresh OTP for an order now in 'ready' state.
+
+    OTPs do not expire or track attempts; they remain valid until used.
+    """
     otp, _ = OrderOTP.objects.get_or_create(order=order)
+    # Generate and persist a unique code, retrying if a rare race happens
     for _ in range(5):
         code = generate_numeric_code()
         otp.set_code(code)
@@ -39,9 +41,9 @@ def ensure_order_otp(order: Order) -> None:
             continue
 
 
-
 @receiver(pre_save, sender=Order)
 def on_order_status_change_generate_otp(sender, instance: Order, **kwargs):
+    # Only if transitioning to ready
     if not instance.pk:
         return
     try:
@@ -54,6 +56,7 @@ def on_order_status_change_generate_otp(sender, instance: Order, **kwargs):
 
 @receiver(pre_save, sender=Order)
 def on_order_finalize_invalidate_otp(sender, instance: Order, **kwargs):
+    # If moving to completed or cancelled, mark otp used/expired
     if not instance.pk:
         return
     try:
@@ -66,25 +69,33 @@ def on_order_finalize_invalidate_otp(sender, instance: Order, **kwargs):
 
 @receiver(pre_save, sender=Order)
 def adjust_inventory_on_status_change(sender, instance: Order, **kwargs):
-    """Handle inventory deduction/restock when order status changes."""
+    """Handle inventory deduction/restock when order status changes.
+
+    Rules:
+    - When leaving 'pending' to any other status except 'cancelled', deduct stock for each item IF not already deducted.
+    - If transitioning to 'cancelled' and stock had been deducted previously (inventory_deducted=True), restock (add back quantities) and mark inventory_deducted False.
+    Safeguards against double deduction via the inventory_deducted flag.
+    Uses atomic transaction & F expressions for concurrency safety.
+    """
     if not instance.pk:
         return
     try:
         prev = Order.objects.select_related().get(pk=instance.pk)
     except Order.DoesNotExist:
         return
+    # No change
     if prev.status == instance.status:
         return
 
     # Deduct path: leaving pending -> (preparing|ready|completed) etc., excluding cancelled immediate jump
     if prev.status == 'pending' and instance.status != 'cancelled' and not prev.inventory_deducted:
         with transaction.atomic():
+            # Lock order items' related drinks for update to avoid race (optional optimization: select_for_update)
             items = list(prev.items.select_related('drink').all())
             for it in items:
+                # Use F expression to avoid race conditions
                 Drink.objects.filter(pk=it.drink_id).update(stock=F('stock') - it.quantity)
-                # Refresh drink from DB and update availability
-                drink = Drink.objects.get(pk=it.drink_id)
-                update_drink_availability(drink)
+            # Mark inventory deducted on instance (so save will persist) and prev
             instance.inventory_deducted = True
     # Restock path: moving to cancelled AFTER deduction happened
     elif instance.status == 'cancelled' and prev.inventory_deducted:
@@ -92,19 +103,21 @@ def adjust_inventory_on_status_change(sender, instance: Order, **kwargs):
             items = list(prev.items.select_related('drink').all())
             for it in items:
                 Drink.objects.filter(pk=it.drink_id).update(stock=F('stock') + it.quantity)
-                # Refresh drink from DB and update availability
-                drink = Drink.objects.get(pk=it.drink_id)
-                update_drink_availability(drink)
             instance.inventory_deducted = False
     else:
+        # Preserve flag state if no relevant transition; ensure instance carries forward existing state
         instance.inventory_deducted = prev.inventory_deducted
 
 
 @receiver(post_save, sender=Drink)
 def update_orders_on_drink_change(sender, instance: Drink, created, **kwargs):
-    """When a drink is created/updated, update totals of orders containing it."""
+    """When a drink is created/updated, update totals of orders containing it.
+
+    We only need to act on updates; creates do not belong to any order yet.
+    """
     if created:
         return
+    # Find orders that have items with this drink
     order_ids = (
         OrderItem.objects.filter(drink=instance).values_list('order_id', flat=True).distinct()
     )
@@ -126,23 +139,3 @@ def update_order_total_on_item_save(sender, instance: OrderItem, created, **kwar
 def update_order_total_on_item_delete(sender, instance: OrderItem, **kwargs):
     """Recalculate order total when an item is removed."""
     recalc_order_total(instance.order)
-
-
-
-def sync_all_drink_availability():
-    """
-    Synchronize availability for all drinks based on current stock.
-    Call this manually if you need to fix availability out-of-sync issues.
-    """
-    from django.db.models import Count
-    
-    updated_count = 0
-    for drink in Drink.objects.all():
-        old_available = drink.available
-        drink.available = drink.stock > drink.unavailable_threshold
-        
-        if drink.available != old_available:
-            drink.save(update_fields=['available', 'updated_at'])
-            updated_count += 1
-    
-    return updated_count
