@@ -55,9 +55,9 @@ const Login = () => {
       <div className='wrapper' id={theme}>
         <div className='togglebutton'><ThemeButton/></div>
         <div className='content'>
-          <h1>SwiftServe</h1>
+          <h1 className='swiftserve'>SwiftServe</h1>
           <h4>Skip the queue!</h4>
-          <form onSubmit={(e) => {checklogin(e); e.preventDefault();}}>
+          <form onSubmit={(e) => {checklogin(e); e.preventDefault();}} style={{display: 'flex', flexDirection:'column', alignContent:'center', alignItems:'center'}}>
             <div className='input-container'>
               <PersonIcon className='input-icon' />
               <input type='text' placeholder='Username' required className='username' ref={username}/>
@@ -72,7 +72,7 @@ const Login = () => {
               {isLoading ? 'Logging in...' : 'Log in'}
             </button>
           </form>
-          <h5>Don't have an account?</h5>
+          <h5 className='no-account'>Don't have an account?</h5>
           <button className='signup' onClick={() => {setSignUpModal(true)}}>Sign up</button>
           {signupmodal && <SignUp />}
         </div>

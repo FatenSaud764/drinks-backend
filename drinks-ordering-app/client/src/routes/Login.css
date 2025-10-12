@@ -1,12 +1,23 @@
 .wrapper{
-    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+    align-content: center;
     background: linear-gradient(180deg, #2563EB, #16296b);
     width:100vw;
     height: 100vh;
 }
 
 .wrapper#dark{
-    background: #1F2937 !important;
+    background: linear-gradient(180deg, #293952, #19212d);
+}
+
+.swiftserve{
+    font-size: 40px !important;
+    letter-spacing: 2px;
+    color: #F59E0B;
 }
 
 .togglebutton{
@@ -18,27 +29,26 @@
 }
 
 .content{
-    position: absolute;
-    transform: translate(-50%, -50%);
-    top: 50%;
-    left: 50%;
-    width: 400px; /* Fixed width in pixels instead of vh */
-    height: 500px; /* Fixed height in pixels */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    justify-items: center;
+    gap: 2vh;
+    width: 85%; 
+    height: auto;
+    min-height: 50%; 
 }
 
 .login{
-    display: flex;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    left: 50%;
-    top: 75%;
     align-content: center;
     align-items: center;
     text-align: center;
     justify-content: center;
     justify-items: center;
-    width: 100%; /* Full width of parent container */
-    height: 45px;
+    width: 55vw; /* Full width of parent container */
+    height: 35px;
     background: #F59E0B;
     color: white;
     box-shadow: none !important;
@@ -48,15 +58,18 @@
     font-size: 16px;
     font-weight:lighter;
     font-family: 'Lilita One';
+    margin-top: 4vh;
+}
+
+.no-account{
+    height: 1vh;
+    color: white;
+    font-family: 'Nunito';
 }
 
 .signup{
-    position: absolute;
-    transform: translate(-50%, -50%);
-    left: 50%;
-    top: 94%;
     width: 200px;
-    height: 40px;
+    height: 15px;
     background: none;
     color: white;
     box-shadow: none !important;
@@ -72,80 +85,39 @@
     color:#F59E0B !important;
 }
 
-.content h1{
-    position: absolute;
-    transform: translate(-50%, -50%);
-    left: 50%;
-    top: 10%;
-    color: #F59E0B;
-    font-size: 48px;
-    margin: 0;
-}
-
 .content h4{
-    position: absolute;
-    transform: translate(-50%, -50%);
-    left: 50%;
-    top: 25%;
     color: white;
     font-size: 18px;
     font-family: 'Nunito';
     margin: 0;
 }
 
-.content h5{
-    display: flex;
-    justify-content: center;
-    justify-items: center;
-    position: absolute;
-    transform: translate(-50%, -50%);
-    width: 100%;
-    left: 50%;
-    top: 88%;
-    color: white;
-    font-size: 14px;
-    font-family: 'Nunito';
-    font-weight: 300;
-    margin: 0;
-}
 
 /* Input container with icon styling */
 .input-container {
-    position: absolute;
-    transform: translate(-50%, -50%);
-    left: 50%;
     display: flex;
-    align-items: center;
+    align-items: center !important;
+    align-content: center !important;
+    gap: 1vh;
     width: 100%; /* Full width of parent container */
     height: 40px;
+    margin-top: 1vh;
 }
 
-.input-container:nth-of-type(1) {
-    top: 45%;
-}
-
-.input-container:nth-of-type(2) {
-    top: 60%;
-}
 
 .input-icon {
-    position: absolute;
-    left: 15px;
     color: #F59E0B;
     z-index: 1;
     font-size: 1rem;
 }
 
 .username, .password {
-    position: absolute;
-    left: 0;
-    top: 0;
-    height: 40px;
+    height: 30px;
     width: 100%;
-    padding-left: 45px;
+    padding-left: 25px !important;
     padding-right: 15px;
     border: 2px solid #F59E0B;
-    border-radius: 25px;
+    border-radius: 1.5vh;
     font-family: 'Nunito';
     font-size: 14px;
     color: #1F2937;
@@ -169,64 +141,3 @@
     color: #F59E0B;
 }
 
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-    .content {
-        width: 350px;
-        height: 450px;
-    }
-    
-    .content h1 {
-        font-size: 40px;
-    }
-    
-    .content h4 {
-        font-size: 16px;
-    }
-}
-
-@media (max-width: 480px) {
-    .content {
-        width: 300px;
-        height: 400px;
-    }
-    
-    .content h1 {
-        font-size: 36px;
-    }
-    
-    .content h4 {
-        font-size: 14px;
-    }
-    
-    .input-icon {
-        font-size: 0.9rem;
-        left: 12px;
-    }
-    
-    .username, .password {
-        padding-left: 40px;
-        font-size: 13px;
-    }
-}
-
-@media (max-width: 375px) {
-    .content {
-        width: 280px;
-        height: 380px;
-    }
-    
-    .content h1 {
-        font-size: 32px;
-    }
-    
-    .input-icon {
-        font-size: 0.8rem;
-        left: 10px;
-    }
-    
-    .username, .password {
-        padding-left: 35px;
-        font-size: 12px;
-    }
-}
