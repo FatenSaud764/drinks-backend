@@ -495,6 +495,12 @@
   padding-top: 4vw;
   text-align: right;
 }
+.vat-label {
+  font-size: 0.75em;
+  font-weight: normal;
+  color: #666;
+  margin-right: 4px;
+}
 
 #dark .order-footer {
   border-top-color: #4a5568;

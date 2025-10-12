@@ -417,7 +417,7 @@ const OrdersPage = () => {
 
                   <div className="order-footer">
                     <span className="order-total">
-                      Total: R{
+                      Total: <span className="vat-label">(VAT incl.)</span> R{
                         order.total_price 
                           ? parseFloat(order.total_price).toFixed(2)
                           : order.items && order.items.length > 0
