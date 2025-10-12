@@ -16,6 +16,7 @@ input:focus{
 
 .global-footer{
     display: flex;
+    margin-top: auto;
     font-size: 13px;
     font-family: 'Nunito';
     color: white;

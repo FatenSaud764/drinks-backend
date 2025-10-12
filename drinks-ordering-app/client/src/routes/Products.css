@@ -1,6 +1,8 @@
 .prodwrapper{
-    justify-content: center;
-    justify-items: center;
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
     width: auto;
     min-height: 100vh;
     height: auto;
