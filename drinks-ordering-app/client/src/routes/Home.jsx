@@ -40,7 +40,7 @@ const Home = () => {
     GetOrderData(); // Always fetch products
     const interval = setInterval(() => {
       GetOrderData();
-    }, 5000)
+    }, 3000)
     return () => clearInterval(interval);
   }, [])
 
@@ -99,7 +99,7 @@ const Home = () => {
         </div>
         {sortedOrders.length<=0 ? <h3 className='no_orders'>You have no active orders!</h3> : <div className='orderrow'>
           <div style={{fontFamily: 'Nunito', fontSize: '17px', fontWeight:'700'}}>Order #{sortedOrders[0].id}</div>
-          <div style={{fontFamily: 'Nunito', fontSize: '17px', border: 'none', borderRadius: '2vh', background: `${statusColor}`, width: '11vh', height: '3vh', display:'flex', justifyContent:'center', justifyItems:'center', color:'white', alignContent: 'center', alignItems: 'center'}}>{sortedOrders[0].status}</div>
+          <div style={{fontFamily: 'Nunito', fontSize: '17px', border: 'none', borderRadius: '2vh', background: `${statusColor}`, width: '13vh', height: '3.5vh', display:'flex', justifyContent:'center', justifyItems:'center', color:'white', alignContent: 'center', alignItems: 'center'}}>{sortedOrders[0].status}</div>
           </div>}
       </div>
       <div className='carousel-list'>
@@ -119,7 +119,7 @@ const Home = () => {
           )}
       </div>
       <br />
-      <br />
+      <footer className='global-footer'>@ 2025 SwiftServe</footer>
     </div>
   )
 }
