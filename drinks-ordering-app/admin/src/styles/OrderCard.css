@@ -104,6 +104,13 @@
   height: 18px;
 }
 
+.vat-label {
+  font-size: 0.8em;
+  font-weight: normal;
+  color: var(--text-muted);
+  margin-left: 4px;
+}
+
 /* Shimmer animation */
 @keyframes shimmer {
   0% {

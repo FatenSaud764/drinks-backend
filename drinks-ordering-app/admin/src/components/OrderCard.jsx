@@ -89,7 +89,7 @@ const OrderCard = ({
               })}
             </div>
             <div className="total-row">
-              <span><strong>Total:</strong></span>
+              <span><strong>Total:</strong> <span className="vat-label">(VAT incl.)</span></span>
               <span className="total-amount"><strong>{formatCurrency(order.totalAmount)}</strong></span>
             </div>
           </>
