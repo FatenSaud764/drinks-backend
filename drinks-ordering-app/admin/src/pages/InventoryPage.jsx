@@ -43,6 +43,7 @@ const InventoryPage = () => {
     globalFilter: ''
   });
   const [activeFilter, setActiveFilter] = useState('all'); // 'all', 'available', 'unavailable', 'low-stock'
+  const [categoryFilter, setCategoryFilter] = useState('all'); // Category filter state
   const [formData, setFormData] = useState({
     id: null,
     name: '',
@@ -489,30 +490,58 @@ const InventoryPage = () => {
     };
   }, [drinks]);
 
-  // Filter drinks based on active filter
-  const filteredDrinks = useMemo(() => {
-    if (activeFilter === 'all') return drinks;
-    
-    return drinks.filter(d => {
-      const stock = d.stock || 0;
-      const lowThreshold = d.low_stock_threshold || 10;
-      const unavailableThreshold = d.unavailable_threshold || 5;
-      
-      switch (activeFilter) {
-        case 'available':
-          return d.available;
-        case 'unavailable':
-          return !d.available;
-        case 'low-stock':
-          return d.available && stock > unavailableThreshold && stock <= lowThreshold;
-        default:
-          return true;
-      }
+  // Calculate category counts for filter tabs
+  const categoryCounts = useMemo(() => {
+    const counts = { all: drinks.length };
+    Object.values(DRINK_CATEGORIES).forEach(category => {
+      counts[category] = drinks.filter(d => d.category === category).length;
     });
-  }, [drinks, activeFilter]);
+    return counts;
+  }, [drinks]);
+
+  // Filter drinks based on active filter and category filter
+  const filteredDrinks = useMemo(() => {
+    let filtered = drinks;
+    
+    // Apply status filter
+    if (activeFilter !== 'all') {
+      filtered = filtered.filter(d => {
+        const stock = d.stock || 0;
+        const lowThreshold = d.low_stock_threshold || 10;
+        const unavailableThreshold = d.unavailable_threshold || 5;
+        
+        switch (activeFilter) {
+          case 'available':
+            return d.available;
+          case 'unavailable':
+            return !d.available;
+          case 'low-stock':
+            return d.available && stock > unavailableThreshold && stock <= lowThreshold;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Apply category filter
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(d => d.category === categoryFilter);
+    }
+
+    return filtered;
+  }, [drinks, activeFilter, categoryFilter]);
 
   const handleFilterClick = (filter) => {
     setActiveFilter(filter);
+    // Reset to first page when filter changes
+    setTableState(prev => ({
+      ...prev,
+      pagination: { ...prev.pagination, pageIndex: 0 }
+    }));
+  };
+
+  const handleCategoryFilterChange = (category) => {
+    setCategoryFilter(category);
     // Reset to first page when filter changes
     setTableState(prev => ({
       ...prev,
@@ -615,6 +644,31 @@ const InventoryPage = () => {
             </button>
           </div>
         )}
+
+        {/* Category Filter Section */}
+        <div className="orders-controls">
+          <div className="filter-section">
+            <div className="filter-tabs">
+              <button
+                className={`filter-tab ${categoryFilter === 'all' ? 'active' : ''}`}
+                onClick={() => handleCategoryFilterChange('all')}
+              >
+                All Categories
+                <span className="count">{categoryCounts.all}</span>
+              </button>
+              {Object.values(DRINK_CATEGORIES).map(category => (
+                <button
+                  key={category}
+                  className={`filter-tab ${categoryFilter === category ? 'active' : ''}`}
+                  onClick={() => handleCategoryFilterChange(category)}
+                >
+                  {category}
+                  <span className="count">{categoryCounts[category] || 0}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
 
         {/* Loading indicator for updates */}
         {loading && drinks.length > 0 && (
