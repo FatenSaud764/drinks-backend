@@ -86,11 +86,3 @@ Then enter the network URL displayed in your terminal (e.g., `http://192.168.1.x
 Both frontends connect to the same Supabase backend, allowing real-time communication between devices.
 
 ---
-
-## Inventory Auto-Adjustment Logic
-
-Inventory (drink stock) is automatically adjusted based on order status transitions on the backend:
-
-- When an order leaves the `pending` state to any other status except `cancelled`, the quantities of each order item are deducted from the corresponding drink stock exactly once.
-- If such an order is later moved to `cancelled`, the previously deducted stock is fully restored.
-- Direct cancellation while still `pending` does NOT change stock.
