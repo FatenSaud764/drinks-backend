@@ -34,37 +34,6 @@ export const DRINK_CATEGORIES = {
   OTHER: 'other', // Anything that do not fall under a specific category
 };
 
-export const DRINK_CATEGORY_IMAGES = {
-  ALCOHOLIC: alcoholic,        
-  NON_ALCOHOLIC: nonalcoholic,
-  COCKTAIL: cocktail,
-  MOCKTAIL: mocktail,
-  SHOT: shot,
-  BEER: beer,
-  CIDER: cider,
-  WATER: water,
-  WINE: wine,
-  OTHER: other,
-};
-
-
-export const getDrinkImage = (drinkType) => {
-  const mappings = {
-    'alcoholic': DRINK_CATEGORY_IMAGES.ALCOHOLIC,
-    'non-alcoholic': DRINK_CATEGORY_IMAGES.NON_ALCOHOLIC,
-    'cocktail': DRINK_CATEGORY_IMAGES.COCKTAIL,
-    'mocktail': DRINK_CATEGORY_IMAGES.MOCKTAIL,
-    'shot': DRINK_CATEGORY_IMAGES.SHOT,
-    'beer': DRINK_CATEGORY_IMAGES.BEER,
-    'cider': DRINK_CATEGORY_IMAGES.CIDER,
-    'wine': DRINK_CATEGORY_IMAGES.WINE,
-    'water': DRINK_CATEGORY_IMAGES.WATER,
-    'other': DRINK_CATEGORY_IMAGES.OTHER,
-  };
-  
-  return mappings[drinkType] || DRINK_CATEGORY_IMAGES.OTHER;
-};
-
 export const USER_ROLES = {
   CUSTOMER: 'customer',
   ADMIN: 'admin',
