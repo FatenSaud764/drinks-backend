@@ -14,9 +14,9 @@ export default function Notification({ isDisplaying, onClose, orderStatus, order
     }
 
     if (isDisplaying) {
-      timerRef.current = setTimeout(() => {
+      timerRef.current = setInterval(() => {
         onClose();
-      }, 8000);
+      }, 2500);
     }
 
     return () => {
