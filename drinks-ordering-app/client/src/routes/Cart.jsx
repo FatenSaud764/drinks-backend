@@ -252,7 +252,7 @@ const Cart = () => {
       
       {cartItems.length > 0 && (
         <div className="cart-footer">
-          <span>Total: R {totalPrice}</span>
+          <span style={{fontWeight: '500', fontSize: '18px'}}>Total: R {totalPrice} <span style={{fontWeight: '300'}}> (incl. VAT)</span></span>
           <button className="checkout-btn" onClick={() => {PlaceOrder()}}>Checkout</button>
         </div>
       )}

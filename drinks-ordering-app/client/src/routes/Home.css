@@ -98,7 +98,7 @@
     padding-top: 1vh;
     height: auto;
     min-height: 38vh;
-    width: 100vw;
+    width: 90vw;
     align-items: center;
     gap: 2.5vh;
     background:#f5f0eb;
@@ -106,6 +106,18 @@
     border-bottom: 3px solid #F59E0B;
 }
 
+#dark .carousel-wrapper{
+    background: none;
+    color: white !important;
+}
+
+#dark .slick-dots li button:before {
+  color: white;
+}
+
+#dark .slick-dots li.slick-active button:before {
+  color: white;
+}
 
 .slide-container{
     display: flex;
@@ -163,8 +175,8 @@
 
 
 .category-name{
-    font-family: 'Nunito';
-    font-size: 25px;
+    font-family: 'Roboto Slab';
+    font-size: 22px;
 }
 
 .carousel-image{
@@ -199,7 +211,7 @@
 .carousel-list{
     display: flex;
     flex-direction: column;
-    gap: 5vh;
+    gap: 7vh;
     align-items: center;
     align-content: center;
 }

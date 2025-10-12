@@ -120,7 +120,10 @@ const addToCart = async (e) => {
           )
         })}
         </div>
-      <div className='footer'></div>
+        <br />
+        <br />
+        <br />
+        <footer className='global-footer'>@ 2025 SwiftServe</footer>
       </div>
     </div>
   )

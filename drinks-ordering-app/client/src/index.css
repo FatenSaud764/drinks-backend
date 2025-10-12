@@ -13,3 +13,16 @@
 input:focus{
   outline: none;
 }
+
+.global-footer{
+    display: flex;
+    font-size: 13px;
+    font-family: 'Nunito';
+    color: white;
+    padding-left: 5vh;
+    align-items: center;
+    align-content: center;
+    height: 7vh;
+    width: 100vw;
+    background: #2563EB;
+}

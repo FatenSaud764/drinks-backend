@@ -6,7 +6,7 @@
   min-height: 64px;
   width: 100vw !important;
   margin: 0 !important;
-  background: #2563EB;
+  background: linear-gradient(90deg, #296dfe, #0039b5);
   z-index: 999;
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -16,7 +16,7 @@
 }
 
 #dark .nav {
-  background: #F59E0B !important;
+  background: linear-gradient(90deg, #ffac1d, #ff7b00) !important;
 }
 
 .brand {
