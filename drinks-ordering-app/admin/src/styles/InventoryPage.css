@@ -524,8 +524,12 @@
 }
 
 /* Category filter - override original styles of FilterControls */
+.filter-tabs {
+  justify-content: left !important;
+}
+
 .filter-tab {
-  padding: 0.5rem 1rem !important;
+  padding: 0.5rem 0.5rem !important;
 }
 
 /* Responsive Design */
