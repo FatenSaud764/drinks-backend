@@ -12,7 +12,9 @@ from django.db import IntegrityError
 from .otp_utils import generate_numeric_code
 
 
-
+# ============================================================================
+# EXISTING CODE (keep as is)
+# ============================================================================
 
 def recalc_order_total(order: Order) -> None:
     """Recalculate an order's total from its current items and drink prices."""
@@ -39,6 +41,22 @@ def ensure_order_otp(order: Order) -> None:
             continue
 
 
+def update_drink_availability(drink: Drink) -> None:
+    """
+    Helper: Update drink availability based on stock vs. unavailable_threshold.
+    Drink is AVAILABLE only if stock is GREATER THAN unavailable_threshold.
+    Only saves if availability changed.
+    """
+    old_available = drink.available
+    drink.available = drink.stock > drink.unavailable_threshold
+    
+    if drink.available != old_available:
+        drink.save(update_fields=['available', 'updated_at'])
+
+
+# ============================================================================
+# EXISTING SIGNALS (keep as is)
+# ============================================================================
 
 @receiver(pre_save, sender=Order)
 def on_order_status_change_generate_otp(sender, instance: Order, **kwargs):
@@ -128,6 +146,36 @@ def update_order_total_on_item_delete(sender, instance: OrderItem, **kwargs):
     recalc_order_total(instance.order)
 
 
+# ============================================================================
+# NEW: AUTOMATIC AVAILABILITY SWITCHING
+# ============================================================================
+
+@receiver(post_save, sender=Order)
+def update_drink_availability_after_order_change(sender, instance: Order, created, **kwargs):
+    """
+    Update drink availability after order status changes (post_save).
+    This runs AFTER adjust_inventory_on_status_change and ensures availability
+    is recalculated when stock was adjusted.
+    """
+    if instance.inventory_deducted or instance.status in ('cancelled', 'completed'):
+        items = instance.items.select_related('drink').all()
+        for item in items:
+            update_drink_availability(item.drink)
+
+
+@receiver(post_save, sender=Drink)
+def auto_update_drink_availability_on_direct_change(sender, instance: Drink, created, **kwargs):
+    """
+    Auto-update availability when a drink's stock is directly modified.
+    Runs after the drink is saved, checking if availability should change.
+    """
+    if not created:  # Skip on creation, only on updates
+        update_drink_availability(instance)
+
+
+# ============================================================================
+# BULK SYNC HELPER
+# ============================================================================
 
 def sync_all_drink_availability():
     """
