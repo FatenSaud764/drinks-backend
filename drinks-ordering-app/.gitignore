@@ -6,6 +6,7 @@ __pycache__/
 *.log
 *.sqlite3
 *.db
+backup.dump
 
 # Logs
 logs
@@ -25,7 +26,6 @@ dist-ssr
 *.local
 
 # Virtual Environment
-backend/env/
 env/
 venv/
 ENV/
@@ -35,10 +35,7 @@ myenv/
 .myenv/
 myenvironment/
 .myenvironment/
-/home/faten/Samus-RW344/drinks-ordering-app/backend/myenvironment
-
 backend/env/
-**/package-lock.json
 
 # Logs
 logs
