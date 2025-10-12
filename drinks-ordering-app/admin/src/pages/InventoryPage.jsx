@@ -470,18 +470,18 @@ const InventoryPage = () => {
     }
   };
 
-  // Calculate stats using dynamic thresholds
+  // Calculate stats using actual available property and stock thresholds
   const stats = useMemo(() => {
     return {
       total: drinks.length,
-      available: drinks.filter(d => (d.stock || 0) > (d.unavailable_threshold || 5)).length,
-      unavailable: drinks.filter(d => (d.stock || 0) <= (d.unavailable_threshold || 5)).length,
+      available: drinks.filter(d => d.available).length,
+      unavailable: drinks.filter(d => !d.available).length,
       lowStock: drinks.filter(d => {
         const stock = d.stock || 0;
         const lowThreshold = d.low_stock_threshold || 10;
         const unavailableThreshold = d.unavailable_threshold || 5;
-        // low stock if strictly above unavailable threshold but at or below low threshold
-        return stock > unavailableThreshold && stock <= lowThreshold;
+        // low stock if available and stock is at or below low threshold but above unavailable
+        return d.available && stock > unavailableThreshold && stock <= lowThreshold;
       }).length
     };
   }, [drinks]);
