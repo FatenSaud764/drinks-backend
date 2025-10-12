@@ -24,7 +24,7 @@ export default function Notification({ isDisplaying, onClose, orderStatus, order
         clearTimeout(timerRef.current);
       }
     };
-  }, [isDisplaying]);
+  }, [isDisplaying, onClose]);
 
   const handleClick = () => {
     onClose();
@@ -42,7 +42,7 @@ export default function Notification({ isDisplaying, onClose, orderStatus, order
       'cancelled': 'Your order has been cancelled'
     };
 
-    return statusMap[status.toLowerCase()] || status;
+    return statusMap[status?.toLowerCase()] || status;
   };
 
   const getStatusClass = (status) => {

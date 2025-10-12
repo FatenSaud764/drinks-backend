@@ -47,43 +47,46 @@ export const NotificationProvider = ({ children }) => {
   }, []);
 
   const checkForUpdates = useCallback(async () => {
-    if (!isLoggedIn || !user) return;
+  if (!isLoggedIn || !user) return;
 
-    if (isCheckingRef.current) {
-      console.log('Already checking');
-      return;
-    }
+  if (isCheckingRef.current) {
+    console.log('Already checking');
+    return;
+  }
 
-    isCheckingRef.current = true;
+  isCheckingRef.current = true;
 
-    try {
-      const since = lastCheckedRef.current || new Date(Date.now() - 60000).toISOString();
-      const recentOrders = await fetchRecentOrders(since);
+  try {
+    const since = lastCheckedRef.current || new Date(Date.now() - 60000).toISOString();
+    const recentOrders = await fetchRecentOrders(since);
 
-      recentOrders.forEach(order => {
-        const previousOrder = previousOrdersRef.current.get(order.id);
+    recentOrders.forEach(order => {
+      const previousOrder = previousOrdersRef.current.get(order.id);
 
+      // Only add notification if status actually changed
+      if (previousOrder && previousOrder.status !== order.status) {
         addNotification({
           orderId: order.id,
           orderNumber: order.order_number || order.id,
-          oldStatus: previousOrder.status,
-          newStatus: order.status,
+          oldStatus: previousOrder?.status,
+          newStatus: order?.status,
           timestamp: new Date()
         });
+      }
 
-        previousOrdersRef.current.set(order.id, {
-          status: order.status,
-          updated_at: order.updated_at
-        });
+      previousOrdersRef.current.set(order.id, {
+        status: order?.status,
+        updated_at: order.updated_at
       });
+    });
 
-      lastCheckedRef.current = new Date().toISOString();
-    } catch (error) {
-      console.error('Error checking for order updates', error);
-    } finally {
-      isCheckingRef.current = false;
-    }
-  }, [isLoggedIn, user, addNotification]);
+    lastCheckedRef.current = new Date().toISOString();
+  } catch (error) {
+    console.error('Error checking for order updates', error);
+  } finally {
+    isCheckingRef.current = false;
+  }
+}, [isLoggedIn, user, addNotification]);
 
   useEffect(() => {
     if (isLoggedIn && user) {
@@ -93,7 +96,7 @@ export const NotificationProvider = ({ children }) => {
 
       checkForUpdates();
 
-      intervalRef.current = setInterval(checkForUpdates, 10000);
+      intervalRef.current = setInterval(checkForUpdates, 4000);
 
       return () => {
         if (intervalRef.current) {
