@@ -214,7 +214,6 @@ class OrderViewset(viewsets.ViewSet):
         """Returns filtered queryset with optimized prefetch"""
         user = request.user if request.user.is_authenticated else User.objects.filter(role='staff').first()
 
-        # CRITICAL OPTIMIZATION: Prefetch all related data
         queryset = Order.objects.select_related('user').prefetch_related(
             Prefetch(
                 'items',
@@ -263,7 +262,6 @@ class OrderViewset(viewsets.ViewSet):
         """POST /api/orders/ - Submit current cart as a new order"""
         user = request.user if request.user.is_authenticated else User.objects.first()
         
-        # OPTIMIZATION: Prefetch cart items with drinks
         cart = Cart.objects.prefetch_related(
             Prefetch('items', queryset=CartItem.objects.select_related('drink'))
         ).get(user=user)
@@ -315,7 +313,6 @@ class OrderViewset(viewsets.ViewSet):
         order.status = new_status
         order.save() 
 
-        # OPTIMIZATION: Refetch with prefetch for serialization
         order = Order.objects.prefetch_related(
             Prefetch('items', queryset=OrderItem.objects.select_related('drink'))
         ).get(pk=pk)
@@ -425,7 +422,6 @@ class OrderViewset(viewsets.ViewSet):
         else:
             since = timezone.now() - timedelta(seconds=30)
         
-        # Check BOTH created_at AND updated_at
         queryset = self.get_queryset(request).filter(
             models.Q(created_at__gt=since) | models.Q(updated_at__gt=since)
         )
@@ -441,7 +437,7 @@ class OrderViewset(viewsets.ViewSet):
     )
     def send_reminder(self, request, pk=None):
         """POST /api/orders/{id}/send-reminder/ - Staff triggers a reminder"""
-        order = get_object_or_404(self.get_queryset(request), pk=pk) # Use queryset (clients only get reminders for their own orders)
+        order = get_object_or_404(self.get_queryset(request), pk=pk)
         
         if order.status != 'ready':
             return Response(
@@ -449,7 +445,6 @@ class OrderViewset(viewsets.ViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Just update the order's updated_at timestamp to trigger polling
         order.save(update_fields=['updated_at'])
         
         return Response({'detail': 'Reminder sent'})
@@ -483,7 +478,6 @@ class CartViewset(viewsets.GenericViewSet):
         """GET /api/cart/ - Retrieve the current user's cart with note and items"""
         cart = self.get_cart(request)
         
-        # CRITICAL OPTIMIZATION: Refetch with prefetch for serialization
         cart = Cart.objects.prefetch_related(
             Prefetch('items', queryset=CartItem.objects.select_related('drink'))
         ).get(pk=cart.pk)
@@ -506,7 +500,6 @@ class CartViewset(viewsets.GenericViewSet):
             serializer.save()
             cart.save()
             
-            # OPTIMIZATION: Refetch with prefetch
             cart = Cart.objects.prefetch_related(
                 Prefetch('items', queryset=CartItem.objects.select_related('drink'))
             ).get(pk=cart.pk)
@@ -523,7 +516,6 @@ class CartViewset(viewsets.GenericViewSet):
             serializer.save()
             cart.save()
             
-            # OPTIMIZATION: Refetch with prefetch
             cart = Cart.objects.prefetch_related(
                 Prefetch('items', queryset=CartItem.objects.select_related('drink'))
             ).get(pk=cart.pk)
@@ -571,7 +563,6 @@ class CartViewset(viewsets.GenericViewSet):
                 item.save()
             cart.save()
             
-            # OPTIMIZATION: Refetch with prefetch
             cart = Cart.objects.prefetch_related(
                 Prefetch('items', queryset=CartItem.objects.select_related('drink'))
             ).get(pk=cart.pk)
@@ -600,7 +591,6 @@ class CartViewset(viewsets.GenericViewSet):
             item.delete()
             cart.save()
             
-            # OPTIMIZATION: Refetch with prefetch
             cart = Cart.objects.prefetch_related(
                 Prefetch('items', queryset=CartItem.objects.select_related('drink'))
             ).get(pk=cart.pk)
@@ -611,7 +601,6 @@ class CartViewset(viewsets.GenericViewSet):
         if serializer.is_valid():
             serializer.save()
             
-            # OPTIMIZATION: Refetch with prefetch
             cart = Cart.objects.prefetch_related(
                 Prefetch('items', queryset=CartItem.objects.select_related('drink'))
             ).get(pk=cart.pk)
