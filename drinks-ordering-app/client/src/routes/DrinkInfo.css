@@ -87,6 +87,8 @@
     align-items: center;
     align-content: center;
     border-bottom: 1px solid #F59E0B;
+    padding-bottom: 0.5rem;
+    font-family: 'Nunito' !important;
 }
 
 
@@ -138,4 +140,33 @@
   position: relative;
   bottom: 8vh;
   right: 47vw;
+}
+
+/* Add this to your DrinkInfo.css file */
+
+/* Position the image container relatively */
+.drinkinfowrapper {
+    position: relative;
+}
+
+.drinkimage {
+    position: relative;
+}
+
+/* Category tag on the drink info page - positioned on the image */
+.category-tag-info {
+    position: absolute;
+    top: calc(11.5vh + 5vh + 2vh + 2vh + 10px);
+    left: 10%;
+    transform: translateX(16px);
+    padding: 5px 10px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border-radius: 6px;
+    background: rgb(245, 158, 11, 0.6);
+    color: rgb(255, 255, 255);
+    z-index: 10;
+    backdrop-filter: blur(4px);
+    transition: all 0.3s ease;
 }

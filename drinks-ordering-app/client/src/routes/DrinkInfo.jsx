@@ -47,6 +47,7 @@ const DrinkInfo = () => {
           <div style={{fontFamily:'Nunito', fontWeight:'600'}}>Return to products page</div>
         </div>
         <img src= {`${selecteddrink.image}`} className='drinkimage' />
+        <span className='category-tag-info'>{selecteddrink.category.charAt(0).toUpperCase() + selecteddrink.category.slice(1).toLowerCase()}</span>
         <div className='drink_name_price'>
           <div className='drinkname'>
             {selecteddrink.name}

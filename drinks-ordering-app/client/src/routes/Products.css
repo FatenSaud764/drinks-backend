@@ -154,11 +154,12 @@
   font-weight: 700;
   letter-spacing: 0.5px;
   border-radius: 6px;
-  background: rgb(245, 158, 11, 0.4);
+  background: rgb(245, 158, 11, 0.6);
   color: white;
   z-index: 10;
   backdrop-filter: blur(4px);
   transition: all 0.3s ease;
+  font-family: 'Nunito' !important;
 }
 
 .productbutton:hover .category-tag {
