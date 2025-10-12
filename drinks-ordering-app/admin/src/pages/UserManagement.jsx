@@ -21,6 +21,7 @@ const UserManagementPage = () => {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [validationErrors, setValidationErrors] = useState({});
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all', 'admin', 'staff'
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -242,6 +243,16 @@ const UserManagementPage = () => {
     };
   }, [users]);
 
+  // Filter users based on active filter
+  const filteredUsers = useMemo(() => {
+    if (activeFilter === 'admin') {
+      return users.filter(u => u.is_admin);
+    } else if (activeFilter === 'staff') {
+      return users.filter(u => !u.is_admin);
+    }
+    return users;
+  }, [users, activeFilter]);
+
   return (
     <div className="page">
       <div className="page-container">
@@ -269,15 +280,27 @@ const UserManagementPage = () => {
 
         {/* Summary Stats */}
         <div className="inventory-stats">
-          <div className="stat-card">
+          <div 
+            className={`stat-card ${activeFilter === 'all' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('all')}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="stat-value total">{stats.total}</div>
             <div className="stat-label">Total Users</div>
           </div>
-          <div className="stat-card">
+          <div 
+            className={`stat-card ${activeFilter === 'admin' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('admin')}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="stat-value admin">{stats.admins}</div>
             <div className="stat-label">Admins</div>
           </div>
-          <div className="stat-card">
+          <div 
+            className={`stat-card ${activeFilter === 'staff' ? 'active' : ''}`}
+            onClick={() => setActiveFilter('staff')}
+            style={{ cursor: 'pointer' }}
+          >
             <div className="stat-value staff">{stats.staff}</div>
             <div className="stat-label">Staff</div>
           </div>
@@ -303,7 +326,7 @@ const UserManagementPage = () => {
         <div className="orders-controls table-container">
           <MaterialReactTable
             columns={columns}
-            data={users}
+            data={filteredUsers}
             enableGlobalFilter={true}
             enableColumnFilters={false}
             enableSorting={true}
