@@ -257,35 +257,6 @@
   background: var(--bg-muted) !important;
 }
 
-/* Search Field */
-.table-container .MuiTextField-root .MuiOutlinedInput-root {
-  background: var(--bg-card) !important;
-  color: var(--text-primary) !important;
-  transition: border-color 0.2s ease !important; /* Keep only border transition */
-}
-
-.table-container .MuiTextField-root .MuiOutlinedInput-root .MuiOutlinedInput-notchedOutline {
-  border-color: var(--border-color) !important;
-  transition: border-color 0.2s ease !important;
-}
-
-.table-container .MuiTextField-root .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline {
-  border-color: var(--accent-color) !important;
-}
-
-.table-container .MuiTextField-root .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline {
-  border-color: var(--accent-color) !important;
-}
-
-.table-container .MuiTextField-root .MuiInputLabel-root {
-  color: var(--text-secondary) !important;
-  transition: color 0.2s ease !important;
-}
-
-.table-container .MuiTextField-root .MuiOutlinedInput-input {
-  color: var(--text-primary) !important;
-}
-
 /* No Records Display Message */
 .table-container .MuiTableBody-root .MuiTableCell-body {
   background: var(--bg-card) !important;
@@ -521,15 +492,6 @@
   color: var(--text-muted);
   font-size: 14px;
   line-height: 1.5;
-}
-
-/* Category filter - override original styles of FilterControls */
-.filter-tabs {
-  justify-content: left !important;
-}
-
-.filter-tab {
-  padding: 0.5rem 0.5rem !important;
 }
 
 /* Responsive Design */

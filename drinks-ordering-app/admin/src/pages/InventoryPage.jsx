@@ -39,9 +39,9 @@ const InventoryPage = () => {
   const [validationErrors, setValidationErrors] = useState({});
   const [tableState, setTableState] = useState({
     pagination: { pageSize: 10, pageIndex: 0 },
-    sorting: [],
-    globalFilter: ''
+    sorting: []
   });
+  const [searchTerm, setSearchTerm] = useState('');
   const [activeFilter, setActiveFilter] = useState('all'); // 'all', 'available', 'unavailable', 'low-stock'
   const [categoryFilter, setCategoryFilter] = useState('all'); // Category filter state
   const [formData, setFormData] = useState({
@@ -490,16 +490,7 @@ const InventoryPage = () => {
     };
   }, [drinks]);
 
-  // Calculate category counts for filter tabs
-  const categoryCounts = useMemo(() => {
-    const counts = { all: drinks.length };
-    Object.values(DRINK_CATEGORIES).forEach(category => {
-      counts[category] = drinks.filter(d => d.category === category).length;
-    });
-    return counts;
-  }, [drinks]);
-
-  // Filter drinks based on active filter and category filter
+  // Filter drinks based on active filter, category filter, and search term
   const filteredDrinks = useMemo(() => {
     let filtered = drinks;
     
@@ -528,8 +519,18 @@ const InventoryPage = () => {
       filtered = filtered.filter(d => d.category === categoryFilter);
     }
 
+    // Apply search filter
+    if (searchTerm.trim()) {
+      const lowerSearch = searchTerm.toLowerCase();
+      filtered = filtered.filter(d => 
+        d.name?.toLowerCase().includes(lowerSearch) ||
+        d.category?.toLowerCase().includes(lowerSearch) ||
+        d.description?.toLowerCase().includes(lowerSearch)
+      );
+    }
+
     return filtered;
-  }, [drinks, activeFilter, categoryFilter]);
+  }, [drinks, activeFilter, categoryFilter, searchTerm]);
 
   const handleFilterClick = (filter) => {
     setActiveFilter(filter);
@@ -645,28 +646,31 @@ const InventoryPage = () => {
           </div>
         )}
 
-        {/* Category Filter Section */}
+        {/* Search and Category Filter Section */}
         <div className="orders-controls">
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Search drinks by name, category, or description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+          
           <div className="filter-section">
-            <div className="filter-tabs">
-              <button
-                className={`filter-tab ${categoryFilter === 'all' ? 'active' : ''}`}
-                onClick={() => handleCategoryFilterChange('all')}
-              >
-                All Categories
-                <span className="count">{categoryCounts.all}</span>
-              </button>
+            <select 
+              value={categoryFilter} 
+              onChange={(e) => handleCategoryFilterChange(e.target.value)}
+              className="date-select"
+            >
+              <option value="all">All Categories</option>
               {Object.values(DRINK_CATEGORIES).map(category => (
-                <button
-                  key={category}
-                  className={`filter-tab ${categoryFilter === category ? 'active' : ''}`}
-                  onClick={() => handleCategoryFilterChange(category)}
-                >
-                  {category}
-                  <span className="count">{categoryCounts[category] || 0}</span>
-                </button>
+                <option key={category} value={category}>
+                  {category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}
+                </option>
               ))}
-            </div>
+            </select>
           </div>
         </div>
 
@@ -682,7 +686,7 @@ const InventoryPage = () => {
           <MaterialReactTable
             columns={columns}
             data={filteredDrinks}
-            enableGlobalFilter={true}
+            enableGlobalFilter={false}
             enableColumnFilters={false}
             enableSorting={true}
             enablePagination={true}
@@ -690,15 +694,13 @@ const InventoryPage = () => {
             enableFullScreenToggle={false}
             enableHiding={true}
             enableColumnActions={false}
-            enableTopToolbar={true}
+            enableTopToolbar={false}
             enableBottomToolbar={true}
             manualPagination={false}
             autoResetPageIndex={false}
             initialState={{
               pagination: tableState.pagination,
               sorting: tableState.sorting,
-              globalFilter: tableState.globalFilter,
-              showGlobalFilter: true,
             }}
             onPaginationChange={(updater) => {
               setTableState(prev => ({
@@ -711,17 +713,6 @@ const InventoryPage = () => {
                 ...prev,
                 sorting: typeof updater === 'function' ? updater(prev.sorting) : updater
               }));
-            }}
-            onGlobalFilterChange={(filter) => {
-              setTableState(prev => ({
-                ...prev,
-                globalFilter: filter
-              }));
-            }}
-            muiSearchTextFieldProps={{
-              placeholder: 'Search drinks...',
-              variant: 'outlined',
-              size: 'small',
             }}
             muiTablePaginationProps={{
               sx: {
@@ -739,7 +730,6 @@ const InventoryPage = () => {
               isLoading: loading,
               pagination: tableState.pagination,
               sorting: tableState.sorting,
-              globalFilter: tableState.globalFilter,
             }}
           />
         </div>
