@@ -315,13 +315,6 @@ const UserManagementPage = () => {
           </div>
         )}
 
-        {/* Loading indicator */}
-        {loading && (
-          <div className="loading-indicator">
-            <p>Loading users...</p>
-          </div>
-        )}
-
         {/* Material React Table */}
         <div className="orders-controls table-container">
           <MaterialReactTable
