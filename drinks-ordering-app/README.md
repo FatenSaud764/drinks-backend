@@ -1,6 +1,6 @@
 # Drinks Ordering App
 
-This project contains two Vite React apps (`admin` and `client`), a backend and a shared package.
+This project contains two Vite React apps (`admin` and `client`) that connect to a remote Supabase backend hosted on Render. The frontend apps can run on different devices and communicate through the shared backend.
 
 ---
 
@@ -9,114 +9,88 @@ This project contains two Vite React apps (`admin` and `client`), a backend and 
 - Node.js (v24 or later)
 - npm (v11 or later)
 - Make (GNU Make)
-- Python 3.10+
-- Docker
 
 ---
 
 ## Available Makefile Commands
+Run the following from `drinks-ordering-app/`
 
-Starts both development servers (bar-end and client-end) simultaneously.
+1. **To see all available commands:**
+   ```bash
+   make help
+   ```
 
-1. **Install Dependencies**
+2. **Install Dependencies**
 
    ```bash
    make install
    ```
 
-2. **Start Both Development Server**
+3. **Start Both Development Servers**
 
    ```bash
    make dev
    ```
 
-3. **Build Both**
+   Starts both the admin and client apps simultaneously on one device.
+
+4. **Build Both Apps**
 
    ```bash
    make build
    ```
 
-4. **Clean Build Files**
+5. **Clean Build Files**
 
    ```bash
    make clean
    ```
 
-5. **Install Frontend Dependencies**
+---
 
-   ```bash
-   make install-frontend
-   ```
+## Running Apps Individually
 
-6. **Install Backend Dependencies**
+### Admin App (view on desktop)
 
-   ```bash
-   make install-backend
-   ```
+```bash
+cd admin/
+npm run dev
+```
 
-7. **Start Database (Postgres in Docker)**
+### Client App (view on desktop)
 
-   ```bash
-   make start-db
-   ```
+```bash
+cd client/
+npm run dev
+```
 
-8. **Initialize Database**
+### Client App (view on mobile device)
 
-   ```bash
-   make init-db
-   ```
+To access the client app from your phone or other devices on the same network:
 
-9. **Stop Database**
+```bash
+cd client
+npm run dev -- --host
+```
 
-   ```bash
-   make stop-db
-   ```
+Then enter the network URL displayed in your terminal (e.g., `http://192.168.1.x:5173`) into your phone's browser.
 
-10. **Start Frontend Only (admin + client)**
+---
 
-   ```bash
-   make frontend
-   ```
+## Architecture
 
-11. **Start Backend Only**
+- **Backend**: Remote Supabase database hosted on Render
+- **Admin Frontend**: Bar staff/admin interface for managing orders and inventory
+- **Client Frontend**: Customer-facing app for placing orders
 
-   ```bash
-   make backend
-   ```
+Both frontends connect to the same Supabase backend, allowing real-time communication between devices.
 
-12. **Run Backend Tests**
-
-   ```bash
-   make test-backend
-   ```
-
-13. **Apply Backend Migrations**
-
-   ```bash
-   make migrate
-   ```
-
-## Available Django management commands
-
-Ensure virtual environment is activated.
-
-1. **Create Dummy Data**
-   ```bash
-   python manage.py create_dummy_data
-   ```
+---
 
 ## Inventory Auto-Adjustment Logic
 
-As of latest changes, inventory (drink stock) is automatically adjusted based on order status transitions:
+Inventory (drink stock) is automatically adjusted based on order status transitions on the backend:
 
-- When an order leaves the `pending` state to any other status except `cancelled`, the quantities of each `OrderItem` are deducted from the corresponding `Drink.stock` exactly once.
+- When an order leaves the `pending` state to any other status except `cancelled`, the quantities of each order item are deducted from the corresponding drink stock exactly once.
 - If such an order is later moved to `cancelled`, the previously deducted stock is fully restored.
 - Direct cancellation while still `pending` does NOT change stock.
-
-Implementation details:
-- A Boolean field `Order.inventory_deducted` tracks whether stock has been deducted for that order to prevent double adjustments.
-- Adjustments are performed in a pre-save signal using atomic updates with `F()` expressions for concurrency safety.
-
-Testing:
-- New tests in `backend/tests.py` (`InventoryAdjustmentTest`) validate deduction, restocking, idempotency, and no-op on direct cancellation of pending orders.
-
