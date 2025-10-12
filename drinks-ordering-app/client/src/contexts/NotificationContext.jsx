@@ -64,15 +64,13 @@ export const NotificationProvider = ({ children }) => {
       const previousOrder = previousOrdersRef.current.get(order.id);
 
       // Only add notification if status actually changed
-      if (previousOrder && previousOrder.status !== order.status) {
-        addNotification({
-          orderId: order.id,
-          orderNumber: order.order_number || order.id,
-          oldStatus: previousOrder?.status,
-          newStatus: order?.status,
-          timestamp: new Date()
-        });
-      }
+      addNotification({
+        orderId: order.id,
+        orderNumber: order.order_number || order.id,
+        oldStatus: previousOrder?.status,
+        newStatus: order?.status,
+        timestamp: new Date()
+      });
 
       previousOrdersRef.current.set(order.id, {
         status: order?.status,
