@@ -1,3 +1,7 @@
+/**
+ * @author Kirsten Sanders
+ * @description This is the page where users can view their active and past orders.
+*/
 import React, { useContext, useEffect, useState, useRef } from 'react'
 import NavBar from '../components/NavBar'
 import { LightDark, ProductList } from '../contexts/contexts'
@@ -16,6 +20,10 @@ const OrdersPage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const intervalRef = useRef(null)
+
+  // Filter states
+  const [searchOrderId, setSearchOrderId] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
 
   // OTP states
   const [selectedOrderId, setSelectedOrderId] = useState(null)
@@ -180,7 +188,22 @@ const OrdersPage = () => {
     order.status?.toLowerCase() === 'cancelled'
   )
 
-  const currentOrders = activeTab === 'active' ? activeOrders : pastOrders
+  // Apply filters
+  let currentOrders = activeTab === 'active' ? activeOrders : pastOrders
+  
+  // Filter by search order ID
+  if (searchOrderId.trim()) {
+    currentOrders = currentOrders.filter(order => 
+      order.id.toString().includes(searchOrderId.trim())
+    )
+  }
+  
+  // Filter by status
+  if (statusFilter !== 'all') {
+    currentOrders = currentOrders.filter(order => 
+      order.status?.toLowerCase() === statusFilter.toLowerCase()
+    )
+  }
 
   if (!isLoggedIn) {
     return (
@@ -253,6 +276,48 @@ const OrdersPage = () => {
           </button>
         </div>
 
+        <div className="filter-bar">
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Search by Order #"
+              value={searchOrderId}
+              onChange={(e) => setSearchOrderId(e.target.value)}
+              className="search-input"
+            />
+            {searchOrderId && (
+              <button 
+                className="clear-search"
+                onClick={() => setSearchOrderId('')}
+              >
+                ×
+              </button>
+            )}
+          </div>
+          
+          <div className="status-filter">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="status-select"
+            >
+              <option value="all">All Statuses</option>
+              {activeTab === 'active' ? (
+                <>
+                  <option value="pending">Pending</option>
+                  <option value="preparing">Preparing</option>
+                  <option value="ready">Ready</option>
+                </>
+              ) : (
+                <>
+                  <option value="completed">Completed</option>
+                  <option value="cancelled">Cancelled</option>
+                </>
+              )}
+            </select>
+          </div>
+        </div>
+
         {loading ? (
           <div className="loading">Loading your orders...</div>
         ) : error ? (
@@ -267,11 +332,13 @@ const OrdersPage = () => {
             {currentOrders.length === 0 ? (
               <div className="no-orders">
                 <p>
-                  {activeTab === 'active' 
-                    ? "You don't have any active orders at the moment." 
-                    : "You don't have any past orders yet."}
+                  {searchOrderId || statusFilter !== 'all'
+                    ? "No orders match your filters."
+                    : activeTab === 'active' 
+                      ? "You don't have any active orders at the moment." 
+                      : "You don't have any past orders yet."}
                 </p>
-                {activeTab === 'active' && orders.length === 0 && (
+                {activeTab === 'active' && orders.length === 0 && !searchOrderId && statusFilter === 'all' && (
                   <p>Start shopping to see your orders here!</p>
                 )}
               </div>
