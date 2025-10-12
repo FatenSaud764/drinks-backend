@@ -523,6 +523,11 @@
   line-height: 1.5;
 }
 
+/* Category filter - override original styles of FilterControls */
+.filter-tab {
+  padding: 0.5rem 1rem !important;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .inventory-stats {
