@@ -162,14 +162,14 @@ class DrinkViewset(viewsets.ViewSet):
         if value < 0:
             return Response({"detail": "unavailable_threshold must be >= 0."}, status=status.HTTP_400_BAD_REQUEST)
 
-        Drink.objects.all().update(unavailable_threshold=value)
         updated = Drink.objects.all().update(
-            available=Case(
-                When(stock__lt=F('unavailable_threshold'), then=Value(False)),
-                default=Value(True),
-                output_field=BooleanField(),
-            )
+        unavailable_threshold=value,
+        available=Case(
+            When(stock__lt=value, then=Value(False)),
+            default=Value(True),
+            output_field=BooleanField(),
         )
+    )
         return Response({"updated": updated})
 
     @action(detail=True, methods=["patch"], url_path="low-stock-threshold", permission_classes=[permissions.IsAdminUser])
