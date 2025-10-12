@@ -40,6 +40,7 @@ const Products = () => {
     });
   }, [products, keys]);
 
+  console.log('drinksclient', products)
 
   const filtered = search === '' ? products : fuse.search(search).map(result => result.item);
 

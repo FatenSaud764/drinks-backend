@@ -92,7 +92,7 @@ const AppContent = () => {
     GetData(); // Always fetch products
     const interval = setInterval(() => {
       GetData();
-    }, 7000)
+    }, 4000)
     return () => clearInterval(interval);
   }, [])
 
