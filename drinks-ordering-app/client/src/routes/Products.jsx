@@ -110,7 +110,10 @@ const addToCart = async (e) => {
           
           return (
               <div key={product.id} className='productdisplay'>
-              <button className='productbutton' onClick={() => {if(product.available && isLoggedIn && accessToken){setSelectedDrink(product); navigate('/drinkinfo');}}}><img src={product.available ? `${product.image}` : nostock} className='drinkcard'/></button>
+              <button className='productbutton' onClick={() => {if(product.available && isLoggedIn && accessToken){setSelectedDrink(product); navigate('/drinkinfo');}}}>
+                <img src={product.available ? `${product.image}` : nostock} className='drinkcard'/>
+                <span className='category-tag'>{product.category.charAt(0).toUpperCase() + product.category.slice(1).toLowerCase()}</span>
+              </button>
               <div className='productdesc'>{product.name}</div>
               <div className='additemwrapper'>
               <div className='productprice'>R{product.price}</div>
