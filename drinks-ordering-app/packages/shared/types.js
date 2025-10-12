@@ -19,16 +19,19 @@ export const ORDER_STATUSES = {
 };
 
 export const DRINK_CATEGORIES = {
-  ALCOHOLIC: 'alcoholic',
-  NON_ALCOHOLIC: 'non-alcoholic',
+  NON_ALCOHOLIC: 'non-alcoholic', // Non-alcoholic drinks (that has alcoholic choices)
   COCKTAIL: 'cocktail',
-  MOCKTAIL: 'mocktail',
-  SHOT: 'shot',
-  BEER: 'beer',
-  CIDER: 'cider',
+  MOCKTAIL: 'mocktail', // Cocktails with no alcohol
+  SHOT: 'shot', // Shot glass drinks
+  BEER: 'beer', // All alcoholic beer
+  CIDER: 'cider', // All alcoholic ciders
   WINE: 'wine',
-  WATER: 'water',
-  OTHER: 'other',
+  SPIRITS: 'spirits', // Alcoholic drinks that has spirits and side-mixer (e.g. brandy and coke)
+  WATER: 'water', // Tap, sparkling, bottled
+  SOFT_DRINK: 'soft-drink', // Sodas, Coke, Fanta, etc.
+  JUICE: 'juice', // Fresh juices, bottled juices
+  MILKSHAKE: 'milkshake', // Dairy-based shakes
+  OTHER: 'other', // Anything that do not fall under a specific category
 };
 
 export const DRINK_CATEGORY_IMAGES = {
