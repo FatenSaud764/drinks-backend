@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description Skeleton Card styles
+*/
+
 .skeleton-card {
   pointer-events: none;
   user-select: none;
