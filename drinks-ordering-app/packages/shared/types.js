@@ -25,6 +25,7 @@ export const DRINK_CATEGORIES = {
   SHOT: 'shot', // Shot glass drinks
   BEER: 'beer', // All alcoholic beer
   CIDER: 'cider', // All alcoholic ciders
+  SPRITZER: 'spritzer', // Wine spritzers e.g. Aperol Spritz, Brutal Fruit
   WINE: 'wine',
   SPIRITS: 'spirits', // Alcoholic drinks that has spirits and side-mixer (e.g. brandy and coke)
   WATER: 'water', // Tap, sparkling, bottled
