@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description Login modal styles
+*/
+
 .login-modal-overlay {
   position: fixed;
   top: 0;

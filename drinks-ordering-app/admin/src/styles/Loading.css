@@ -1,4 +1,8 @@
-/* Loading Indicator Styles */
+/**
+ * @author Kirsten Sanders
+ * @description Loading indicator styles
+*/
+
 .loading-indicator {
   display: flex;
   flex-direction: column;
