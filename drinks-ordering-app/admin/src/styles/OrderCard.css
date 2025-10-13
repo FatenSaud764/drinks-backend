@@ -31,6 +31,17 @@
 /* Make sure the note doesn't break the card layout */
 .order-items {
   position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollable items list container */
+.items-list {
+  max-height: calc(2.8em * 3.5); /* Fits exactly 3 items, scrolls at 4+ */
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 4px;
+  margin-bottom: 8px;
 }
 
 .item-price {
@@ -43,6 +54,9 @@
 /* Skeleton loading container */
 .items-loading {
   padding: 10px 0;
+  max-height: calc(2.8em * 4.5); /* Match the items-list max height */
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* Individual skeleton item row */
