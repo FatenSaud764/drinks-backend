@@ -935,3 +935,51 @@
   height: 5vh;
   width: 100%;
 }
+
+.view-receipt-btn {
+  padding: 2vw 4vw;
+  background-color: #2563EB;
+  color: white;
+  border: none;
+  border-radius: 1.5vw;
+  font-size: 3vw;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: 'Roboto Slab';
+  margin-top: 2vw;
+}
+
+.view-receipt-btn:hover {
+  background-color: #1d4ed8;
+}
+
+/* Update order-footer to accommodate the button */
+.order-footer {
+  border-top: 2px solid #e5e5e5;
+  padding-top: 4vw;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2vw;
+}
+
+#dark .order-footer {
+  border-top-color: #4a5568;
+}
+
+/* Responsive styles for receipt button */
+@media (max-width: 768px) {
+  .view-receipt-btn {
+    font-size: 3.5vw;
+    padding: 2.5vw 4.5vw;
+  }
+}
+
+@media (max-width: 400px) {
+  .view-receipt-btn {
+    font-size: 4vw;
+    padding: 3vw 5vw;
+  }
+}
