@@ -400,6 +400,15 @@
   font-size: 3.5vw;
 }
 
+/* Order Items Container - Scrollable */
+.order-items {
+  max-height: 250px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-bottom: 4vw;
+  padding-right: 1vw;
+}
+
 /* Order Items */
 .order-item {
   display: flex;
@@ -494,16 +503,21 @@
   border-top: 2px solid #e5e5e5;
   padding-top: 4vw;
   text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2vw;
 }
+
+#dark .order-footer {
+  border-top-color: #4a5568;
+}
+
 .vat-label {
   font-size: 0.75em;
   font-weight: normal;
   color: #666;
   margin-right: 4px;
-}
-
-#dark .order-footer {
-  border-top-color: #4a5568;
 }
 
 .order-total {
@@ -952,21 +966,6 @@
 
 .view-receipt-btn:hover {
   background-color: #1d4ed8;
-}
-
-/* Update order-footer to accommodate the button */
-.order-footer {
-  border-top: 2px solid #e5e5e5;
-  padding-top: 4vw;
-  text-align: right;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 2vw;
-}
-
-#dark .order-footer {
-  border-top-color: #4a5568;
 }
 
 /* Responsive styles for receipt button */
