@@ -29,6 +29,7 @@ export const DRINK_CATEGORIES = {
   SPIRITS: 'spirits', // Alcoholic drinks that has spirits and side-mixer (e.g. brandy and coke)
   WATER: 'water', // Tap, sparkling, bottled
   SOFT_DRINK: 'soft-drink', // Sodas, Coke, Fanta, etc.
+  ENERGY_DRINK: 'energy-drink', // Red Bull, Monster, etc.
   JUICE: 'juice', // Fresh juices, bottled juices
   MILKSHAKE: 'milkshake', // Dairy-based shakes
   OTHER: 'other', // Anything that do not fall under a specific category
