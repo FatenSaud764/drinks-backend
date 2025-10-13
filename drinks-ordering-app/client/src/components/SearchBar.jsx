@@ -21,7 +21,7 @@ const SearchBar = () => {
                 <input type='submit' ref={submit} style={{display: 'none'}}></input>
                 <select value={category} className='selectcategory' onChange={(e) => {setCategory(e.target.value)}}>
                   <option value='all'>All Drinks</option>
-                  {Object.values(DRINK_CATEGORIES).map((drinkcategory) =>
+                  {Object.values(DRINK_CATEGORIES).sort((a,b)=>{return a.localeCompare(b)}).map((drinkcategory) =>
                     <option key={drinkcategory} value={drinkcategory}>{drinkcategory.charAt(0).toUpperCase() + drinkcategory.slice(1).toLowerCase()}</option>
                   )}
                 </select>
