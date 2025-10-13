@@ -24,7 +24,7 @@
 }
 
 .footer{
-    margin-top: 4vh;
+    margin-top: 8vh;
     height: 5vh;
     width: 100%;
 }
@@ -41,6 +41,7 @@
     row-gap: 18vw;
     height: auto;
     width: 91.2vw;
+    padding-bottom: 6vh;
 }
 
 .menu{
@@ -182,6 +183,7 @@
         row-gap: 12vw;
         width: 90vw;
         margin-top: 3vh;
+        padding-bottom: 6vh;
     }
     
     .productdisplay{
@@ -235,6 +237,7 @@
         row-gap: 8vw;
         width: 92vw;
         margin-top: 4vh;
+        padding-bottom: 6vh;
     }
     
     .productdisplay{
@@ -288,6 +291,7 @@
         row-gap: 6vw;
         width: 92vw;
         margin-top: 5vh;
+        padding-bottom: 6vh;
     }
     
     .productdisplay{

@@ -205,18 +205,19 @@
     }
 }
 
+
 /* Laptops (1025px - 1439px) */
 @media screen and (min-width: 1025px) and (max-width: 1439px) {
     .drinkinfowrapper{
-        flex-direction: row;
-        flex-wrap: nowrap;
-        justify-content: center;
-        align-items: center;
+        display: grid;
+        grid-template-columns: 38vw 38vw;
         gap: 4vw;
-        padding: 0 6vw;
-        min-height: 100vh;
-        height: 100vh;
-        overflow: hidden;
+        padding: 15vh 6vw 4vh 6vw;
+        grid-template-areas: 
+            "image name-price"
+            "image description"
+            "image cart"
+            "image .";
     }
 
     .return{
@@ -229,15 +230,15 @@
     }
 
     .drinkimage{
-        width: 38vw;
+        grid-area: image;
+        width: 100%;
         max-width: 450px;
-        height: 65vh;
-        max-height: 450px;
+        height: auto;
+        aspect-ratio: 3/4;
         object-fit: cover;
         border-radius: 2vh;
         box-shadow: 0 10px 40px rgba(245, 158, 11, 0.15);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        margin-top: 0;
     }
 
     .drinkimage:hover{
@@ -245,17 +246,8 @@
         box-shadow: 0 15px 50px rgba(245, 158, 11, 0.25);
     }
 
-    .cart_section{
-        width: 38vw;
-        max-width: 450px;
-        height: auto;
-        gap: 2vh;
-        align-items: flex-start;
-        justify-content: center;
-        padding: 0;
-    }
-
     .drink_name_price{
+        grid-area: name-price;
         width: 100%;
         padding-bottom: 0.8rem;
         margin-bottom: 0.5vh;
@@ -278,10 +270,17 @@
     }
 
     .drinkdesc{
+        grid-area: description;
         font-size: 15px !important;
         width: 100%;
         line-height: 1.6;
         margin-bottom: 1vh;
+    }
+
+    .cart_section{
+        grid-area: cart;
+        width: 100%;
+        max-width: 450px;
     }
 
     .addtocart{
@@ -303,6 +302,7 @@
     }
 
     .category-tag-info {
+        position: absolute;
         top: calc(15vh + 10px);
         left: calc(6vw + 16px);
         font-size: 0.85rem;
@@ -313,15 +313,15 @@
 /* Desktops (1440px +) */
 @media screen and (min-width: 1440px) {
     .drinkinfowrapper{
-        flex-direction: row;
-        flex-wrap: nowrap;
-        justify-content: center;
-        align-items: center;
+        display: grid;
+        grid-template-columns: 35vw 35vw;
         gap: 6vw;
-        padding: 0 8vw;
-        min-height: 100vh;
-        height: 100vh;
-        overflow: hidden;
+        padding: 15vh 8vw 4vh 8vw;
+        grid-template-areas: 
+            "image name-price"
+            "image description"
+            "image cart"
+            "image .";
     }
 
     .return{
@@ -334,15 +334,15 @@
     }
 
     .drinkimage{
-        width: 35vw;
+        grid-area: image;
+        width: 100%;
         max-width: 500px;
-        height: 70vh;
-        max-height: 500px;
+        height: auto;
+        aspect-ratio: 3/4;
         object-fit: cover;
         border-radius: 2vh;
         box-shadow: 0 10px 40px rgba(245, 158, 11, 0.15);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
-        margin-top: 0;
     }
 
     .drinkimage:hover{
@@ -350,17 +350,8 @@
         box-shadow: 0 15px 50px rgba(245, 158, 11, 0.25);
     }
 
-    .cart_section{
-        width: 35vw;
-        max-width: 500px;
-        height: auto;
-        gap: 2vh;
-        align-items: flex-start;
-        justify-content: center;
-        padding: 0;
-    }
-
     .drink_name_price{
+        grid-area: name-price;
         width: 100%;
         padding-bottom: 0.8rem;
         margin-bottom: 0.5vh;
@@ -383,10 +374,17 @@
     }
 
     .drinkdesc{
+        grid-area: description;
         font-size: 16px !important;
         width: 100%;
         line-height: 1.6;
         margin-bottom: 1vh;
+    }
+
+    .cart_section{
+        grid-area: cart;
+        width: 100%;
+        max-width: 500px;
     }
 
     .addtocart{
@@ -408,6 +406,7 @@
     }
 
     .category-tag-info {
+        position: absolute;
         top: calc(15vh + 10px);
         left: calc(8vw + 16px);
         font-size: 0.9rem;

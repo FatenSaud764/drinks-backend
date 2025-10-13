@@ -218,7 +218,7 @@
 @media (min-width: 600px) and (max-width: 1024px) {
   .greeting {
     font-size: 28px;
-    margin-top: 10vh;
+    margin-top: 14vh;
   }
 
   .orderwrapper {
@@ -254,7 +254,7 @@
 @media (min-width: 1025px) and (max-width: 1439px) {
   .greeting {
     font-size: 32px;
-    margin-top: 10vh;
+    margin-top: 14vh;
   }
 
   .orderwrapper {
@@ -285,7 +285,7 @@
 @media (min-width: 1440px) {
   .greeting {
     font-size: 36px;
-    margin-top: 10vh;
+    margin-top: 14vh;
   }
 
   .orderwrapper {
