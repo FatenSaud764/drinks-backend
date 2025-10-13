@@ -33,7 +33,6 @@ export const DRINK_CATEGORIES = {
   ENERGY_DRINK: 'energy-drink', // Red Bull, Monster, etc.
   JUICE: 'juice', // Fresh juices, bottled juices
   MILKSHAKE: 'milkshake', // Dairy-based shakes
-  OTHER: 'other', // Anything that do not fall under a specific category
 };
 
 export const USER_ROLES = {
