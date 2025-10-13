@@ -27,8 +27,11 @@ export default function NavBar() {
     }
   }, [notifications]);
 
-  const handleCloseNotification = () => {
+  const handleCloseNotification = (e) => {
     if (displayedNotification) {
+      if (e) {
+        e.stopPropagation();
+      }
       removeNotification(displayedNotification.id);
       setDisplayedNotification(null);
     }

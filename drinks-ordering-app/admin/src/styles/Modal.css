@@ -141,6 +141,7 @@
   resize: vertical;
   min-height: 80px;
   font-family: inherit;
+  margin-bottom: 0;
 }
 
 /* Error Messages in Modal */

@@ -6,55 +6,27 @@ SHARED_DIR = packages/shared
 BACKEND_DIR = backend
 PYTHON ?= python3
 VENV_ACTIVATE = . env/bin/activate
-VENV_DIR = env
 
-# Start all dev servers
+# Start both frontend dev servers
 .PHONY: dev
 dev:
 	cd $(BAR_DIR) && npm run dev & \
-	cd $(CLIENT_DIR) && npm run dev & \
-	cd $(BACKEND_DIR) && ${VENV_ACTIVATE} && ${PYTHON} manage.py runserver
-
-# Start frontend (client + bar) only
-.PHONY: frontend
-frontend:
-	cd $(BAR_DIR) && npm run dev & \
 	cd $(CLIENT_DIR) && npm run dev
 
-# Start backend only
-.PHONY: backend
-backend:
-	cd $(BACKEND_DIR) && ${VENV_ACTIVATE} && ${PYTHON} manage.py runserver
-
 # Install all frontend dependencies
-.PHONY: install-frontend
-install-frontend:
+.PHONY: install
+install:
 	cd $(BAR_DIR) && npm install
 	cd $(CLIENT_DIR) && npm install
 	cd $(SHARED_DIR) && npm install
 
-.PHONY: start-db
-start-db:
-	docker compose up -d postgres
+# Build both apps (for production)
+.PHONY: build
+build:
+	cd $(BAR_DIR) && npm run build
+	cd $(CLIENT_DIR) && npm run build
 
-.PHONY: init-db
-init-db: start-db
-	cd $(BACKEND_DIR) && ${VENV_ACTIVATE} && ${PYTHON} manage.py migrate && ${PYTHON} manage.py create_dummy_data
-
-.PHONY: stop-db
-stop-db:
-	docker compose down
-
-# Install backend dependencies
-.PHONY: install-backend
-install-backend: start-db
-	cd $(BACKEND_DIR) && ${PYTHON} -m venv env && \
-	${VENV_ACTIVATE} && \
-	pip install -r requirements.txt && \
-	${PYTHON} manage.py makemigrations && \
-	${PYTHON} manage.py migrate
-
-# Clean all node_modules and lock files
+# Clean all node_modules and build files
 .PHONY: clean
 clean:
 	rm -rf $(BAR_DIR)/node_modules \
@@ -63,30 +35,37 @@ clean:
 	       $(BAR_DIR)/package-lock.json \
 	       $(CLIENT_DIR)/package-lock.json \
 	       $(SHARED_DIR)/package-lock.json \
-		   $(BACKEND_DIR)/$(VENV_DIR) \
-	       $(BACKEND_DIR)/__pycache__ \
-	       $(BACKEND_DIR)/*.sqlite3 \
-	       $(BACKEND_DIR)/.pytest_cache \
-	       $(BACKEND_DIR)/*.log
-	find $(BACKEND_DIR) -name '*.pyc' -delete
-	find $(BACKEND_DIR) -name '*.pyo' -delete
+	       $(BAR_DIR)/dist \
+	       $(CLIENT_DIR)/dist
 
-# Reinstall everything (frontend + backend)
-.PHONY: install
-install: install-frontend install-backend
+# Backend utility commands (for local development/testing)
+.PHONY: create-dummy-data
+create-dummy-data:
+	cd $(BACKEND_DIR) && ${VENV_ACTIVATE} && ${PYTHON} manage.py create_dummy_data
 
-# Build both apps (for production)
-.PHONY: build
-build:
-	cd $(BAR_DIR) && npm run build
-	cd $(CLIENT_DIR) && npm run build
+.PHONY: migrate
+migrate:
+	cd $(BACKEND_DIR) && ${VENV_ACTIVATE} && ${PYTHON} manage.py migrate
 
-# Run backend tests
 .PHONY: test-backend
 test-backend:
 	cd $(BACKEND_DIR) && ${VENV_ACTIVATE} && ${PYTHON} manage.py test
 
-# Apply backend migrations
-.PHONY: migrate
-migrate:
-	cd $(BACKEND_DIR) && ${VENV_ACTIVATE} && ${PYTHON} manage.py migrate
+# Help command
+.PHONY: help
+help:
+	@echo "Available commands:"
+	@echo "  make install            - Install all dependencies"
+	@echo "  make dev                - Start both development servers (admin + client)"
+	@echo "  make build              - Build both apps for production"
+	@echo "  make clean              - Clean build files and node_modules"
+	@echo ""
+	@echo "Backend utilities (for local backend development):"
+	@echo "  make create-dummy-data  - Populate database with test data"
+	@echo "  make migrate            - Apply database migrations"
+	@echo "  make test-backend       - Run backend tests"
+	@echo ""
+	@echo "Run individual apps:"
+	@echo "  cd admin && npm run dev              - Admin app only"
+	@echo "  cd client && npm run dev             - Client app only"
+	@echo "  cd client && npm run dev -- --host   - Client app with network access (for mobile)"
