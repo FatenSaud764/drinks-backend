@@ -190,6 +190,12 @@ const OrdersPage = () => {
     order.status?.toLowerCase() === 'cancelled'
   )
 
+  // Total item count helper
+  const getTotalItemCount = (items) => {
+    if (!items || items.length === 0) return 0
+    return items.reduce((sum, item) => sum + (item.quantity || 1), 0)
+  }
+
   // Apply filters
   let currentOrders = activeTab === 'active' ? activeOrders : pastOrders
   
@@ -429,20 +435,26 @@ const OrdersPage = () => {
                   </div>
 
                   <div className="order-footer">
-                    <span className="order-total">
-                      Total: <span className="vat-label">(VAT incl.)</span> R{
-                        order.total_price 
-                          ? parseFloat(order.total_price).toFixed(2)
-                          : order.items && order.items.length > 0
-                            ? order.items.reduce((sum, item) => {
-                                const drinkId = item.drink_id || item.drink || item.product_id
-                                const price = getProductPrice(drinkId)
-                                const quantity = item.quantity || 1
-                                return sum + (price * quantity)
-                              }, 0).toFixed(2)
-                            : '0.00'
-                      }
-                    </span>
+                    <div className="order-summary">
+                      <span className="order-total">
+                        Total: <span className="vat-label">(VAT incl.)</span> R{
+                          order.total_price 
+                            ? parseFloat(order.total_price).toFixed(2)
+                            : order.items && order.items.length > 0
+                              ? order.items.reduce((sum, item) => {
+                                  const drinkId = item.drink_id || item.drink || item.product_id
+                                  const price = getProductPrice(drinkId)
+                                  const quantity = item.quantity || 1
+                                  return sum + (price * quantity)
+                                }, 0).toFixed(2)
+                              : '0.00'
+                        }
+                      </span>
+                      
+                      <span className="item-count">
+                        ({getTotalItemCount(order.items)} {getTotalItemCount(order.items) === 1 ? 'item' : 'items'})
+                      </span>
+                    </div>
                     
                     {(order.status?.toLowerCase() === 'completed' || 
                       order.status?.toLowerCase() === 'ready' || 
