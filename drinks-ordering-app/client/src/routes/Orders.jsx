@@ -104,7 +104,7 @@ const OrdersPage = () => {
       fetchOrders()
 
       intervalRef.current = setInterval(() => {
-        if(!selectedReceiptOrder){fetchOrders(false)}
+        fetchOrders(false);
       }, 4000)
 
       return () => {
@@ -263,20 +263,18 @@ const OrdersPage = () => {
   )
 
   // Receipt Modal Component
-  const ReceiptModal = () => (
-    selectedReceiptOrder && (
-      <Receipt 
-        order={selectedReceiptOrder} 
-        onClose={() => setSelectedReceiptOrder(null)}
-      />
-    )
-  )
+
 
   return (
     <div className="orderswrapper" id={theme}>
       <NavBar />
       <OtpVisiblity />
-      <ReceiptModal />
+      {selectedReceiptOrder && (
+      <Receipt 
+        order={selectedReceiptOrder} 
+        onClose={() => setSelectedReceiptOrder(null)}
+      />
+    )}
       <div className="orders-content">
         <h1 className="orders-title">My Orders</h1>
         
@@ -460,7 +458,7 @@ const OrdersPage = () => {
                     {order.status?.toLowerCase() === 'completed' && (
                       <button 
                         className="view-receipt-btn"
-                        onClick={() => setSelectedReceiptOrder(order)}
+                        onClick={() => {setSelectedReceiptOrder(order)}}
                       >
                         View Receipt
                       </button>
