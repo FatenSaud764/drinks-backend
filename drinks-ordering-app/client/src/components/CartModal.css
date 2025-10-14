@@ -21,6 +21,7 @@
   margin-left: auto;
   margin-right: auto;
   background-clip: padding-box;
+  z-index: 999;
 }
 
 .addednotif {

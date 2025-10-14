@@ -104,7 +104,7 @@ const OrdersPage = () => {
       fetchOrders()
 
       intervalRef.current = setInterval(() => {
-        fetchOrders(false)
+        if(!selectedReceiptOrder){fetchOrders(false)}
       }, 4000)
 
       return () => {
