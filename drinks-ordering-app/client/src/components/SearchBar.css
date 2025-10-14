@@ -10,21 +10,21 @@
 
 .search {
     border: 2px solid #F59E0B;
-    border-radius: 30vh;
+    border-radius: 1.5vh;
     padding-left: 4vw;
-    width: 50vw;
-    height: 3.4vh;
+    min-width: 55vw !important;
+    height:3.4vh;
     cursor: pointer;
-    font-family: 'Lalita One';
-    font-size: 12px;
+    font-family: 'Nunito';
+
 }
 
 .search:focus {
     outline: none;
 }
 
-.selectcategory {
-    margin-left: 13vw;
+.selectcategory{
+    margin-left: 8vw;
     text-align: center;
     width: 28vw;
     height: 2.8vh;

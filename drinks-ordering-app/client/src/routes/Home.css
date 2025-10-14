@@ -5,12 +5,12 @@
     height: auto;
     min-height: 110vh;
     width: 100vw;
-    max-width: 100vw;
     overflow-y: auto;
     background: #f5f0eb;
     align-items: center;
     align-content: center;
     margin-top: 1vh;
+    overflow-x: hidden;
 }
 
 .no_orders{

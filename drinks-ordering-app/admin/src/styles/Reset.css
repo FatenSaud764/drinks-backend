@@ -8,7 +8,7 @@
   padding: 0;
   box-sizing: border-box;
   /* scrollbars */
-  scrollbar-width: auto;
+  scrollbar-width: thin;
   scrollbar-color: var(--bg-muted) var(--bg-secondary);
 }
 

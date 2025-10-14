@@ -62,6 +62,10 @@ const InventoryPage = () => {
     unavailable_threshold: 5
   });
 
+  const getSortedCategories = () => {
+    return Object.values(DRINK_CATEGORIES).sort((a, b) => a.localeCompare(b));
+  };
+
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -665,7 +669,7 @@ const InventoryPage = () => {
               className="date-select"
             >
               <option value="all">All Categories</option>
-              {Object.values(DRINK_CATEGORIES).map(category => (
+              {getSortedCategories().map(category => (
                 <option key={category} value={category}>
                   {category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}
                 </option>
@@ -792,8 +796,8 @@ const InventoryPage = () => {
                         required
                       >
                         <option value="">Select Category</option>
-                        {Object.values(DRINK_CATEGORIES).map(category => (
-                          <option key={category} value={category}>{category}</option>
+                        {getSortedCategories().map(category => (
+                          <option key={category} value={category}>{category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}</option>
                         ))}
                       </select>
                       {validationErrors.category && (

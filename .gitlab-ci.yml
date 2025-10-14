@@ -6,11 +6,12 @@ variables:
   PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
 
 stages:
-  - test
+  - backend
+  - frontend
 
-# Runs Django tests directly in a Python environment (no Docker-in-Docker)
+# Runs Django tests directly in a Python environment
 backend-django-tests:
-  stage: test
+  stage: backend
   tags:
     - shared-docker-runner
   cache:
@@ -18,7 +19,7 @@ backend-django-tests:
     paths:
       - .cache/pip
   before_script:
-    - set -euo pipefail
+    - set -eu
     - python --version
     - pip --version
     - python -m pip install --upgrade pip setuptools wheel
@@ -40,3 +41,59 @@ backend-django-tests:
       when: on_success
     - if: $CI_COMMIT_BRANCH
       when: on_success
+
+# Frontend tests: admin
+admin-frontend-tests:
+  image: node:20-alpine
+  stage: frontend
+  tags:
+    - shared-docker-runner
+  cache:
+    key: "admin-node-modules"
+    paths:
+      - drinks-ordering-app/admin/node_modules
+      - drinks-ordering-app/packages/shared/node_modules
+  before_script:
+    - set -eu
+    - node --version
+    - npm --version
+    - (cd drinks-ordering-app/packages/shared && npm install)
+    - (cd drinks-ordering-app/admin && npm install)
+  script:
+    - cd drinks-ordering-app/admin && npm run test:ci
+  artifacts:
+    when: always
+    paths:
+      - drinks-ordering-app/admin/coverage
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+
+# Frontend tests: client
+client-frontend-tests:
+  image: node:20-alpine
+  stage: frontend
+  tags:
+    - shared-docker-runner
+  cache:
+    key: "client-node-modules"
+    paths:
+      - drinks-ordering-app/client/node_modules
+      - drinks-ordering-app/packages/shared/node_modules
+  before_script:
+    - set -eu
+    - node --version
+    - npm --version
+    - (cd drinks-ordering-app/packages/shared && npm install)
+    - (cd drinks-ordering-app/client && npm install)
+  script:
+    - cd drinks-ordering-app/client && npm run test:ci
+  artifacts:
+    when: always
+    paths:
+      - drinks-ordering-app/client/coverage
+    expire_in: 1 week
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH

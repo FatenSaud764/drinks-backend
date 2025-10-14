@@ -17,12 +17,12 @@ const SearchBar = () => {
     <>
         <form onSubmit={(e) => {setSearch(searchterms.current.value); e.preventDefault();}}>
             <div className='searchwrap'>
-                <input type='search' className='search' ref={searchterms} placeholder='Search' onChange={(e) => {submit.current.click(); e.preventDefault();}}/>
+                <input type='search' className='search' ref={searchterms} placeholder='Find a drink...' onChange={(e) => {submit.current.click(); e.preventDefault();}}/>
                 <input type='submit' ref={submit} style={{display: 'none'}}></input>
                 <select value={category} className='selectcategory' onChange={(e) => {setCategory(e.target.value)}}>
                   <option value='all'>All Drinks</option>
-                  {Object.values(DRINK_CATEGORIES).map((drinkcategory) =>
-                    <option key={drinkcategory} value={drinkcategory}>{drinkcategory.charAt(0).toUpperCase() + drinkcategory.slice(1).toLowerCase()}</option>
+                  {Object.values(DRINK_CATEGORIES).sort((a,b)=>{return a.localeCompare(b)}).map((drinkcategory) =>
+                    <option style={{fontFamily: 'Nunito'}} key={drinkcategory} value={drinkcategory}>{drinkcategory.charAt(0).toUpperCase() + drinkcategory.slice(1).toLowerCase()}</option>
                   )}
                 </select>
             </div>

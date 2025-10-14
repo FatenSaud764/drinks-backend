@@ -400,6 +400,15 @@
   font-size: 3.5vw;
 }
 
+/* Order Items Container - Scrollable */
+.order-items {
+  max-height: 250px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  margin-bottom: 4vw;
+  padding-right: 1vw;
+}
+
 /* Order Items */
 .order-item {
   display: flex;
@@ -465,16 +474,51 @@
   border-top: 2px solid #e5e5e5;
   padding-top: 4vw;
   text-align: right;
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: 12px;
+  gap: 2vw;
 }
+
+#dark .order-footer {
+  border-top-color: #4a5568;
+}
+
+/* New wrapper for total and item count */
+.order-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.order-total {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+#dark .order-total {
+  color: #e5e5e5;
+}
+
+/* New item count styles */
+.item-count {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+#dark .item-count {
+  color: #999;
+}
+
 .vat-label {
   font-size: 0.75em;
   font-weight: normal;
   color: #666;
   margin-right: 4px;
-}
-
-#dark .order-footer {
-  border-top-color: #4a5568;
 }
 
 .order-total {
@@ -1296,4 +1340,37 @@
   margin-top: 4vh;
   height: 5vh;
   width: 100%;
+}
+
+.view-receipt-btn {
+  padding: 2vw 4vw;
+  background-color: #2563EB;
+  color: white;
+  border: none;
+  border-radius: 1.5vw;
+  font-size: 3vw;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: 'Roboto Slab';
+  margin-top: 2vw;
+}
+
+.view-receipt-btn:hover {
+  background-color: #1d4ed8;
+}
+
+/* Responsive styles for receipt button */
+@media (max-width: 768px) {
+  .view-receipt-btn {
+    font-size: 3.5vw;
+    padding: 2.5vw 4.5vw;
+  }
+}
+
+@media (max-width: 400px) {
+  .view-receipt-btn {
+    font-size: 4vw;
+    padding: 3vw 5vw;
+  }
 }

@@ -1,0 +1,15 @@
+# Client-specific ignores
+node_modules/
+.dist/
+
+# Coverage reports
+coverage/
+lcov-report/
+*.lcov
+.nyc_output/
+
+# Build artifacts
+/dist
+
+# Local env
+*.local

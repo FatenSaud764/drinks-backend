@@ -8,6 +8,21 @@ export default defineConfig({
     alias: {
       shared: path.resolve(__dirname, '../packages/shared')
     }
+  },
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./vitest.setup.js'],
+    css: true,
+    coverage: {
+      provider: 'v8',
+      reportsDirectory: './coverage',
+      reporter: ['text', 'lcov', 'html'],
+      lines: 70,
+      statements: 70,
+      functions: 70,
+      branches: 60
+    }
   }
 })
 

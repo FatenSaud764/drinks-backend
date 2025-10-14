@@ -36,9 +36,9 @@
 .prodlist{
     display: grid;
     grid-template-columns: 40.5vw 40.5vw;
-    grid-auto-rows: 60vw;
+    grid-auto-rows: auto;
     column-gap: 9vw;
-    row-gap: 18vw;
+    row-gap: 3vh;
     height: auto;
     width: 91.2vw;
     padding-bottom: 6vh;
@@ -76,7 +76,7 @@
     width: 40.5vw;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 51vw 6vw 8vw;
+    grid-template-rows: 51vw auto auto;  /* Changed 6vw and 8vw to auto */
     row-gap: 3vw;
     text-align: center;
     border: 0.8vw solid #F59E0B;

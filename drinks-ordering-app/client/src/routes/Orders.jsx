@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext'
 import './Orders.css'
 import AxiosInstance from '../components/Axios'
 import { useCallback } from 'react'
+import Receipt from './Receipt'
 
 const OrdersPage = () => {
   const { theme } = useContext(LightDark)
@@ -31,6 +32,9 @@ const OrdersPage = () => {
   const [otpError, setOtpError] = useState(null)
   const [otpVisible, setOtpVisible] = useState(false)
   const [fetchedOtp, setFetchedOtp] = useState(null)
+
+  // Receipt state
+  const [selectedReceiptOrder, setSelectedReceiptOrder] = useState(null)
 
   const fetchOrders = async (showLoading = true) => {
     try {
@@ -65,8 +69,6 @@ const OrdersPage = () => {
       setFetchedOtp(null)
 
       const res = await AxiosInstance.get(`/api/orders/${orderId}/otp/`)
-  
-
       setFetchedOtp(res.data.code)
 
       return res.data
@@ -102,7 +104,7 @@ const OrdersPage = () => {
       fetchOrders()
 
       intervalRef.current = setInterval(() => {
-        fetchOrders(false)
+        if(!selectedReceiptOrder){fetchOrders(false)}
       }, 4000)
 
       return () => {
@@ -188,6 +190,12 @@ const OrdersPage = () => {
     order.status?.toLowerCase() === 'cancelled'
   )
 
+  // Total item count helper
+  const getTotalItemCount = (items) => {
+    if (!items || items.length === 0) return 0
+    return items.reduce((sum, item) => sum + (item.quantity || 1), 0)
+  }
+
   // Apply filters
   let currentOrders = activeTab === 'active' ? activeOrders : pastOrders
   
@@ -254,10 +262,21 @@ const OrdersPage = () => {
     )
   )
 
+  // Receipt Modal Component
+  const ReceiptModal = () => (
+    selectedReceiptOrder && (
+      <Receipt 
+        order={selectedReceiptOrder} 
+        onClose={() => setSelectedReceiptOrder(null)}
+      />
+    )
+  )
+
   return (
     <div className="orderswrapper" id={theme}>
       <NavBar />
       <OtpVisiblity />
+      <ReceiptModal />
       <div className="orders-content">
         <h1 className="orders-title">My Orders</h1>
         
@@ -416,20 +435,36 @@ const OrdersPage = () => {
                   </div>
 
                   <div className="order-footer">
-                    <span className="order-total">
-                      Total: <span className="vat-label">(VAT incl.)</span> R{
-                        order.total_price 
-                          ? parseFloat(order.total_price).toFixed(2)
-                          : order.items && order.items.length > 0
-                            ? order.items.reduce((sum, item) => {
-                                const drinkId = item.drink_id || item.drink || item.product_id
-                                const price = getProductPrice(drinkId)
-                                const quantity = item.quantity || 1
-                                return sum + (price * quantity)
-                              }, 0).toFixed(2)
-                            : '0.00'
-                      }
-                    </span>
+                    <div className="order-summary">
+                      <span className="order-total">
+                        Total: <span className="vat-label">(VAT incl.)</span> R{
+                          order.total_price 
+                            ? parseFloat(order.total_price).toFixed(2)
+                            : order.items && order.items.length > 0
+                              ? order.items.reduce((sum, item) => {
+                                  const drinkId = item.drink_id || item.drink || item.product_id
+                                  const price = getProductPrice(drinkId)
+                                  const quantity = item.quantity || 1
+                                  return sum + (price * quantity)
+                                }, 0).toFixed(2)
+                              : '0.00'
+                        }
+                      </span>
+                      
+                      <span className="item-count">
+                        ({getTotalItemCount(order.items)} {getTotalItemCount(order.items) === 1 ? 'item' : 'items'})
+                      </span>
+                    </div>
+                    
+                    {/* Show receipt button ONLY for completed orders */}
+                    {order.status?.toLowerCase() === 'completed' && (
+                      <button 
+                        className="view-receipt-btn"
+                        onClick={() => setSelectedReceiptOrder(order)}
+                      >
+                        View Receipt
+                      </button>
+                    )}
                   </div>
                 </div>
               ))
