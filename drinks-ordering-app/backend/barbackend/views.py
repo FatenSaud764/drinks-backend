@@ -506,7 +506,7 @@ For support, contact us at: support@swiftserve.com"""
             email = EmailMultiAlternatives(
                 subject=f'SwiftServe Receipt #{order.id}',
                 body=text_content,
-                from_email='noreply@swiftserve.com',
+                from_email='fatensaud04@gmail.com',
                 to=[user.email]
             )
             email.attach_alternative(html_content, "text/html")
