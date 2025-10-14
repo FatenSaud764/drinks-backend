@@ -92,24 +92,24 @@ const Receipt = ({ order, onClose }) => {
     const imgData = canvas.toDataURL('image/png');
     
 
-    const imgWidth = 105; 
+    const imgWidth = 125; 
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
     
-    const pdf = new jsPDF('p', 'mm', 'a5');
+    const pdf = new jsPDF('p', 'mm', 'a6');
     
     let heightLeft = imgHeight;
     let position = 0;
     
     // Add first page
     pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    heightLeft -= 210; 
+    heightLeft -= 150; 
     
 
     while (heightLeft > 0) {
       position = heightLeft - imgHeight;
       pdf.addPage();
       pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= 210;
+      heightLeft -= 150;
     }
     
     pdf.save('receipt.pdf');
@@ -120,7 +120,7 @@ const Receipt = ({ order, onClose }) => {
   return (
     <div className="receipt-overlay" onClick={onClose}>
       <div className="receipt-container" id={'receipt'} onClick={(e) => e.stopPropagation()} ref={receiptRef}>
-        <button className="receipt-close" onClick={onClose}>×</button>
+        <button className="receipt-close" onClick={onClose} data-html2canvas-ignore>×</button>
         
         <div className="receipt-content">
           {/* Header */}
@@ -210,7 +210,7 @@ const Receipt = ({ order, onClose }) => {
             Email Receipt
           </button>
           <button className="receipt-action-btn receipt-print-btn" data-html2canvas-ignore onClick={handlePrint}>
-            Print Receipt
+            Download
           </button>
         </div>
       </div>
