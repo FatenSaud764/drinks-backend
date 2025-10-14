@@ -68,8 +68,8 @@ export default function Notification({ isDisplaying, onClose, orderStatus, order
           onClick={handleClick}
         >
           <div className="notification-text">
-            {orderNumber && <strong>Order #{orderNumber}: </strong>}
-            <strong>{formatStatusMessage(orderStatus)}</strong>
+            {orderNumber && <strong style={{fontFamily: 'Nunito'}}>Order #{orderNumber}: </strong>}
+            <strong style={{fontFamily: 'Nunito'}}>{formatStatusMessage(orderStatus)}</strong>
           </div>
           <button className="close-notif-btn" onClick={onClose} aria-label="Close notification">
             <X size={24} />

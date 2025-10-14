@@ -14,11 +14,12 @@
   justify-content: center;
   align-items: center;
   z-index: 900;
+  font-family: 'Nunito' !important;
 }
 
 .notification-text {
-  margin-right: 14px;
-  margin-left: 10px;
+  width: 92%;
+  font-family: 'Nunito' !important;
 }
 
 .close-notif-btn {
@@ -32,11 +33,12 @@
 }
 
 .close-notif-btn:hover {
-  color: #F59E0B;
+  color: rgb(175, 175, 175);
 }
 
 @media (max-width: 768px) {
   .notification-text {
     font-size: 16px;
+    font-family: 'Nunito';
   }
 }
