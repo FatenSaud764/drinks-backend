@@ -10,12 +10,12 @@
 
 .search{
     border: 2px solid #F59E0B;
-    border-radius: 30vh;
+    border-radius: 1.5vh;
     padding-left: 4vw;
-    width: 50vw;
+    min-width: 55vw !important;
     height:3.4vh;
     cursor: pointer;
-    font-family: 'Lalita One';
+    font-family: 'Nunito';
 
 }
 
@@ -24,7 +24,7 @@
 }
 
 .selectcategory{
-    margin-left: 13vw;
+    margin-left: 8vw;
     text-align: center;
     width: 28vw;
     height: 2.8vh;

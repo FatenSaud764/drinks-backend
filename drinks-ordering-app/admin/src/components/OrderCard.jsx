@@ -31,6 +31,12 @@ const OrderCard = ({
     return drinks.find(drink => drink.id === drinkId);
   };
 
+  // Calculate total item count of an order
+  const getTotalItemCount = (items) => {
+    if (!items || items.length === 0) return 0;
+    return items.reduce((sum, item) => sum + (item.quantity || 1), 0);
+  };
+
   return (
     <div className={`order-card ${isHistory ? 'history-card' : ''}`}>
       <div className="order-header">
@@ -88,9 +94,17 @@ const OrderCard = ({
                 );
               })}
             </div>
-            <div className="total-row">
-              <span><strong>Total:</strong> <span className="vat-label">(VAT incl.)</span></span>
-              <span className="total-amount"><strong>{formatCurrency(order.totalAmount)}</strong></span>
+            
+            <div className="total-section">
+              <div className="total-row">
+                <span><strong>Total:</strong> <span className="vat-label">(VAT incl.)</span></span>
+                <span className="total-amount"><strong>{formatCurrency(order.totalAmount)}</strong></span>
+              </div>
+              <div className="item-count-row">
+                <span className="item-count">
+                  {getTotalItemCount(order.items)} {getTotalItemCount(order.items) === 1 ? 'item' : 'items'}
+                </span>
+              </div>
             </div>
           </>
         )}

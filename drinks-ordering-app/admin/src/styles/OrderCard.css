@@ -1,3 +1,8 @@
+/**
+ * @author Kirsten Sanders
+ * @description Order card styles
+*/
+
 /* Order Note Styling */
 .order-note {
   margin-top: 12px;
@@ -147,6 +152,24 @@
   50% {
     opacity: 0.8;
   }
+}
+
+.total-section {
+  margin-top: 12px;
+  padding-top: 12px;
+}
+
+/* Item count row */
+.item-count-row {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 4px;
+}
+
+.item-count {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
 }
 
 /* Responsiveness */
