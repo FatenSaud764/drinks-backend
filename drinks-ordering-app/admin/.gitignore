@@ -1,0 +1,12 @@
+# Admin-specific ignores
+node_modules/
+
+# Coverage reports
+coverage/
+lcov-report/
+*.lcov
+.nyc_output/
+
+# Build output
+/dist
+/dist-ssr

@@ -2,21 +2,15 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import ThemeButton from '../components/ThemeButton';
 import { LightDark } from '../contexts/contexts';
 
-function Provider({ children }) {
-  const value = { theme: 'light', setTheme: vi.fn() };
-  return (
-    <LightDark.Provider value={value}>{children}</LightDark.Provider>
-  );
-}
-
-test('renders ThemeButton and toggles theme', () => {
+test('ThemeButton calls setTheme on click', () => {
+  const setTheme = vi.fn();
   render(
-    <Provider>
+    <LightDark.Provider value={{ theme: 'light', setTheme }}>
       <ThemeButton />
-    </Provider>
+    </LightDark.Provider>
   );
-
   const button = screen.getByRole('button');
-  expect(button).toBeInTheDocument();
   fireEvent.click(button);
+  expect(setTheme).toHaveBeenCalledTimes(1);
 });
+

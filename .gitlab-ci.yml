@@ -9,7 +9,7 @@ stages:
   - backend
   - frontend
 
-# Runs Django tests directly in a Python environment (no Docker-in-Docker)
+# Runs Django tests directly in a Python environment
 backend-django-tests:
   stage: backend
   tags:
@@ -55,12 +55,17 @@ admin-frontend-tests:
       - drinks-ordering-app/packages/shared/node_modules
   before_script:
     - set -eu
-    # Install shared first (no lockfile present)
+    - node --version
+    - npm --version
     - (cd drinks-ordering-app/packages/shared && npm install)
-    # Install admin deps (prefer ci when lock exists)
-    - (cd drinks-ordering-app/admin && npm ci) || (cd drinks-ordering-app/admin && npm install)
+    - (cd drinks-ordering-app/admin && npm install)
   script:
     - cd drinks-ordering-app/admin && npm run test:ci
+  artifacts:
+    when: always
+    paths:
+      - drinks-ordering-app/admin/coverage
+    expire_in: 1 week
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH
@@ -78,12 +83,17 @@ client-frontend-tests:
       - drinks-ordering-app/packages/shared/node_modules
   before_script:
     - set -eu
-    # Install shared first (no lockfile present)
+    - node --version
+    - npm --version
     - (cd drinks-ordering-app/packages/shared && npm install)
-    # Install client deps (fallback to npm install if no lockfile)
-    - (cd drinks-ordering-app/client && npm ci) || (cd drinks-ordering-app/client && npm install)
+    - (cd drinks-ordering-app/client && npm install)
   script:
     - cd drinks-ordering-app/client && npm run test:ci
+  artifacts:
+    when: always
+    paths:
+      - drinks-ordering-app/client/coverage
+    expire_in: 1 week
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH

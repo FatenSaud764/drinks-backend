@@ -1,17 +1,13 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import Header from '../components/Header';
-
-function Wrapper({ children }) {
-  // minimal wrapper to supply required props
-  return children;
-}
+import { ThemeProvider } from '../contexts/ThemeContext';
 
 test('renders header and toggles sidebar', () => {
   const toggleSidebar = vi.fn();
   render(
-    <Wrapper>
+    <ThemeProvider>
       <Header toggleSidebar={toggleSidebar} isSidebarOpen={false} />
-    </Wrapper>
+    </ThemeProvider>
   );
 
   expect(screen.getByRole('heading', { name: /swiftserve staff/i })).toBeInTheDocument();

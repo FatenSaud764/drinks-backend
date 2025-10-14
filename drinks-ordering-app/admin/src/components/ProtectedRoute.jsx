@@ -8,18 +8,18 @@ import { useAuth } from "../contexts/AuthContext";
 import { useState, useEffect } from "react";
 import "../styles/Loading.css"; // Loading spinner
 
-export default function ProtectedRoute({ children }) {
+export default function ProtectedRoute({ children, __testDelay, delayMs }) {
   const { isAuthenticated, loading } = useAuth();
-  const [artificialLoading, setArtificialLoading] = useState(true);
+  const isTestEnv = process.env.NODE_ENV === 'test';
+  const [artificialLoading, setArtificialLoading] = useState(!isTestEnv);
+  // Allow explicit override but skip entirely in test env
+  const effectiveDelay = isTestEnv ? 0 : (typeof delayMs === 'number' ? delayMs : (typeof __testDelay === 'number' ? __testDelay : 1500));
 
-  // Delay for showcasing the loading indicator
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setArtificialLoading(false);
-    }, 1500); // timeout just to showcase the loading state
-
+    if (isTestEnv) return; // no artificial delay in tests
+    const timer = setTimeout(() => setArtificialLoading(false), effectiveDelay);
     return () => clearTimeout(timer);
-  }, []);
+  }, [effectiveDelay, isTestEnv]);
 
   // Show loading while checking authentication OR during artificial delay
   if (loading || artificialLoading) {

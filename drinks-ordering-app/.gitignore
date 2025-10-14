@@ -76,3 +76,9 @@ Thumbs.db
 
 # Other
 .env
+
+# Coverage reports
+coverage/
+lcov-report/
+*.lcov
+.nyc_output/
