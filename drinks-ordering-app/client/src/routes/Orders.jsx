@@ -456,9 +456,8 @@ const OrdersPage = () => {
                       </span>
                     </div>
                     
-                    {(order.status?.toLowerCase() === 'completed' || 
-                      order.status?.toLowerCase() === 'ready' || 
-                      order.status?.toLowerCase() === 'cancelled') && (
+                    {/* Show receipt button ONLY for completed orders */}
+                    {order.status?.toLowerCase() === 'completed' && (
                       <button 
                         className="view-receipt-btn"
                         onClick={() => setSelectedReceiptOrder(order)}
