@@ -19,8 +19,10 @@ from drf_spectacular.utils import (
 )
 from drf_spectacular.types import OpenApiTypes
 from django.http import JsonResponse
+from django.core.mail import EmailMultiAlternatives
+from decimal import Decimal
 
-CART_EXPIRY_SECONDS = 15*60  # 15 minutes
+CART_EXPIRY_SECONDS = 15*60
 
 def ping(request):
     return JsonResponse({"status": "alive"})
@@ -31,8 +33,6 @@ def _require_platform_admin(user):
 
 
 class DrinkViewset(viewsets.ViewSet):
-    """Public drink catalogue endpoints (list/create/retrieve/update/delete)."""
-
     permission_classes = [permissions.AllowAny]
     queryset = Drink.objects.all()
     serializer_class = DrinkSerializer
@@ -44,7 +44,6 @@ class DrinkViewset(viewsets.ViewSet):
         description="Returns all drinks. Authorization: Bearer JWT required.",
     )
     def list(self, request):
-        """GET /api/drink/ - Returns a list of all drinks"""
         queryset = Drink.objects.all()
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
@@ -71,7 +70,6 @@ class DrinkViewset(viewsets.ViewSet):
         description="Create a drink. Use multipart/form-data for image uploads. Authorization: Bearer JWT required.",
     )
     def create(self, request):
-        """POST /api/drink/ - Creates a new drink"""
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -86,7 +84,6 @@ class DrinkViewset(viewsets.ViewSet):
         description="Get a drink by ID. Authorization: Bearer JWT required.",
     )
     def retrieve(self, request, pk=None):
-        """GET /api/drink/{id}/ - Returns a specific drink by ID"""
         drink = get_object_or_404(Drink, pk=pk)
         serializer = self.serializer_class(drink)
         return Response(serializer.data)
@@ -100,7 +97,6 @@ class DrinkViewset(viewsets.ViewSet):
         description="Replace a drink. Use multipart/form-data for image. Authorization: Bearer JWT required.",
     )
     def update(self, request, pk=None):
-        """PUT /api/drink/{id}/ - Updates a specific drink completely"""
         drink = get_object_or_404(Drink, pk=pk)
         serializer = self.serializer_class(drink, data=request.data)
         if serializer.is_valid():
@@ -117,7 +113,6 @@ class DrinkViewset(viewsets.ViewSet):
         description="Partially update a drink. Authorization: Bearer JWT required.",
     )
     def partial_update(self, request, pk=None):
-        """PATCH /api/drink/{id}/ - Updates a specific drink partially"""
         drink = get_object_or_404(Drink, pk=pk)
         serializer = self.serializer_class(drink, data=request.data, partial=True)
         if serializer.is_valid():
@@ -133,14 +128,12 @@ class DrinkViewset(viewsets.ViewSet):
         description="Delete a drink. Authorization: Bearer JWT required.",
     )
     def destroy(self, request, pk=None):
-        """DELETE /api/drink/{id}/ - Deletes a specific drink"""
         drink = get_object_or_404(Drink, pk=pk)
         drink.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=True, methods=["patch"], url_path="threshold", permission_classes=[permissions.IsAdminUser])
     def update_threshold(self, request, pk=None):
-        """PATCH /api/drink/{id}/threshold/ - Admin-only: Update unavailable_threshold"""
         drink = get_object_or_404(Drink, pk=pk)
         try:
             value = int(request.data.get("unavailable_threshold"))
@@ -154,27 +147,24 @@ class DrinkViewset(viewsets.ViewSet):
 
     @action(detail=False, methods=["patch"], url_path="threshold", permission_classes=[permissions.IsAdminUser])
     def update_all_thresholds(self, request):
-        """PATCH /api/drink/threshold/ - Admin-only: Bulk update thresholds"""
         try:
             value = int(request.data.get("unavailable_threshold"))
         except (TypeError, ValueError):
             return Response({"detail": "unavailable_threshold must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
         if value < 0:
             return Response({"detail": "unavailable_threshold must be >= 0."}, status=status.HTTP_400_BAD_REQUEST)
-
         updated = Drink.objects.all().update(
-        unavailable_threshold=value,
-        available=Case(
-            When(stock__lt=value, then=Value(False)),
-            default=Value(True),
-            output_field=BooleanField(),
+            unavailable_threshold=value,
+            available=Case(
+                When(stock__lt=value, then=Value(False)),
+                default=Value(True),
+                output_field=BooleanField(),
+            )
         )
-    )
         return Response({"updated": updated})
 
     @action(detail=True, methods=["patch"], url_path="low-stock-threshold", permission_classes=[permissions.IsAdminUser])
     def update_low_stock_threshold(self, request, pk=None):
-        """PATCH /api/drink/{id}/low-stock-threshold/ - Update warning threshold"""
         drink = get_object_or_404(Drink, pk=pk)
         try:
             value = int(request.data.get("low_stock_threshold"))
@@ -190,7 +180,6 @@ class DrinkViewset(viewsets.ViewSet):
 
     @action(detail=False, methods=["patch"], url_path="low-stock-threshold", permission_classes=[permissions.IsAdminUser])
     def update_all_low_stock_thresholds(self, request):
-        """PATCH /api/drink/low-stock-threshold/ - Bulk update warning thresholds"""
         try:
             value = int(request.data.get("low_stock_threshold"))
         except (TypeError, ValueError):
@@ -205,23 +194,15 @@ class DrinkViewset(viewsets.ViewSet):
 
 
 class OrderViewset(viewsets.ViewSet):
-    """Order endpoints for customers and staff."""
-
     permission_classes = [permissions.AllowAny]
     serializer_class = OrderSerializer
 
     def get_queryset(self, request):
-        """Returns filtered queryset with optimized prefetch"""
         user = request.user if request.user.is_authenticated else User.objects.filter(role='staff').first()
-
         queryset = Order.objects.select_related('user').prefetch_related(
-            Prefetch(
-                'items',
-                queryset=OrderItem.objects.select_related('drink')
-            ),
+            Prefetch('items', queryset=OrderItem.objects.select_related('drink')),
             'otp'
         )
-
         if hasattr(user, 'is_staff') and user.is_staff:
             return queryset.all()
         return queryset.filter(user=user)
@@ -233,7 +214,6 @@ class OrderViewset(viewsets.ViewSet):
         description="List orders (all for admin or own for customer). Authorization: Bearer JWT required.",
     )
     def list(self, request):
-        """GET /api/orders/ - Customer: list own orders, Admin: list all orders"""
         queryset = self.get_queryset(request)
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
@@ -246,7 +226,6 @@ class OrderViewset(viewsets.ViewSet):
         description="Get order by ID. Authorization: Bearer JWT required.",
     )
     def retrieve(self, request, pk=None):
-        """GET /api/orders/{id}/ - Customer: view own order, Admin: view any order"""
         order = get_object_or_404(self.get_queryset(request), pk=pk)
         serializer = self.serializer_class(order)
         return Response(serializer.data)
@@ -259,25 +238,18 @@ class OrderViewset(viewsets.ViewSet):
         description="Create a new order from the current user's cart. Authorization: Bearer JWT required.",
     )
     def create(self, request):
-        """POST /api/orders/ - Submit current cart as a new order"""
         user = request.user if request.user.is_authenticated else User.objects.first()
-        
         cart = Cart.objects.prefetch_related(
             Prefetch('items', queryset=CartItem.objects.select_related('drink'))
         ).get(user=user)
-
         order_data = {
             'user': user.id,
             'note': cart.note,
-            'items': [{'drink_id': item.drink.id, 'quantity': item.quantity} 
-                    for item in cart.items.all()]
+            'items': [{'drink_id': item.drink.id, 'quantity': item.quantity} for item in cart.items.all()]
         }
-        
         serializer = self.serializer_class(data=order_data)
         if serializer.is_valid():
             order = serializer.save()
-
-            # Clear cart
             cart.items.all().delete()
             cart.note = ""
             cart.save()
@@ -290,33 +262,23 @@ class OrderViewset(viewsets.ViewSet):
         summary="Change order status",
         request=inline_serializer(
             name="OrderStatusPatch",
-            fields={
-                'status': drf_serializers.ChoiceField(choices=[c[0] for c in Order.STATUS_CHOICES])
-            }
+            fields={'status': drf_serializers.ChoiceField(choices=[c[0] for c in Order.STATUS_CHOICES])}
         ),
         responses={200: OrderSerializer, 400: OpenApiResponse(description="Invalid status")},
         parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
         description="Set status to one of: pending, preparing, ready, completed, cancelled. Authorization: Bearer JWT required.",
     )
     def change_status(self, request, pk=None):
-        """
-        PATCH /api/orders/{id}/status/
-        Update the status of an order and automatically send appropriate message.
-        """
         order = get_object_or_404(Order, pk=pk)
         new_status = request.data.get('status')
-        
         if new_status not in dict(Order.STATUS_CHOICES):
             return Response({"detail": "Invalid status"}, status=status.HTTP_400_BAD_REQUEST)
-        
         old_status = order.status
         order.status = new_status
-        order.save() 
-
+        order.save()
         order = Order.objects.prefetch_related(
             Prefetch('items', queryset=OrderItem.objects.select_related('drink'))
         ).get(pk=pk)
-        
         serializer = self.serializer_class(order)
         return Response(serializer.data)
 
@@ -334,7 +296,6 @@ class OrderViewset(viewsets.ViewSet):
         description="Returns the plaintext OTP for the order if owner and status=ready. Authorization: Bearer JWT required.",
     )
     def get_otp(self, request, pk=None):
-        """GET /api/orders/{id}/otp/ - Retrieve OTP if order is ready"""
         order = get_object_or_404(self.get_queryset(request), pk=pk)
         req_user = request.user if getattr(request, 'user', None) and request.user.is_authenticated else User.objects.first()
         if order.user_id != getattr(req_user, 'id', None):
@@ -363,7 +324,6 @@ class OrderViewset(viewsets.ViewSet):
         description="Verify the OTP using JSON body { code: '123456' }. Authorization: Bearer JWT required.",
     )
     def verify_otp(self, request, pk=None):
-        """POST /api/orders/{id}/otp/verify/ - Verify OTP and complete order"""
         order = get_object_or_404(self.get_queryset(request), pk=pk)
         code = str(request.data.get('code', '')).strip()
         if not code:
@@ -390,30 +350,23 @@ class OrderViewset(viewsets.ViewSet):
         description="Delete an order only if it is pending. Authorization: Bearer JWT required.",
     )
     def destroy(self, request, pk=None):
-        """DELETE /api/orders/{id}/ - Cancel a pending order"""
         order = get_object_or_404(Order, pk=pk)
         if order.status != 'pending':
             return Response({"detail": "Only pending orders can be cancelled"}, status=status.HTTP_400_BAD_REQUEST)
         order.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
     @action(detail=False, methods=['get'], url_path='recent')
     @extend_schema(
         tags=["Orders"],
         summary="Get recent orders and updates",
         parameters=[
-            OpenApiParameter(
-                name="since", 
-                type=OpenApiTypes.DATETIME,
-                description="Get orders updated after this timestamp"
-            )
+            OpenApiParameter(name="since", type=OpenApiTypes.DATETIME, description="Get orders updated after this timestamp")
         ],
         responses={200: OrderSerializer(many=True)}
     )
     def recent(self, request):
-        """GET /api/orders/recent/?since=<timestamp> - Get recently created OR updated orders"""
         since_param = request.query_params.get('since')
-        
         if since_param:
             try:
                 since = timezone.datetime.fromisoformat(since_param.replace('Z', '+00:00'))
@@ -421,14 +374,12 @@ class OrderViewset(viewsets.ViewSet):
                 since = timezone.now() - timedelta(seconds=30)
         else:
             since = timezone.now() - timedelta(seconds=30)
-        
         queryset = self.get_queryset(request).filter(
             models.Q(created_at__gt=since) | models.Q(updated_at__gt=since)
         )
-        
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
-    
+
     @action(detail=True, methods=['post'], url_path='send-reminder')
     @extend_schema(
         tags=["Orders"],
@@ -436,36 +387,147 @@ class OrderViewset(viewsets.ViewSet):
         responses={200: OpenApiResponse(description="Reminder triggered")}
     )
     def send_reminder(self, request, pk=None):
-        """POST /api/orders/{id}/send-reminder/ - Staff triggers a reminder"""
         order = get_object_or_404(self.get_queryset(request), pk=pk)
-        
         if order.status != 'ready':
-            return Response(
-                {'detail': 'Can only remind for ready orders'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
+            return Response({'detail': 'Can only remind for ready orders'}, status=status.HTTP_400_BAD_REQUEST)
         order.save(update_fields=['updated_at'])
-        
         return Response({'detail': 'Reminder sent'})
 
-class CartViewset(viewsets.GenericViewSet):
-    """Shopping cart endpoints for the current user."""
+    @action(detail=True, methods=['post'], url_path='email-receipt')
+    @extend_schema(
+        tags=["Orders"],
+        summary="Email receipt to customer",
+        responses={
+            200: inline_serializer(name='EmailReceiptResponse', fields={'detail': drf_serializers.CharField()}),
+            400: OpenApiResponse(description="No email on file"),
+            500: OpenApiResponse(description="Failed to send")
+        },
+        parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
+        description="Send order receipt via email. Authorization: Bearer JWT required.",
+    )
+    def email_receipt(self, request, pk=None):
+        order = get_object_or_404(self.get_queryset(request), pk=pk)
+        user = order.user
+        if not user.email:
+            return Response({'detail': 'No email address on file'}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            order = Order.objects.prefetch_related(
+                Prefetch('items', queryset=OrderItem.objects.select_related('drink'))
+            ).get(pk=pk)
+            items = []
+            subtotal = Decimal('0.00')
+            for item in order.items.all():
+                item_total = item.drink.price * item.quantity
+                subtotal += item_total
+                items.append({
+                    'name': item.drink.name,
+                    'quantity': item.quantity,
+                    'price': f"{item.drink.price:.2f}",
+                    'total': f"{item_total:.2f}"
+                })
+            vat = subtotal * Decimal('0.15')
+            total = subtotal + vat
+            formatted_date = order.created_at.strftime('%B %d, %Y at %I:%M %p')
+            context = {
+                'order_id': order.id,
+                'order_date': formatted_date,
+                'customer_name': user.username,
+                'order_status': order.status.title(),
+                'items': items,
+                'subtotal': f"{subtotal:.2f}",
+                'vat': f"{vat:.2f}",
+                'total': f"{total:.2f}",
+            }
+            html_content = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body {{font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;}}
+        .header {{text-align: center; padding: 20px 0; border-bottom: 3px solid #F59E0B; margin-bottom: 30px;}}
+        .logo {{font-size: 32px; font-weight: bold; color: #F59E0B; margin: 0;}}
+        .tagline {{font-size: 14px; color: #666; font-style: italic;}}
+        .info-section {{margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 5px;}}
+        .info-row {{display: flex; justify-content: space-between; padding: 5px 0;}}
+        .label {{font-weight: bold; color: #555;}}
+        .items-table {{width: 100%; border-collapse: collapse; margin: 20px 0;}}
+        .items-table th {{background: #2563EB; color: white; padding: 10px; text-align: left;}}
+        .items-table td {{padding: 10px; border-bottom: 1px solid #ddd;}}
+        .totals {{margin: 20px 0; text-align: right;}}
+        .total-row {{padding: 5px 0;}}
+        .grand-total {{font-size: 20px; font-weight: bold; color: #F59E0B; border-top: 2px solid #333; padding-top: 10px; margin-top: 10px;}}
+        .footer {{text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px dashed #ddd; color: #666;}}
+        .thank-you {{font-size: 18px; color: #2563EB; font-weight: bold;}}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="logo">SwiftServe</h1>
+        <p class="tagline">Skip the queue!</p>
+    </div>
+    <div class="info-section">
+        <div class="info-row"><span class="label">Receipt #:</span><span>{context['order_id']}</span></div>
+        <div class="info-row"><span class="label">Date:</span><span>{context['order_date']}</span></div>
+        <div class="info-row"><span class="label">Customer:</span><span>{context['customer_name']}</span></div>
+        <div class="info-row"><span class="label">Status:</span><span>{context['order_status']}</span></div>
+    </div>
+    <table class="items-table">
+        <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+        <tbody>{''.join(f'<tr><td>{item["name"]}</td><td>{item["quantity"]}</td><td>R{item["price"]}</td><td>R{item["total"]}</td></tr>' for item in context['items'])}</tbody>
+    </table>
+    <div class="totals">
+        <div class="total-row"><span>Subtotal: R{context['subtotal']}</span></div>
+        <div class="total-row"><span>VAT (15%): R{context['vat']}</span></div>
+        <div class="total-row grand-total"><span>Total: R{context['total']}</span></div>
+    </div>
+    <div class="footer">
+        <p class="thank-you">Thank you for your order!</p>
+        <p>For support, contact us at support@swiftserve.com</p>
+    </div>
+</body>
+</html>
+            """
+            text_content = f"""SwiftServe - Skip the queue!
+========================================
+RECEIPT #{context['order_id']}
+Date: {context['order_date']}
+Customer: {context['customer_name']}
+Status: {context['order_status']}
+----------------------------------------
+ITEMS:
+{''.join(f"{item['name']}\n  Qty: {item['quantity']} x R{item['price']} = R{item['total']}\n" for item in context['items'])}----------------------------------------
+Subtotal: R{context['subtotal']}
+VAT (15%): R{context['vat']}
+TOTAL: R{context['total']}
+========================================
+Thank you for your order!
+For support, contact us at: support@swiftserve.com"""
+            email = EmailMultiAlternatives(
+                subject=f'SwiftServe Receipt #{order.id}',
+                body=text_content,
+                from_email='noreply@swiftserve.com',
+                to=[user.email]
+            )
+            email.attach_alternative(html_content, "text/html")
+            email.send()
+            return Response({'detail': 'Receipt sent successfully'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'detail': f'Failed to send email: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+
+class CartViewset(viewsets.GenericViewSet):
     permission_classes = [permissions.AllowAny]
     serializer_class = CartSerializer
     queryset = Cart.objects.all()
 
     def get_cart(self, request):
-        """Helper method to get or create the current user's cart with expiry check"""
         user = request.user if request.user.is_authenticated else User.objects.first()
         cart, created = Cart.objects.get_or_create(user=user)
-
         if not created and (timezone.now() - cart.updated_at).total_seconds() > CART_EXPIRY_SECONDS:
             cart.items.all().delete()
             cart.note = ""
             cart.save()
-
         return cart
 
     @extend_schema(
@@ -475,13 +537,10 @@ class CartViewset(viewsets.GenericViewSet):
         description="Return current user's cart with items. Authorization: Bearer JWT required.",
     )
     def list(self, request):
-        """GET /api/cart/ - Retrieve the current user's cart with note and items"""
         cart = self.get_cart(request)
-        
         cart = Cart.objects.prefetch_related(
             Prefetch('items', queryset=CartItem.objects.select_related('drink'))
         ).get(pk=cart.pk)
-        
         serializer = CartSerializer(cart)
         return Response(serializer.data)
 
@@ -493,33 +552,27 @@ class CartViewset(viewsets.GenericViewSet):
         description="Update cart note or items. Authorization: Bearer JWT required.",
     )
     def partial_update(self, request, pk=None):
-        """PATCH /api/cart/ - Update cart note or nested items"""
         cart = self.get_cart(request)
         serializer = CartSerializer(cart, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             cart.save()
-            
             cart = Cart.objects.prefetch_related(
                 Prefetch('items', queryset=CartItem.objects.select_related('drink'))
             ).get(pk=cart.pk)
-            
             return Response(CartSerializer(cart).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['patch'], url_path='')
     def update_cart(self, request):
-        """Explicit collection-level PATCH endpoint at /api/cart/"""
         cart = self.get_cart(request)
         serializer = CartSerializer(cart, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             cart.save()
-            
             cart = Cart.objects.prefetch_related(
                 Prefetch('items', queryset=CartItem.objects.select_related('drink'))
             ).get(pk=cart.pk)
-            
             return Response(CartSerializer(cart).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -530,7 +583,6 @@ class CartViewset(viewsets.GenericViewSet):
         description="Clear all items and reset note. Authorization: Bearer JWT required.",
     )
     def destroy(self, request, pk=None):
-        """DELETE /api/cart/ - Clear all items and reset note"""
         cart = self.get_cart(request)
         cart.items.all().delete()
         cart.note = ""
@@ -549,7 +601,6 @@ class CartViewset(viewsets.GenericViewSet):
         description="Add a drink to cart or increment quantity if exists. Authorization: Bearer JWT required.",
     )
     def add_item(self, request):
-        """POST /api/cart/items/ - Add a new drink to the cart"""
         cart = self.get_cart(request)
         serializer = CartItemSerializer(data=request.data)
         if serializer.is_valid():
@@ -562,11 +613,9 @@ class CartViewset(viewsets.GenericViewSet):
                 item.quantity += serializer.validated_data['quantity']
                 item.save()
             cart.save()
-            
             cart = Cart.objects.prefetch_related(
                 Prefetch('items', queryset=CartItem.objects.select_related('drink'))
             ).get(pk=cart.pk)
-            
             return Response(CartSerializer(cart).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -583,28 +632,21 @@ class CartViewset(viewsets.GenericViewSet):
         description="PUT/PATCH to change quantity; DELETE to remove item. Authorization: Bearer JWT required.",
     )
     def update_item(self, request, pk=None, item_id=None):
-        """PUT/PATCH/DELETE /api/cart/{cart_id}/items/{item_id}/ - Update or remove cart item"""
         cart = self.get_cart(request)
         item = get_object_or_404(CartItem, pk=item_id, cart=cart)
-        
         if request.method == 'DELETE':
             item.delete()
             cart.save()
-            
             cart = Cart.objects.prefetch_related(
                 Prefetch('items', queryset=CartItem.objects.select_related('drink'))
             ).get(pk=cart.pk)
-            
             return Response(CartSerializer(cart).data)
-        
         serializer = CartItemSerializer(item, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
-            
             cart = Cart.objects.prefetch_related(
                 Prefetch('items', queryset=CartItem.objects.select_related('drink'))
             ).get(pk=cart.pk)
-            
             return Response(CartSerializer(cart).data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -616,7 +658,6 @@ class CartViewset(viewsets.GenericViewSet):
         description="DELETE /api/cart/clear/ clears all items. Authorization: Bearer JWT required.",
     )
     def clear_cart(self, request):
-        """DELETE /api/cart/clear/ - Clear all items and reset cart note"""
         cart = self.get_cart(request)
         cart.items.all().delete()
         cart.note = ""
@@ -625,13 +666,10 @@ class CartViewset(viewsets.GenericViewSet):
 
 
 class AuthViewset(viewsets.ViewSet):
-    """Authentication endpoints for registration and user profile."""
-
     serializer_class = UserSerializer
 
     @action(detail=False, methods=['post'], url_path='register', permission_classes=[permissions.AllowAny])
     def register(self, request):
-        """POST /api/auth/register - Register a new user"""
         serializer = self.serializer_class(data=request.data, context={'request': request})
         if serializer.is_valid():
             user = serializer.save()
@@ -640,7 +678,6 @@ class AuthViewset(viewsets.ViewSet):
 
     @action(detail=False, methods=['get', 'patch'], url_path='profile', permission_classes=[permissions.IsAuthenticated])
     def profile(self, request):
-        """GET/PATCH /api/auth/profile - Retrieve or update authenticated user's profile"""
         if request.method.lower() == 'get':
             return Response(self.serializer_class(request.user).data)
         serializer = self.serializer_class(request.user, data=request.data, partial=True, context={'request': request})
@@ -651,13 +688,10 @@ class AuthViewset(viewsets.ViewSet):
 
 
 class StaffUserViewset(viewsets.ViewSet):
-    """Admin-only staff management."""
-
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request):
-        """GET /api/management/ - List staff and admin users"""
         _require_platform_admin(request.user)
         qs = User.objects.filter(Q(role='staff') | Q(is_admin=True)).order_by('id').distinct()
         data = self.serializer_class(qs, many=True).data
@@ -665,7 +699,6 @@ class StaffUserViewset(viewsets.ViewSet):
 
     @action(detail=False, methods=['post'], url_path='register')
     def register(self, request):
-        """POST /api/management/register/ - Create a new staff-level user"""
         _require_platform_admin(request.user)
         payload = request.data.copy()
         payload['role'] = 'staff'
@@ -679,12 +712,10 @@ class StaffUserViewset(viewsets.ViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request):
-        """Legacy path support"""
         return self.register(request)
 
     @action(detail=True, methods=['patch'], url_path='role')
     def update_role(self, request, pk=None):
-        """PATCH /api/management/{id}/role/ - Adjust user privilege level"""
         _require_platform_admin(request.user)
         target = get_object_or_404(User, pk=pk)
         level = request.data.get('level')
@@ -705,7 +736,6 @@ class StaffUserViewset(viewsets.ViewSet):
         return Response(self.serializer_class(target).data)
 
     def destroy(self, request, pk=None):
-        """DELETE /api/management/{id}/ - Delete a staff or admin user"""
         _require_platform_admin(request.user)
         target = get_object_or_404(User, pk=pk)
         if target.id == request.user.id:

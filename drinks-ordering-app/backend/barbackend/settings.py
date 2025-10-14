@@ -21,7 +21,7 @@ SECRET_KEY = config("DJANGO_SECRET_KEY")
 DEBUG = config("DEBUG", default=True, cast=bool)
 
 ALLOWED_HOSTS = [
-    "drinks-backend-ojv2.onrender.com",  # No https://, no trailing /
+    "drinks-backend-ojv2.onrender.com",
     "localhost",
     "127.0.0.1",
     "[::1]",
@@ -50,7 +50,6 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # "barbackend.middleware.CloseConnectionMiddleware"
 ]
 
 ROOT_URLCONF = "barbackend.urls"
@@ -76,7 +75,7 @@ WSGI_APPLICATION = 'barbackend.wsgi.application'
 DATABASES = {
     "default": dj_database_url.config(
         default="postgresql://postgres.lrbmdxrikfwrxgsawgwi:barpasssamus@aws-1-eu-west-2.pooler.supabase.com:5432/postgres",
-        conn_max_age=0,  # ← CHANGED: Don't persist connections (critical for pooler)
+        conn_max_age=0,
         conn_health_checks=True,
         ssl_require=True,
     )
@@ -85,8 +84,7 @@ DATABASES = {
 # Improved connection options
 DATABASES['default']['OPTIONS'] = {
     'connect_timeout': 10,
-    'options': '-c statement_timeout=30000',  # 30 second query timeout
-    # Remove keepalives - they conflict with Supabase's pooler
+    'options': '-c statement_timeout=30000',
 }
 
 # Use SQLite for tests to avoid external DB dependency
@@ -187,3 +185,15 @@ SUPABASE_BUCKET_NAME = config("SUPABASE_BUCKET_NAME", default="drink-images")
 
 # Use Supabase Storage for media files in production
 DEFAULT_FILE_STORAGE = "barbackend.storage_backends.SupabaseStorage"
+
+# Email Configuration
+if DEBUG:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
+    EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
+    EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
+    EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
+    EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
+    DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@swiftserve.com')
