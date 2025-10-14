@@ -18,7 +18,8 @@
 }
 
 .notification-text {
-  width: 92%;
+  margin-left: -4% !important;
+  width: 90%;
   font-family: 'Nunito' !important;
 }
 
