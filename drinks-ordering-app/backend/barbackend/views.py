@@ -47,14 +47,7 @@ class DrinkViewset(viewsets.ViewSet):
         description="Returns all drinks. Authorization: Bearer JWT required.",
     )
     def list(self, request):
-        queryset = Drink.objects.only(
-        'id', 
-        'name', 
-        'price', 
-        'category',
-        'available',
-        'stock',
-        'description')
+        queryset = Drink.objects.all()
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
     
