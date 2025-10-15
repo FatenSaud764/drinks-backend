@@ -46,3 +46,19 @@
     font-size: 20px;
   }
 }
+
+/*Laptops and desktops - smaller and closer together */
+@media (min-width: 1025px) {
+  .additemswrapper {
+    column-gap: 1vw;
+  }
+  
+  .additembutton {
+    width: 2.5vw;
+    height: 2.5vw;
+  }
+  
+  .itemquantity {
+    width: 2.5vw;
+  }
+}

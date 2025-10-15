@@ -126,10 +126,16 @@
     background:#e29b1f;
 }
 
-.drinkimage{
+.drinkimage-container{
+    position: relative;
     margin-top: 1vh;
     height: 39vh;
     width: 80%;
+}
+
+.drinkimage{
+    height: 100%;
+    width: 100%;
     border-radius: 1vh;
     background: white;
     border: 3px solid #F59E0B;
@@ -145,7 +151,7 @@
 /* Add this to your DrinkInfo.css file */
 
 /* Position the image container relatively */
-.drinkinfowrapper {
+.drinkimage-container {
     position: relative;
 }
 
@@ -156,9 +162,8 @@
 /* Category tag on the drink info page - positioned on the image */
 .category-tag-info {
     position: absolute;
-    top: calc(11.5vh + 5vh + 2vh + 2vh + 10px);
-    left: 10%;
-    transform: translateX(16px);
+    top: 16px;
+    left: 16px;
     padding: 5px 10px;
     font-size: 0.85rem;
     font-weight: 700;
@@ -194,8 +199,13 @@
         margin-top: -1vh;
     }
 
-    .drinkimage{
+    .drinkimage-container{
         width: 70%;
+        height: auto;
+    }
+
+    .drinkimage{
+        width: 100%;
         height: auto;
         aspect-ratio: 4/3;
     }
@@ -229,19 +239,25 @@
         z-index: 100;
     }
 
-    .drinkimage{
+    .drinkimage-container{
         grid-area: image;
         width: 100%;
         max-width: 450px;
+        margin-top: -50vh; /* shifted up */
+    }
+
+    .drinkimage{
+        width: 100%;
         height: auto;
         aspect-ratio: 3/4;
         object-fit: cover;
         border-radius: 2vh;
         box-shadow: 0 10px 40px rgba(245, 158, 11, 0.15);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
     }
 
-    .drinkimage:hover{
+    .drinkimage-container:hover .drinkimage{
         transform: translateY(-5px);
         box-shadow: 0 15px 50px rgba(245, 158, 11, 0.25);
     }
@@ -251,6 +267,7 @@
         width: 100%;
         padding-bottom: 0.8rem;
         margin-bottom: 0.5vh;
+        margin-top: -40vh; /* shifted up */
     }
 
     .drinkname{
@@ -275,21 +292,23 @@
         width: 100%;
         line-height: 1.6;
         margin-bottom: 1vh;
+        margin-top: -30vh; /* shifted up */
     }
 
     .cart_section{
         grid-area: cart;
         width: 100%;
         max-width: 450px;
+        margin-top: -25vh; /* shifted up */
     }
 
     .addtocart{
         width: 100%;
-        max-width: 230px;
-        height: 5.5vh;
+        max-width: 200px;
+        height: 4.5vh;
         font-size: 15px;
         font-weight: 600;
-        margin-top: 0.5vh;
+        margin-top: -9vh;
         border-radius: 12px;
         transition: all 0.3s ease;
         text-transform: uppercase;
@@ -303,8 +322,8 @@
 
     .category-tag-info {
         position: absolute;
-        top: calc(15vh + 10px);
-        left: calc(6vw + 16px);
+        top: 16px;
+        left: 16px;
         font-size: 0.85rem;
         padding: 8px 16px;
     }
@@ -333,19 +352,25 @@
         z-index: 100;
     }
 
-    .drinkimage{
+    .drinkimage-container{
         grid-area: image;
         width: 100%;
         max-width: 500px;
+        margin-top: -50vh; /* shifted up */
+    }
+
+    .drinkimage{
+        width: 100%;
         height: auto;
         aspect-ratio: 3/4;
         object-fit: cover;
         border-radius: 2vh;
         box-shadow: 0 10px 40px rgba(245, 158, 11, 0.15);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
     }
 
-    .drinkimage:hover{
+    .drinkimage-container:hover .drinkimage{
         transform: translateY(-5px);
         box-shadow: 0 15px 50px rgba(245, 158, 11, 0.25);
     }
@@ -355,6 +380,7 @@
         width: 100%;
         padding-bottom: 0.8rem;
         margin-bottom: 0.5vh;
+        margin-top: -25vh; /* shifted up */
     }
 
     .drinkname{
@@ -379,12 +405,15 @@
         width: 100%;
         line-height: 1.6;
         margin-bottom: 1vh;
+        margin-top: -30vh; /* shifted up */
     }
 
     .cart_section{
         grid-area: cart;
         width: 100%;
-        max-width: 500px;
+        max-width: 700px;
+        margin-top: -25vh; /* shifted up */
+        /*margin-left: 5vh;*/
     }
 
     .addtocart{
@@ -393,7 +422,7 @@
         height: 6vh;
         font-size: 16px;
         font-weight: 600;
-        margin-top: 0.5vh;
+        margin-top: -9vh;
         border-radius: 12px;
         transition: all 0.3s ease;
         text-transform: uppercase;
@@ -407,8 +436,8 @@
 
     .category-tag-info {
         position: absolute;
-        top: calc(15vh + 10px);
-        left: calc(8vw + 16px);
+        top: 16px;
+        left: 16px;
         font-size: 0.9rem;
         padding: 8px 16px;
     }
