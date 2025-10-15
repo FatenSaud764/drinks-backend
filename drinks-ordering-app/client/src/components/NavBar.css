@@ -27,7 +27,7 @@
   letter-spacing: 0.3px;
   color: white;
   text-decoration: none;
-  margin-left: -20px !important;
+  margin-left: -20px;
 }
 
 .nav-left {
@@ -105,8 +105,8 @@
 }
 
 .user-btn {
-  background: white;
-  color: #2563EB;
+  background: #4276e6;
+  color: white;
   border: none;
   padding: 8px 16px;
   border-radius: 8px;
@@ -116,11 +116,15 @@
   margin-right: 24px;
 }
 
+#dark .user-btn{
+  background: #ffb027 !important;
+}
+
 .user-btn:hover {
   background: rgba(255, 255, 255, 0.9);
 }
 
-.loged-in-username {
+.logged-in-username {
   color: white;
   font-weight: 500;
   margin-right: 8px;
@@ -262,12 +266,19 @@
   transform: rotate(-45deg) translate(6px, -5px) 
 }
 
+@media (max-width: 500px) {
+  .brand{
+    margin-left: -30px !important;
+  }
+}
+
+
 /* Tablet styles (601px - 1024px) */
 @media (min-width: 601px) and (max-width: 1024px) {
   .nav {
     min-height: 68px;
     gap: 24px;
-    padding: var(--nav-py, 12px) var(--nav-px, 20px) !important;
+    padding: var(--nav-py, 12px) var(--nav-px, 16px) !important;
   }
 
   .brand {
@@ -277,6 +288,10 @@
 
   .nav-center {
     gap: 12px;
+  }
+
+  .nav-left{
+    margin-left: 2vw;
   }
 
   .nav-center a {
@@ -294,6 +309,10 @@
     height: 36px;
   }
 
+  .themeprod{
+    margin-left: -120px !important;
+  }
+
   .user-btn {
     padding: 8px 14px;
     font-size: 14px;
@@ -301,23 +320,23 @@
     margin-right: 12px;
   }
 
-  .loged-in-username {
+  .logged-in-username {
     font-size: 14px;
     margin-right: 8px;
   }
 }
 
 /* Laptop styles (1025px and above) */
-@media (min-width: 1025px) {
+@media (min-width: 1024px) {
   .nav {
     min-height: 72px;
     gap: 28px;
-    padding: var(--nav-py, 14px) var(--nav-px, 24px) !important;
+    padding: var(--nav-py, 14px) var(--nav-px, 16px) !important;
   }
 
   .brand {
     font-size: 21px;
-    margin-left: -12px !important;
+    margin-left: 20px;
   }
 
   .nav-center {
@@ -364,11 +383,21 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   }
 
-  .loged-in-username {
-    font-size: 16px;
-    margin-right: 12px;
+  .logged-in-username {
+    font-size: 18px;
+    margin-left: 10px !important;
+    width: 10vw;
+  }
+  .nav-right {
+  display: flex;
+  justify-content: flex-end;
+}
+
+  .themeprod {
+    margin-left: -15px !important;
   }
 }
+
 
 /* Large Desktop (1440px and above) */
 @media (min-width: 1440px) {
@@ -380,7 +409,7 @@
 
   .brand {
     font-size: 22px;
-    margin-left: 0 !important;
+    margin-left: 0;
   }
 
   .nav-center {
@@ -409,13 +438,13 @@
     margin-right: 30px;
   }
 
-  .loged-in-username {
+  .logged-in-username {
     font-size: 17px;
-    margin-right: 14px;
+    margin-right: -40px;
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 900px) {
   .hide-sm { display: none }
   .nav-center { display: none }
   .hamburger { display: inline-block }

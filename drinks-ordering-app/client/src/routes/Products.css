@@ -284,14 +284,19 @@
 
 /* Large Desktop (1440px and above) */
 @media (min-width: 1440px) {
+    .prodplussearch{
+        margin-top: 13vh;
+    }
     .prodlist{
-        grid-template-columns: repeat(5, 17vw);
+        grid-template-columns: repeat(4, 17vw);
         grid-auto-rows: 27vw;
-        column-gap: 1.5vw;
-        row-gap: 6vw;
+        column-gap: 7.5vw;
+        row-gap: 9vw;
         width: 92vw;
         margin-top: 5vh;
         padding-bottom: 6vh;
+        justify-content: center;
+        justify-items: center;
     }
     
     .productdisplay{
@@ -333,5 +338,17 @@
         width: 3vw;
         margin-top: -0.8vw;
         font-size: 14px;
+    }
+}
+
+@media (min-width: 500px) and (max-width: 700px){
+    .prodlist{
+        margin-top: 6vh;
+    }
+}
+
+@media (min-width: 350px) and (max-width: 500px) and (max-height: 700px){
+    .prodplussearch{
+        padding-top: 2vh;
     }
 }

@@ -51,7 +51,7 @@
 }
 
 .signupform h2 {
-  margin: 0 0 20px 0;
+  margin-top: -2vh !important;
   font-size: clamp(24px, 5vw, 30px) !important;
   font-family: 'Nunito';
   color: black;

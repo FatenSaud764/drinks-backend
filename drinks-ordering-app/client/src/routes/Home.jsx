@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import './Home.css'
 import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { DrinkCategory, LightDark, Orders, ProductList } from '../contexts/contexts'
@@ -46,22 +46,42 @@ const Home = () => {
 
   console.log('drinks', products)
 
+  const [slidesToShow, setSlidesToShow] = useState(3);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 1024) {
+        setSlidesToShow(4);
+      } else if (window.innerWidth > 600) {
+        setSlidesToShow(2);
+      } else {
+        setSlidesToShow(2);
+      }
+    };
+
+    handleResize(); // Set initial value
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const settings = {
     dots: true,
     swipeToSlide: true,
     infinite: true,
     autoplay: true,
-    autoplaySpeed:2000,
-    slidesToShow: 2,
+    autoplaySpeed: 2000,
+    slidesToShow: slidesToShow, // ✅ Use state value
     slidesToScroll: 1,
     arrows: false,
     draggable: true,
     touchMove: true,
-    pauseOnDotsHover:false,
+    pauseOnDotsHover: false,
     pauseOnHover: true,
-    centerMode: true,  // ← Change this to true
-    centerPadding: '0px',  // ← Add this for spacing
+    centerMode: slidesToShow < 3, // Only center mode for mobile/tablet
+    centerPadding: '0px',
   };
+
+
 
   const sortedOrders = orders.filter(order => order.status!="completed").sort((a, b) => {
         const dateA = new Date(a.created_at || a.date)

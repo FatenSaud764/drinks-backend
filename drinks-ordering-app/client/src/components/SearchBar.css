@@ -46,6 +46,8 @@
     .searchwrap {
         margin-top: 4vh;
         height: 5vh;
+        width: 92vw;
+        margin-left: 3vw;
     }
 
     .search {
@@ -82,5 +84,12 @@
         height: 4.2vh;
         font-size: 17px;
         margin-left: 8vw;
+    }
+}
+
+@media (min-width: 520px) and (max-width: 700px){
+  .searchwrap {
+        margin-top: 7vh;
+        height: 6vh;
     }
 }

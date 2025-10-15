@@ -2,7 +2,10 @@
  * @author Kirsten Sanders
  * @description This is the Orders Page Styles
 */
-/* Orders Page Styles */
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
 .orderswrapper {
   display: flex;
   justify-content: center;
@@ -46,37 +49,9 @@
   color: white !important;
 }
 
-/* OTP Error Message Styling */
-.otp-error {
-  color: #dc3545;
-  font-size: 14px;
-  margin-top: 10px;
-  font-family: 'Roboto Slab', serif;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: 8px;
-  padding: 10px;
-}
-
-#dark .otp-error {
-  color: #f8d7da;
-  background-color: #4a1e1e;
-  border-color: #6b2c32;
-}
-
-/* Ensure loading text in modal is styled properly */
-.otp-body .loading {
-  font-size: 16px;
-  color: #666;
-  padding: 20px;
-  font-family: 'Roboto Slab', serif;
-}
-
-#dark .otp-body .loading {
-  color: #e2e8f0;
-}
-
-/* Tabs - Fixed size at top */
+/* ============================================
+   TABS
+   ============================================ */
 .orders-tabs {
   display: flex;
   justify-content: center;
@@ -131,7 +106,9 @@
   border-bottom-color: #F59E0B;
 }
 
-/* Filter Bar Styles */
+/* ============================================
+   FILTER BAR
+   ============================================ */
 .filter-bar {
   display: flex;
   gap: 15px;
@@ -256,7 +233,9 @@
   color: white;
 }
 
-/* Loading and Messages */
+/* ============================================
+   LOADING AND MESSAGES
+   ============================================ */
 .loading, .login-message, .no-orders {
   text-align: center;
   padding: 40px 20px;
@@ -269,7 +248,7 @@
   color: white !important;
 }
 
-.no-orders p{
+.no-orders p {
   font-family: 'Nunito';
 }
 
@@ -284,7 +263,9 @@
   border-color: #F59E0B;
 }
 
-/* Orders List */
+/* ============================================
+   ORDERS LIST
+   ============================================ */
 .orders-list {
   display: flex;
   flex-direction: column;
@@ -293,7 +274,9 @@
   align-self: start;
 }
 
-/* Order Card */
+/* ============================================
+   ORDER CARD
+   ============================================ */
 .order-card {
   background-color: #fff;
   border: 0.8vw solid #F59E0B;
@@ -313,7 +296,6 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-/* Order Header */
 .order-header {
   display: flex;
   justify-content: space-between;
@@ -400,7 +382,9 @@
   font-size: 3.5vw;
 }
 
-/* Order Items Container - Scrollable */
+/* ============================================
+   ORDER ITEMS
+   ============================================ */
 .order-items {
   max-height: 250px;
   overflow-y: auto;
@@ -409,7 +393,6 @@
   padding-right: 1vw;
 }
 
-/* Order Items */
 .order-item {
   display: flex;
   justify-content: space-between;
@@ -469,7 +452,9 @@
   margin-left: 10px;
 }
 
-/* Order Footer */
+/* ============================================
+   ORDER FOOTER
+   ============================================ */
 .order-footer {
   border-top: 2px solid #e5e5e5;
   padding-top: 4vw;
@@ -486,7 +471,6 @@
   border-top-color: #4a5568;
 }
 
-/* New wrapper for total and item count */
 .order-summary {
   display: flex;
   flex-direction: column;
@@ -494,16 +478,16 @@
 }
 
 .order-total {
-  font-size: 18px;
-  font-weight: 600;
-  color: #1a1a1a;
+  font-size: 4.5vw;
+  font-weight: 700;
+  color: #333;
+  font-family: 'Roboto Slab';
 }
 
 #dark .order-total {
-  color: #e5e5e5;
+  color: white !important;
 }
 
-/* New item count styles */
 .item-count {
   font-size: 14px;
   color: #666;
@@ -521,18 +505,42 @@
   margin-right: 4px;
 }
 
-.order-total {
-  font-size: 4.5vw;
-  font-weight: 700;
-  color: #333;
+/* ============================================
+   RECEIPT AND REPEAT BUTTONS
+   ============================================ */
+.receipt-repeat-btns {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.view-receipt-btn,
+.repeat-order-btn {
+  padding: 2vw 4vw;
+  background-color: #2563EB;
+  color: white;
+  border: none;
+  border-radius: 1.5vw;
+  font-size: 3vw;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
   font-family: 'Roboto Slab';
+  margin-top: 2vw;
+  flex: 1;
+  min-width: 120px;
 }
 
-#dark .order-total {
-  color: white !important;
+.view-receipt-btn:hover,
+.repeat-order-btn:hover {
+  background-color: #1d4ed8;
 }
 
-/* OTP Modal Styles - Updated to match design */
+/* ============================================
+   OTP MODAL
+   ============================================ */
 .otp-modal {
   position: fixed;
   top: 0;
@@ -631,6 +639,17 @@
   color: #e2e8f0;
 }
 
+.otp-body .loading {
+  font-size: 16px;
+  color: #666;
+  padding: 20px;
+  font-family: 'Roboto Slab', serif;
+}
+
+#dark .otp-body .loading {
+  color: #e2e8f0;
+}
+
 .pickup-code-text {
   font-size: 18px;
   color: #333;
@@ -709,7 +728,6 @@
   background-color: #5a6268;
 }
 
-/* Get OTP Button Styling */
 .otp-button {
   background-color: #28a745;
   color: white;
@@ -734,36 +752,35 @@
   cursor: not-allowed;
 }
 
-/* CSS Variables for theming */
-:root {
-  --background-color: white;
-  --text-color: #333;
-  --accent-color: #2563EB;
-  --border-color: #e9ecef;
-  --input-background: #f8f9fa;
-  --button-background: #6c757d;
-  --button-text: white;
-  --button-hover: #5a6268;
-  --secondary-button-background: #dc3545;
-  --secondary-button-hover: #c82333;
-  --error-color: #dc3545;
+.otp-error {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 10px;
+  font-family: 'Roboto Slab', serif;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 10px;
 }
 
-#dark {
-  --background-color: #2d3748;
-  --text-color: white;
-  --accent-color: #F59E0B;
-  --border-color: #4a5568;
-  --input-background: #4a5568;
-  --button-background: #6c757d;
-  --button-text: white;
-  --button-hover: #5a6268;
-  --secondary-button-background: #dc3545;
-  --secondary-button-hover: #c82333;
-  --error-color: #dc3545;
+#dark .otp-error {
+  color: #f8d7da;
+  background-color: #4a1e1e;
+  border-color: #6b2c32;
 }
 
-/* Tablet styles (601px - 768px) - Single column for narrow tablets */
+/* ============================================
+   FOOTER
+   ============================================ */
+.footer {
+  margin-top: 4vh;
+  height: 5vh;
+  width: 100%;
+}
+
+/* ============================================
+   RESPONSIVE: TABLET (601px - 768px)
+   ============================================ */
 @media (min-width: 601px) and (max-width: 768px) {
   .orders-content {
     max-width: 100%;
@@ -878,9 +895,19 @@
     border-radius: 12px;
     border: 3px solid #F59E0B;
   }
+
+  .view-receipt-btn,
+  .repeat-order-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 8px;
+  }
 }
 
-/* Tablet styles (769px - 1024px) - Two columns */
+/* ============================================
+   RESPONSIVE: TABLET (769px - 1024px)
+   ============================================ */
 @media (min-width: 769px) and (max-width: 1024px) {
   .orders-content {
     max-width: 95vw;
@@ -987,9 +1014,19 @@
     border-radius: 12px;
     border: 3px solid #F59E0B;
   }
+
+  .view-receipt-btn,
+  .repeat-order-btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-top: 8px;
+  }
 }
 
-/* Laptop styles (1025px and above) */
+/* ============================================
+   RESPONSIVE: LAPTOP (1025px+)
+   ============================================ */
 @media (min-width: 1025px) {
   .orders-content {
     max-width: 95vw;
@@ -1096,9 +1133,19 @@
     border-radius: 12px;
     border: 3px solid #F59E0B;
   }
+
+  .view-receipt-btn,
+  .repeat-order-btn {
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-top: 10px;
+  }
 }
 
-/* Large Desktop (1440px and above) */
+/* ============================================
+   RESPONSIVE: LARGE DESKTOP (1440px+)
+   ============================================ */
 @media (min-width: 1440px) {
   .orders-content {
     max-width: 1600px;
@@ -1156,9 +1203,19 @@
   .loading, .login-message, .no-orders {
     font-size: 22px;
   }
+
+  .view-receipt-btn,
+  .repeat-order-btn {
+    padding: 11px 20px;
+    border-radius: 8px;
+    font-size: 15px;
+    margin-top: 12px;
+  }
 }
 
-/* Mobile responsive updates */
+/* ============================================
+   RESPONSIVE: MOBILE (<=768px)
+   ============================================ */
 @media (max-width: 768px) {
   .orders-content {
     padding: 15px;
@@ -1256,8 +1313,17 @@
   .order-total {
     font-size: 5vw;
   }
+
+  .view-receipt-btn,
+  .repeat-order-btn {
+    font-size: 3.5vw;
+    padding: 2.5vw 4.5vw;
+  }
 }
 
+/* ============================================
+   RESPONSIVE: OTP MODAL MOBILE
+   ============================================ */
 @media (max-width: 480px) {
   .otp-content {
     padding: 30px 20px;
@@ -1282,6 +1348,9 @@
   }
 }
 
+/* ============================================
+   RESPONSIVE: SMALL MOBILE (<=400px)
+   ============================================ */
 @media (max-width: 400px) {
   .orders-content {
     margin-top: 12vh;
@@ -1333,72 +1402,14 @@
   .order-total {
     font-size: 5.5vw;
   }
-}
 
-/* Add footer like other pages */
-.footer {
-  margin-top: 4vh;
-  height: 5vh;
-  width: 100%;
-}
-
-.receipt-repeat-btns{
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.view-receipt-btn {
-  padding: 2vw 4vw;
-  background-color: #2563EB;
-  color: white;
-  border: none;
-  border-radius: 1.5vw;
-  font-size: 3vw;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  font-family: 'Roboto Slab';
-  margin-top: 2vw;
-}
-
-.repeat-order-btn {
-  padding: 2vw 4vw;
-  background-color: #2563EB;
-  color: white;
-  border: none;
-  border-radius: 1.5vw;
-  font-size: 3vw;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-  font-family: 'Roboto Slab';
-  margin-top: 2vw;
-}
-
-.view-receipt-btn:hover {
-  background-color: #1d4ed8;
-}
-
-/* Responsive styles for receipt button */
-@media (max-width: 768px) {
-  .view-receipt-btn {
-    font-size: 3.5vw;
-    padding: 2.5vw 4.5vw;
-  }
-  .repeat-order-btn {
-    font-size: 3.5vw;
-    padding: 2.5vw 4.5vw;
-  }
-}
-
-@media (max-width: 400px) {
-  .view-receipt-btn {
-    font-size: 4vw;
-    padding: 3vw 5vw;
-  }
+  .view-receipt-btn,
   .repeat-order-btn {
     font-size: 4vw;
     padding: 3vw 5vw;
+  }
+
+  .receipt-repeat-btns {
+    gap: 8px;
   }
 }

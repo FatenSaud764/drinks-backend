@@ -111,8 +111,8 @@ export default function NavBar() {
 
       <nav className="nav-center" aria-label="Primary">
         <NavLink to="/home" className="menu-btn" onClick={closeMenu}>Home</NavLink>
-        <NavLink to="/products">Products</NavLink>
-        {user && <NavLink to="/orders" className="hide-sm">Previous Orders</NavLink>}
+        <NavLink to="/products" className="menu-btn">Products</NavLink>
+        {user && <NavLink to="/orders" className="menu-btn">Orders</NavLink>}
       </nav>
 
       <div className='nav-right'>

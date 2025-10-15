@@ -125,16 +125,16 @@
     font-family: 'Nunito';
     font-weight: 700;
     font-size: 14px;
-    color: #949595;
+    color: #666666;
     box-sizing: border-box;
 }
 
 .username::placeholder{
-    color:#888888;
+    color:#666666;
 }
 
 .password::placeholder{
-    color: #888888;
+    color: #666666;
 }
 
 /* Icon color changes */

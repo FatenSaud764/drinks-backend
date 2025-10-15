@@ -50,13 +50,13 @@
   height: auto;
   min-height: 81vh;
   padding-top: 0vh;
-  width: 100vw;
+  width: 90vw;
   overflow-y: auto;
 }
 
 .cart-items-list {
   height: auto;
-  width: 92vw;
+  width: 90vw !important;
 }
 
 .cart-item {
@@ -103,7 +103,7 @@
   align-items: center;
   align-content: center;
   justify-content: space-between;
-  width: 90vw;
+  width: 90vw !important;
   height: 5vh;
   color: rgb(175, 173, 173);
 }
@@ -279,7 +279,7 @@
   padding-left: 4vw;
   padding-right: 4vw;
   padding-top: 1vh;
-  width: 80vw;
+  width: 80vw !important;
   height:13vh;
   cursor: pointer;
   font-family: 'Nunito';
@@ -291,11 +291,14 @@
   outline: none;
 }
 /* --- Large laptops (1440px and below) --- */
-@media (max-width: 1440px) {
+@media (max-width: 1540px) {
   .cart-header h2 { font-size: 2.3vh; }
   .cart-count { font-size: 1.9vh; }
   .checkout-btn, .save-note-btn { font-size: 1.7vh; }
   .item-name { font-size: 18px !important; }
+  .cartwrapper{
+    margin-top: 6vh;
+  }
 }
 
 /* --- Medium laptops / small desktops (1200px and below) --- */
@@ -318,4 +321,34 @@
   .cart-footer { height: 8vh; }
   .cart-footer span { font-size: 2vh; }
   .new-note-text { width: 88vw; height: 11vh; }
+  .cartwrapper{
+    margin-top: 1vh;
+  }
+}
+
+@media (min-width: 300px) and (max-width: 900px) {
+  .cartwrapper{
+    margin-top: -1vh;
+  }
+}
+
+@media (min-width: 900px) and (max-width: 1500px) {
+  .cartwrapper{
+    margin-top: -2.5vh;
+  }
+  .cart-footer span{
+    width: 75%;
+  }
+}
+
+@media (max-height: 750px) {
+  .cartwrapper{
+    margin-top: 1vh;
+  }
+}
+
+@media (min-width: 1024px) and (max-height: 900px) {
+  .cartwrapper{
+    margin-top: 7vh;
+  }
 }
