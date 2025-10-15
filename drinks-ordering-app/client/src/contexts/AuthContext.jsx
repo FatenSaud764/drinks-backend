@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
   const login = useCallback(async (credentials) => {
     try {
       setIsLoading(true);
-      // Updated endpoint to match your API
+
       const response = await AxiosInstance.post('/api/auth/token/', credentials);
       
       const { access, refresh, user: userData } = response.data;
@@ -74,8 +74,7 @@ export const AuthProvider = ({ children }) => {
   // Logout function
   const logout = useCallback(async () => {
     try {
-      // Optional: Call logout endpoint on backend if it exists
-      // Note: I don't see a logout endpoint in your API docs
+
       if (refreshToken) {
         try {
           await AxiosInstance.post('/api/auth/logout/', { refresh: refreshToken });
@@ -103,7 +102,6 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      // Updated endpoint to match your API
       const response = await AxiosInstance.post('/api/auth/token/refresh/', {
         refresh: refreshToken
       });
@@ -132,7 +130,6 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      // Updated endpoint to match your API
       const response = await AxiosInstance.get('/api/auth/profile/');
       setUser(response.data);
       setIsLoggedIn(true);
@@ -194,7 +191,6 @@ export const AuthProvider = ({ children }) => {
     refreshAccessToken,
     checkAuth,
     
-    // Setters (for backward compatibility with your existing code)
     setAccessToken,
     setRefreshToken,
     setUser,

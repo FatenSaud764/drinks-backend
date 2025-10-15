@@ -3,7 +3,7 @@ from django.conf import settings
 from datetime import datetime
 
 SUPABASE_URL = "https://lrbmdxrikfwrxgsawgwi.supabase.co"
-SUPABASE_ANON_KEY = settings.config.get("SUPABASE_ANON_KEY", "")  # Add to your .env
+SUPABASE_ANON_KEY = settings.config.get("SUPABASE_ANON_KEY", "")  
 
 def send_new_order_notification(order):
     """Send notification via Supabase REST API"""

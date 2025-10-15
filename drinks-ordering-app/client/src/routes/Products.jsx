@@ -31,7 +31,6 @@ const Products = () => {
   const [drinkAdded, setDrinkAdded] = useState('');
   const {cartItems, setCartItems} = useContext(CartItems);
 
-  // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
 
   const fuse = useMemo(() => {
