@@ -15,6 +15,7 @@ import AddItems from '../components/AddItems.jsx';
 import CartModal from '../components/CartModal.jsx';
 import NavBar from '../components/NavBar'
 import AxiosInstance from '../components/Axios.jsx';
+import { supabase } from '../../lib/supabaseClient.jsx';
 
 
 const Products = () => {
@@ -89,9 +90,22 @@ const addToCart = async (e) => {
   }
 
 
-  useEffect(() => {
-    fetchdata();
-  }, [accessToken, isLoggedIn])
+useEffect(()=>{
+  fetchdata();
+
+
+  const subscription = supabase
+    .channel('cart')
+    .on('postgres_changes', 
+      { event: '*', schema: 'public', table: 'barbackend_cart' },
+      () => {
+        fetchdata(); 
+      }
+    )
+    .subscribe();
+
+  return () => supabase.removeChannel(subscription);
+},[])
 
   useEffect(() => {
     window.scrollTo(0, 0);

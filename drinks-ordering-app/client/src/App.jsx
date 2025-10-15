@@ -105,6 +105,39 @@ useEffect(() => {
   return () => supabase.removeChannel(subscription);
 }, []);
 
+useEffect(()=>{
+  GetCartData();
+
+
+  const subscription = supabase
+    .channel('cart')
+    .on('postgres_changes', 
+      { event: '*', schema: 'public', table: 'barbackend_cart' },
+      () => {
+        GetCartData(); 
+      }
+    )
+    .subscribe();
+
+  return () => supabase.removeChannel(subscription);
+}, [])
+
+useEffect(() => {
+  GetData(); // Initial fetch
+
+  const subscription = supabase
+    .channel('drinks')
+    .on('postgres_changes', 
+      { event: '*', schema: 'public', table: 'barbackend_drink' },
+      () => {
+        GetData(); // Refetch when anything changes
+      }
+    )
+    .subscribe();
+
+  return () => supabase.removeChannel(subscription);
+}, []);
+
 
   useEffect(() => {
   const interval = setInterval(async () => {
@@ -122,11 +155,7 @@ useEffect(() => {
   return () => clearInterval(interval);
 }, []);
 
-  useEffect(() => {
-    if (isLoggedIn && accessToken && accessToken !== 'null') {
-      GetCartData(); // Only fetch cart if authenticated
-    }
-  }, [isLoggedIn, accessToken])
+
 
   useEffect(() => {
     localStorage.setItem('theme', theme);
