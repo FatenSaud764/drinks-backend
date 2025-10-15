@@ -410,140 +410,140 @@ class OrderViewset(viewsets.ViewSet):
     )
     
 
-@action(detail=True, methods=['post'], url_path='email-receipt')
-def email_receipt(self, request, pk=None):
-    order = get_object_or_404(self.get_queryset(request), pk=pk)
-    user = order.user
-    
-    if not user.email:
-        return Response({'detail': 'No email address on file'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    def send_email_async():
-        try:
-            from django.conf import settings
-            
-            order = Order.objects.prefetch_related(
-                Prefetch('items', queryset=OrderItem.objects.select_related('drink'))
-            ).get(pk=pk)
-            
-            items = []
-            subtotal = Decimal('0.00')
-            for item in order.items.all():
-                item_total = item.drink.price * item.quantity
-                subtotal += item_total
-                items.append({
-                    'name': item.drink.name,
-                    'quantity': item.quantity,
-                    'price': f"{item.drink.price:.2f}",
-                    'total': f"{item_total:.2f}"
-                })
-            
-            vat = subtotal * Decimal('0.15')
-            total = subtotal + vat
-            formatted_date = order.created_at.strftime('%B %d, %Y at %I:%M %p')
-            
-            context = {
-                'order_id': order.id,
-                'order_date': formatted_date,
-                'customer_name': user.username,
-                'order_status': order.status.title(),
-                'items': items,
-                'subtotal': f"{subtotal:.2f}",
-                'vat': f"{vat:.2f}",
-                'total': f"{total:.2f}",
-            }
-            
-            html_content = f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <style>
-        body {{font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;}}
-        .header {{text-align: center; padding: 20px 0; border-bottom: 3px solid #F59E0B; margin-bottom: 30px;}}
-        .logo {{font-size: 32px; font-weight: bold; color: #F59E0B; margin: 0;}}
-        .tagline {{font-size: 14px; color: #666; font-style: italic;}}
-        .info-section {{margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 5px;}}
-        .info-row {{display: flex; justify-content: space-between; padding: 5px 0;}}
-        .label {{font-weight: bold; color: #555;}}
-        .items-table {{width: 100%; border-collapse: collapse; margin: 20px 0;}}
-        .items-table th {{background: #2563EB; color: white; padding: 10px; text-align: left;}}
-        .items-table td {{padding: 10px; border-bottom: 1px solid #ddd;}}
-        .totals {{margin: 20px 0; text-align: right;}}
-        .total-row {{padding: 5px 0;}}
-        .grand-total {{font-size: 20px; font-weight: bold; color: #F59E0B; border-top: 2px solid #333; padding-top: 10px; margin-top: 10px;}}
-        .footer {{text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px dashed #ddd; color: #666;}}
-        .thank-you {{font-size: 18px; color: #2563EB; font-weight: bold;}}
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1 class="logo">SwiftServe</h1>
-        <p class="tagline">Skip the queue!</p>
-    </div>
-    <div class="info-section">
-        <div class="info-row"><span class="label">Receipt #:</span><span>{context['order_id']}</span></div>
-        <div class="info-row"><span class="label">Date:</span><span>{context['order_date']}</span></div>
-        <div class="info-row"><span class="label">Customer:</span><span>{context['customer_name']}</span></div>
-        <div class="info-row"><span class="label">Status:</span><span>{context['order_status']}</span></div>
-    </div>
-    <table class="items-table">
-        <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
-        <tbody>{''.join(f'<tr><td>{item["name"]}</td><td>{item["quantity"]}</td><td>R{item["price"]}</td><td>R{item["total"]}</td></tr>' for item in context['items'])}</tbody>
-    </table>
-    <div class="totals">
-        <div class="total-row"><span>Subtotal: R{context['subtotal']}</span></div>
-        <div class="total-row"><span>VAT (15%): R{context['vat']}</span></div>
-        <div class="total-row grand-total"><span>Total: R{context['total']}</span></div>
-    </div>
-    <div class="footer">
-        <p class="thank-you">Thank you for your order!</p>
-        <p>For support, contact us at support@swiftserve.com</p>
-    </div>
-</body>
-</html>
-            """
-            
-            text_content = f"""SwiftServe - Skip the queue!
-========================================
-RECEIPT #{context['order_id']}
-Date: {context['order_date']}
-Customer: {context['customer_name']}
-Status: {context['order_status']}
-----------------------------------------
-ITEMS:
-{''.join(f"{item['name']}\n  Qty: {item['quantity']} x R{item['price']} = R{item['total']}\n" for item in context['items'])}----------------------------------------
-Subtotal: R{context['subtotal']}
-VAT (15%): R{context['vat']}
-TOTAL: R{context['total']}
-========================================
-Thank you for your order!
-For support, contact us at: support@swiftserve.com"""
-            
-            # Use SendGrid HTTP API instead of SMTP
-            message = Mail(
-                from_email='fatensaud04@gmail.com',
-                to_emails=user.email,
-                subject=f'SwiftServe Receipt #{order.id}',
-                plain_text_content=text_content,
-                html_content=html_content
-            )
-            
-            sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
-            response = sg.send(message)
-            print(f"Email sent successfully to {user.email}. Status: {response.status_code}")
-            
-        except Exception as e:
-            print(f"Failed to send email: {str(e)}")
-            import traceback
-            traceback.print_exc()
-    
-    # Start background thread
-    thread = threading.Thread(target=send_email_async)
-    thread.daemon = True
-    thread.start()
-    
-    return Response({'detail': 'Receipt is being sent to your email'}, status=status.HTTP_200_OK)
+    @action(detail=True, methods=['post'], url_path='email-receipt')
+    def email_receipt(self, request, pk=None):
+        order = get_object_or_404(self.get_queryset(request), pk=pk)
+        user = order.user
+        
+        if not user.email:
+            return Response({'detail': 'No email address on file'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        def send_email_async():
+            try:
+                from django.conf import settings
+                
+                order = Order.objects.prefetch_related(
+                    Prefetch('items', queryset=OrderItem.objects.select_related('drink'))
+                ).get(pk=pk)
+                
+                items = []
+                subtotal = Decimal('0.00')
+                for item in order.items.all():
+                    item_total = item.drink.price * item.quantity
+                    subtotal += item_total
+                    items.append({
+                        'name': item.drink.name,
+                        'quantity': item.quantity,
+                        'price': f"{item.drink.price:.2f}",
+                        'total': f"{item_total:.2f}"
+                    })
+                
+                vat = subtotal * Decimal('0.15')
+                total = subtotal + vat
+                formatted_date = order.created_at.strftime('%B %d, %Y at %I:%M %p')
+                
+                context = {
+                    'order_id': order.id,
+                    'order_date': formatted_date,
+                    'customer_name': user.username,
+                    'order_status': order.status.title(),
+                    'items': items,
+                    'subtotal': f"{subtotal:.2f}",
+                    'vat': f"{vat:.2f}",
+                    'total': f"{total:.2f}",
+                }
+                
+                html_content = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body {{font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;}}
+            .header {{text-align: center; padding: 20px 0; border-bottom: 3px solid #F59E0B; margin-bottom: 30px;}}
+            .logo {{font-size: 32px; font-weight: bold; color: #F59E0B; margin: 0;}}
+            .tagline {{font-size: 14px; color: #666; font-style: italic;}}
+            .info-section {{margin: 20px 0; padding: 15px; background: #f5f5f5; border-radius: 5px;}}
+            .info-row {{display: flex; justify-content: space-between; padding: 5px 0;}}
+            .label {{font-weight: bold; color: #555;}}
+            .items-table {{width: 100%; border-collapse: collapse; margin: 20px 0;}}
+            .items-table th {{background: #2563EB; color: white; padding: 10px; text-align: left;}}
+            .items-table td {{padding: 10px; border-bottom: 1px solid #ddd;}}
+            .totals {{margin: 20px 0; text-align: right;}}
+            .total-row {{padding: 5px 0;}}
+            .grand-total {{font-size: 20px; font-weight: bold; color: #F59E0B; border-top: 2px solid #333; padding-top: 10px; margin-top: 10px;}}
+            .footer {{text-align: center; margin-top: 30px; padding-top: 20px; border-top: 2px dashed #ddd; color: #666;}}
+            .thank-you {{font-size: 18px; color: #2563EB; font-weight: bold;}}
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1 class="logo">SwiftServe</h1>
+            <p class="tagline">Skip the queue!</p>
+        </div>
+        <div class="info-section">
+            <div class="info-row"><span class="label">Receipt #:</span><span>{context['order_id']}</span></div>
+            <div class="info-row"><span class="label">Date:</span><span>{context['order_date']}</span></div>
+            <div class="info-row"><span class="label">Customer:</span><span>{context['customer_name']}</span></div>
+            <div class="info-row"><span class="label">Status:</span><span>{context['order_status']}</span></div>
+        </div>
+        <table class="items-table">
+            <thead><tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
+            <tbody>{''.join(f'<tr><td>{item["name"]}</td><td>{item["quantity"]}</td><td>R{item["price"]}</td><td>R{item["total"]}</td></tr>' for item in context['items'])}</tbody>
+        </table>
+        <div class="totals">
+            <div class="total-row"><span>Subtotal: R{context['subtotal']}</span></div>
+            <div class="total-row"><span>VAT (15%): R{context['vat']}</span></div>
+            <div class="total-row grand-total"><span>Total: R{context['total']}</span></div>
+        </div>
+        <div class="footer">
+            <p class="thank-you">Thank you for your order!</p>
+            <p>For support, contact us at support@swiftserve.com</p>
+        </div>
+    </body>
+    </html>
+                """
+                
+                text_content = f"""SwiftServe - Skip the queue!
+    ========================================
+    RECEIPT #{context['order_id']}
+    Date: {context['order_date']}
+    Customer: {context['customer_name']}
+    Status: {context['order_status']}
+    ----------------------------------------
+    ITEMS:
+    {''.join(f"{item['name']}\n  Qty: {item['quantity']} x R{item['price']} = R{item['total']}\n" for item in context['items'])}----------------------------------------
+    Subtotal: R{context['subtotal']}
+    VAT (15%): R{context['vat']}
+    TOTAL: R{context['total']}
+    ========================================
+    Thank you for your order!
+    For support, contact us at: support@swiftserve.com"""
+                
+                # Use SendGrid HTTP API instead of SMTP
+                message = Mail(
+                    from_email='fatensaud04@gmail.com',
+                    to_emails=user.email,
+                    subject=f'SwiftServe Receipt #{order.id}',
+                    plain_text_content=text_content,
+                    html_content=html_content
+                )
+                
+                sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+                response = sg.send(message)
+                print(f"Email sent successfully to {user.email}. Status: {response.status_code}")
+                
+            except Exception as e:
+                print(f"Failed to send email: {str(e)}")
+                import traceback
+                traceback.print_exc()
+        
+        # Start background thread
+        thread = threading.Thread(target=send_email_async)
+        thread.daemon = True
+        thread.start()
+        
+        return Response({'detail': 'Receipt is being sent to your email'}, status=status.HTTP_200_OK)
 
 
 class CartViewset(viewsets.GenericViewSet):
