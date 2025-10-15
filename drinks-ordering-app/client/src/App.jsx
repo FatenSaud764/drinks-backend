@@ -14,6 +14,7 @@ import AxiosInstance from './components/Axios';
 import DrinkInfo from './routes/DrinkInfo';
 import Home from './routes/Home';
 import NotFound from './routes/NotFound';
+import { supabase } from '../lib/supabaseClient';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -88,15 +89,55 @@ const AppContent = () => {
     });
   }, [selecteddrink])
 
-  useEffect(() => {
-    GetData(); // Always fetch products
-    const interval = setInterval(() => {
-      GetData();
-    }, 4000)
-    return () => clearInterval(interval);
-  }, [])
+useEffect(() => {
+  GetData(); // Initial fetch
 
-  
+  const subscription = supabase
+    .channel('drinks')
+    .on('postgres_changes', 
+      { event: '*', schema: 'public', table: 'barbackend_drink' },
+      () => {
+        GetData(); // Refetch when anything changes
+      }
+    )
+    .subscribe();
+
+  return () => supabase.removeChannel(subscription);
+}, []);
+
+useEffect(()=>{
+  GetCartData();
+
+
+  const subscription = supabase
+    .channel('cart')
+    .on('postgres_changes', 
+      { event: '*', schema: 'public', table: 'barbackend_cart' },
+      () => {
+        GetCartData(); 
+      }
+    )
+    .subscribe();
+
+  return () => supabase.removeChannel(subscription);
+}, [])
+
+useEffect(() => {
+  GetData(); // Initial fetch
+
+  const subscription = supabase
+    .channel('drinks')
+    .on('postgres_changes', 
+      { event: '*', schema: 'public', table: 'barbackend_drink' },
+      () => {
+        GetData(); // Refetch when anything changes
+      }
+    )
+    .subscribe();
+
+  return () => supabase.removeChannel(subscription);
+}, []);
+
 
   useEffect(() => {
   const interval = setInterval(async () => {
@@ -114,11 +155,7 @@ const AppContent = () => {
   return () => clearInterval(interval);
 }, []);
 
-  useEffect(() => {
-    if (isLoggedIn && accessToken && accessToken !== 'null') {
-      GetCartData(); // Only fetch cart if authenticated
-    }
-  }, [isLoggedIn, accessToken])
+
 
   useEffect(() => {
     localStorage.setItem('theme', theme);

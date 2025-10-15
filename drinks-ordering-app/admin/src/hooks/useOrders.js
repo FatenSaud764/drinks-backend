@@ -217,7 +217,7 @@ export const useOrderHistory = () => {
     // Set up polling every 2 seconds
     intervalRef.current = setInterval(() => {
       fetchOrderHistory(false); // Don't show loading for background polls
-    }, 2000);
+    }, 8000);
 
     // Cleanup interval on unmount
     return () => {

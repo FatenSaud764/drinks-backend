@@ -1,14 +1,3 @@
-import beer from './assets/Beer.jpeg'
-import alcoholic from './assets/alcohol.jpeg'
-import nonalcoholic from './assets/non-alcoholic.jpeg'
-import cocktail from './assets/cocktail.jpeg'
-import mocktail from './assets/mock.jpeg'
-import shot from './assets/shots.jpeg'
-import cider from './assets/cider.jpeg'
-import wine from './assets/Wine.jpeg'
-import other from './assets/CocoCola.jpg'
-import water from './assets/StillWater.jpg'
-
 // Types used across the application
 export const ORDER_STATUSES = {
   CANCELLED: 'cancelled',
@@ -33,6 +22,7 @@ export const DRINK_CATEGORIES = {
   ENERGY_DRINK: 'energy-drink', // Red Bull, Monster, etc.
   JUICE: 'juice', // Fresh juices, bottled juices
   MILKSHAKE: 'milkshake', // Dairy-based shakes
+  OTHER: 'other', // Items that don't quite fit into the other categories :)
 };
 
 export const USER_ROLES = {

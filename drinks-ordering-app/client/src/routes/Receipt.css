@@ -27,10 +27,7 @@
   margin: auto;
 }
 
-.receipt-container#dark {
-  background: #2d3748;
-  color: white;
-}
+
 
 /* Close Button */
 .receipt-close {
@@ -68,11 +65,11 @@
 }
 
 .receipt-logo {
-  font-size: 36px;
+  margin-top: 2vh !important;
+  font-size: 37px !important;
   font-weight: bold;
   color: #F59E0B;
   margin: 0 0 5px 0;
-  font-family: 'Lilita One', cursive;
 }
 
 .receipt-tagline {
@@ -83,10 +80,6 @@
   font-style: italic;
 }
 
-#dark .receipt-tagline {
-  color: #a0aec0;
-}
-
 /* Divider */
 .receipt-divider {
   height: 1px;
@@ -94,9 +87,6 @@
   margin: 20px 0;
 }
 
-#dark .receipt-divider {
-  background: linear-gradient(to right, transparent, #4a5568, transparent);
-}
 
 /* Receipt Info */
 .receipt-info {
@@ -107,32 +97,28 @@
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  font-family: 'Roboto Slab', serif;
+  font-family: 'Nunito' !important;
   font-size: 14px;
 }
 
 .receipt-label {
+  font-family: 'Nunito';
   font-weight: 600;
   color: #555;
 }
 
-#dark .receipt-label {
-  color: #a0aec0;
-}
 
 .receipt-value {
   color: #333;
   text-align: right;
+  font-family: 'Nunito';
 }
 
-#dark .receipt-value {
-  color: white;
-}
 
 .receipt-status {
   text-transform: capitalize;
   font-weight: 600;
-  color: #10b981;
+  color: #28a745;
 }
 
 /* Items Section */
@@ -148,13 +134,10 @@
   border-bottom: 2px solid #F59E0B;
   font-weight: 700;
   font-size: 13px;
-  font-family: 'Roboto Slab', serif;
+  font-family: 'Nunito' !important;
   color: #333;
 }
 
-#dark .receipt-items-header {
-  color: white;
-}
 
 .receipt-item-row {
   display: grid;
@@ -163,60 +146,57 @@
   padding: 12px 0;
   border-bottom: 1px solid #f0f0f0;
   font-size: 13px;
-  font-family: 'Roboto Slab', serif;
+  font-family: 'Nunito' !important;
   color: #333;
 }
 
-#dark .receipt-item-row {
-  border-bottom-color: #4a5568;
-  color: white;
-}
 
 .receipt-item-col-name {
   text-align: left;
   word-break: break-word;
+  font-family: 'Nunito';
 }
 
 .receipt-item-col-qty,
 .receipt-item-col-price {
   text-align: center;
+  font-family: 'Nunito';
 }
 
 .receipt-item-col-total {
   text-align: right;
   font-weight: 600;
   color: #F59E0B;
+  font-family: 'Nunito';
 }
 
 /* Totals Section */
 .receipt-totals {
   margin-top: 20px;
+  font-family: 'Nunito';
 }
 
 .receipt-total-row {
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  font-family: 'Roboto Slab', serif;
+  font-family: 'Nunito' !important;
   font-size: 15px;
 }
 
 .receipt-total-label {
   color: #555;
+  font-family: 'Nunito';
 }
 
-#dark .receipt-total-label {
-  color: #a0aec0;
-}
+
 
 .receipt-total-value {
-  font-weight: 600;
+  font-weight: 800;
   color: #333;
+  font-family: 'Nunito';
 }
 
-#dark .receipt-total-value {
-  color: white;
-}
 
 .receipt-grand-total {
   font-size: 20px;
@@ -227,6 +207,11 @@
 .receipt-grand-total .receipt-total-label,
 .receipt-grand-total .receipt-total-value {
   color: #F59E0B;
+  font-weight: 700;
+}
+
+.receipt-grand-total .receipt-total-value{
+  font-weight: 800;
 }
 
 /* Footer */
@@ -237,21 +222,16 @@
   border-top: 2px dashed #e5e5e5;
 }
 
-#dark .receipt-footer {
-  border-top-color: #4a5568;
-}
 
 .receipt-thank-you {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
   color: #2563EB;
   margin: 0 0 10px 0;
-  font-family: 'Roboto Slab', serif;
+  font-family: 'Nunito' !important;
 }
 
-#dark .receipt-thank-you {
-  color: #F59E0B;
-}
+
 
 .receipt-footer-text {
   font-size: 12px;
@@ -260,9 +240,7 @@
   font-family: 'Nunito', sans-serif;
 }
 
-#dark .receipt-footer-text {
-  color: #a0aec0;
-}
+
 
 /* Action Buttons */
 .receipt-actions {
@@ -286,6 +264,7 @@
 .receipt-email-btn {
   background: #2563EB;
   color: white;
+  font-family: 'Nunito' !important;
 }
 
 .receipt-email-btn:hover {
@@ -295,6 +274,7 @@
 .receipt-print-btn {
   background: #F59E0B;
   color: white;
+  font-family: 'Nunito' !important;
 }
 
 .receipt-print-btn:hover {
@@ -435,3 +415,4 @@
     width: 100%;
   }
 }
+

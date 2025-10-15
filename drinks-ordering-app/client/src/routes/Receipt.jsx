@@ -1,14 +1,17 @@
-import React, { useContext, useRef } from 'react';
+import React, { useContext, useRef, useState, useEffect } from 'react';
 import { LightDark, ProductList } from '../contexts/contexts';
 import { useAuth } from '../contexts/AuthContext';
 import './Receipt.css';
 import AxiosInstance from '../components/Axios';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const Receipt = ({ order, onClose }) => {
   const { theme } = useContext(LightDark);
   const { products } = useContext(ProductList);
   const { user, accessToken } = useAuth();
   const receiptRef = useRef(null);
+  const [contentHeight, setContentHeight] = useState(0);
 
   const getProductName = (drinkId) => {
     const product = products.find(p => p.id === drinkId);
@@ -69,17 +72,55 @@ const Receipt = ({ order, onClose }) => {
     }
   };
 
+  useEffect(() => {
+            if (receiptRef.current) {
+              setContentHeight(receiptRef.current.offsetHeight);
+            }
+          }, [receiptRef]);
+
   const handlePrint = () => {
-    // Use setTimeout to ensure the print dialog opens after any state changes
-    setTimeout(() => {
-      window.print();
-    }, 100);
-  };
+  const input = document.getElementById('receipt');
+
+  html2canvas(input, {
+    scrollY: -window.scrollY,
+    scrollX: -window.scrollX,
+    width: input.scrollWidth,
+    height: input.scrollHeight,
+    windowWidth: input.scrollWidth,
+    windowHeight: input.scrollHeight
+  }).then((canvas) => {
+    const imgData = canvas.toDataURL('image/png');
+    
+
+    const imgWidth = 125; 
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+    
+    const pdf = new jsPDF('p', 'mm', 'a6');
+    
+    let heightLeft = imgHeight;
+    let position = 0;
+    
+    // Add first page
+    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+    heightLeft -= 150; 
+    
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      pdf.addPage();
+      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= 150;
+    }
+    
+    pdf.save('receipt.pdf');
+  });
+};
+
 
   return (
     <div className="receipt-overlay" onClick={onClose}>
-      <div className="receipt-container" id={theme} onClick={(e) => e.stopPropagation()} ref={receiptRef}>
-        <button className="receipt-close" onClick={onClose}>×</button>
+      <div className="receipt-container" id={'receipt'} onClick={(e) => e.stopPropagation()} ref={receiptRef}>
+        <button className="receipt-close" onClick={onClose} data-html2canvas-ignore>×</button>
         
         <div className="receipt-content">
           {/* Header */}
@@ -164,12 +205,12 @@ const Receipt = ({ order, onClose }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="receipt-actions">
+        <div className="receipt-actions" data-html2canvas-ignore>
           <button className="receipt-action-btn receipt-email-btn" onClick={handleEmailReceipt}>
             Email Receipt
           </button>
-          <button className="receipt-action-btn receipt-print-btn" onClick={handlePrint}>
-            Print Receipt
+          <button className="receipt-action-btn receipt-print-btn" data-html2canvas-ignore onClick={handlePrint}>
+            Download
           </button>
         </div>
       </div>

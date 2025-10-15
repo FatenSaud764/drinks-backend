@@ -1,4 +1,4 @@
-import React, { useContext, useState, useRef, useEffect } from 'react';
+import React, { useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { LightDark } from '../contexts/contexts';
 import './NavBar.css';
 import ThemeButton from './ThemeButton';
@@ -21,13 +21,13 @@ export default function NavBar() {
   const { user, accessToken, refreshToken, isLoggedIn, login, logout } = useAuth();
 
   useEffect(() => {
-    if (notifications.length > 0) {
+    if (notifications.length > 0 && !displayedNotification) {
       const latest = notifications[notifications.length - 1];
       setDisplayedNotification(latest);
     }
-  }, [notifications]);
+  }, [notifications, displayedNotification]);
 
-  const handleCloseNotification = (e) => {
+  const handleCloseNotification = useCallback((e) => {
     if (displayedNotification) {
       if (e) {
         e.stopPropagation();
@@ -35,7 +35,7 @@ export default function NavBar() {
       removeNotification(displayedNotification.id);
       setDisplayedNotification(null);
     }
-  };
+  }, [removeNotification, displayedNotification]);
 
   const closeMenu = () => {
     if (menuRef.current) menuRef.current.removeAttribute('open')
