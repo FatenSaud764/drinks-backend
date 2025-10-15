@@ -187,14 +187,9 @@ SUPABASE_BUCKET_NAME = config("SUPABASE_BUCKET_NAME", default="drink-images")
 DEFAULT_FILE_STORAGE = "barbackend.storage_backends.SupabaseStorage"
 
 # Email Configuration
-# Email Configuration
+
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-else:
-    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_HOST = 'smtp.sendgrid.net'
-    EMAIL_PORT = 587
-    EMAIL_USE_TLS = True
-    EMAIL_HOST_USER = 'apikey'  # Literally the word "apikey"
-    EMAIL_HOST_PASSWORD = config('SENDGRID_API_KEY', default='')
-    DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='fatensaud04@gmail.com')
+
+SENDGRID_API_KEY = config('SENDGRID_API_KEY', default='') 
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='fatensaud04@gmail.com')

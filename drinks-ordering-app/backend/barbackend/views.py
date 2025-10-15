@@ -21,6 +21,9 @@ from drf_spectacular.types import OpenApiTypes
 from django.http import JsonResponse
 from django.core.mail import EmailMultiAlternatives
 from decimal import Decimal
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail, Email, To, Content
+import threading
 
 CART_EXPIRY_SECONDS = 15*60
 
@@ -405,15 +408,24 @@ class OrderViewset(viewsets.ViewSet):
         parameters=[OpenApiParameter(name="id", type=OpenApiTypes.INT, location=OpenApiParameter.PATH)],
         description="Send order receipt via email. Authorization: Bearer JWT required.",
     )
-    def email_receipt(self, request, pk=None):
-        order = get_object_or_404(self.get_queryset(request), pk=pk)
-        user = order.user
-        if not user.email:
-            return Response({'detail': 'No email address on file'}, status=status.HTTP_400_BAD_REQUEST)
+    
+
+@action(detail=True, methods=['post'], url_path='email-receipt')
+def email_receipt(self, request, pk=None):
+    order = get_object_or_404(self.get_queryset(request), pk=pk)
+    user = order.user
+    
+    if not user.email:
+        return Response({'detail': 'No email address on file'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def send_email_async():
         try:
+            from django.conf import settings
+            
             order = Order.objects.prefetch_related(
                 Prefetch('items', queryset=OrderItem.objects.select_related('drink'))
             ).get(pk=pk)
+            
             items = []
             subtotal = Decimal('0.00')
             for item in order.items.all():
@@ -425,9 +437,11 @@ class OrderViewset(viewsets.ViewSet):
                     'price': f"{item.drink.price:.2f}",
                     'total': f"{item_total:.2f}"
                 })
+            
             vat = subtotal * Decimal('0.15')
             total = subtotal + vat
             formatted_date = order.created_at.strftime('%B %d, %Y at %I:%M %p')
+            
             context = {
                 'order_id': order.id,
                 'order_date': formatted_date,
@@ -438,6 +452,7 @@ class OrderViewset(viewsets.ViewSet):
                 'vat': f"{vat:.2f}",
                 'total': f"{total:.2f}",
             }
+            
             html_content = f"""
 <!DOCTYPE html>
 <html>
@@ -488,6 +503,7 @@ class OrderViewset(viewsets.ViewSet):
 </body>
 </html>
             """
+            
             text_content = f"""SwiftServe - Skip the queue!
 ========================================
 RECEIPT #{context['order_id']}
@@ -503,17 +519,31 @@ TOTAL: R{context['total']}
 ========================================
 Thank you for your order!
 For support, contact us at: support@swiftserve.com"""
-            email = EmailMultiAlternatives(
-                subject=f'SwiftServe Receipt #{order.id}',
-                body=text_content,
+            
+            # Use SendGrid HTTP API instead of SMTP
+            message = Mail(
                 from_email='fatensaud04@gmail.com',
-                to=[user.email]
+                to_emails=user.email,
+                subject=f'SwiftServe Receipt #{order.id}',
+                plain_text_content=text_content,
+                html_content=html_content
             )
-            email.attach_alternative(html_content, "text/html")
-            email.send()
-            return Response({'detail': 'Receipt sent successfully'}, status=status.HTTP_200_OK)
+            
+            sg = SendGridAPIClient(settings.SENDGRID_API_KEY)
+            response = sg.send(message)
+            print(f"Email sent successfully to {user.email}. Status: {response.status_code}")
+            
         except Exception as e:
-            return Response({'detail': f'Failed to send email: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            print(f"Failed to send email: {str(e)}")
+            import traceback
+            traceback.print_exc()
+    
+    # Start background thread
+    thread = threading.Thread(target=send_email_async)
+    thread.daemon = True
+    thread.start()
+    
+    return Response({'detail': 'Receipt is being sent to your email'}, status=status.HTTP_200_OK)
 
 
 class CartViewset(viewsets.GenericViewSet):
