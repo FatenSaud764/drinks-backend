@@ -436,6 +436,13 @@ const InventoryPage = () => {
   const handleToggleAvailability = async (drinkId, currentAvailability) => {
     try {
       const drink = drinks.find(d => d.id === drinkId);
+
+      // Do not allow enabling if stock is zero
+      if (!currentAvailability && drink && drink.stock === 0) {
+        showSnackbar(`Cannot enable "${drink.name}" - stock is at 0`, 'error');
+        return;
+      }
+
       await toggleAvailability(drinkId, !currentAvailability);
       const status = currentAvailability ? 'disabled' : 'enabled';
       showSnackbar(`"${drink?.name || 'Drink'}" ${status} successfully!`, 'success');
