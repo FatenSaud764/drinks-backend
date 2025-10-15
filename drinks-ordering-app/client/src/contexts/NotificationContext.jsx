@@ -64,8 +64,18 @@ export const NotificationProvider = ({ children }) => {
       const previousOrder = previousOrdersRef.current.get(order.id);
 
       // Only add notification if status actually changed
-      if (order.status != "pending" && order.status != previousOrder.status) {
+      if (previousOrder && order.status !== "pending" && order.status !== previousOrder.status) {
         addNotification({
+          orderId: order.id,
+          orderNumber: order.order_number || order.id,
+          oldStatus: previousOrder.status,
+          newStatus: order.status,
+          timestamp: new Date()
+        });
+      }
+
+      if(!previousOrder && order.status != 'pending') {
+          addNotification({
           orderId: order.id,
           orderNumber: order.order_number || order.id,
           oldStatus: previousOrder?.status,
@@ -74,8 +84,8 @@ export const NotificationProvider = ({ children }) => {
         });
       }
 
-      if(!previousOrder && order.status != 'pending') {
-          addNotification({
+      if(previousOrder && order.status == 'ready' && order.updated_at!=previousOrder.updated_at){
+        addNotification({
           orderId: order.id,
           orderNumber: order.order_number || order.id,
           oldStatus: previousOrder?.status,

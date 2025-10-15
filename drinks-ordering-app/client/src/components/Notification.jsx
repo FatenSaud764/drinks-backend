@@ -56,6 +56,8 @@ export default function Notification({ isDisplaying, onClose, orderStatus, order
 
     return statusClasses[status?.toLowerCase()] || '';
   };
+
+  
   return (
     <AnimatePresence>
       {isDisplaying && (
@@ -71,7 +73,7 @@ export default function Notification({ isDisplaying, onClose, orderStatus, order
             {orderNumber && <strong style={{fontFamily: 'Nunito'}}>Order #{orderNumber}: </strong>}
             <strong style={{fontFamily: 'Nunito'}}>{formatStatusMessage(orderStatus)}</strong>
           </div>
-          <button className="close-notif-btn" onClick={onClose} aria-label="Close notification">
+          <button className="close-notif-btn" onClick={(e) => {onClose(); e.stopPropagation();}} aria-label="Close notification">
             <X size={24} />
           </button>
         </motion.div>
