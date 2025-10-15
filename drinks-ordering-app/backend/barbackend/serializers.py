@@ -22,7 +22,7 @@ class DrinkMinimalSerializer(serializers.ModelSerializer):
 class DrinkListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Drink
-        fields = ['id', 'name', 'price', 'category', 'available', 'stock', 'image']
+        fields = ['id', 'name', 'price', 'category', 'available', 'stock', 'image', 'description']
 
 
 class OrderItemSerializer(serializers.ModelSerializer):

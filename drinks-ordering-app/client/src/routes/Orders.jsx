@@ -4,23 +4,25 @@
 */
 import React, { useContext, useEffect, useState, useRef } from 'react'
 import NavBar from '../components/NavBar'
-import { LightDark, ProductList } from '../contexts/contexts'
+import { LightDark, ProductList, CartItems, CartModalBoolean } from '../contexts/contexts'
 import { useAuth } from '../contexts/AuthContext'
 import './Orders.css'
 import AxiosInstance from '../components/Axios'
 import { useCallback } from 'react'
 import Receipt from './Receipt'
+import CartModal from '../components/CartModal'
 
 const OrdersPage = () => {
   const { theme } = useContext(LightDark)
   const { products } = useContext(ProductList)
-  const { isLoggedIn } = useAuth()
   
   const [activeTab, setActiveTab] = useState('active')
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const intervalRef = useRef(null)
+  const {cartItems, setCartItems} = useContext(CartItems);
+  const { accessToken, isLoggedIn } = useAuth();
 
   // Filter states
   const [searchOrderId, setSearchOrderId] = useState('')
@@ -32,6 +34,7 @@ const OrdersPage = () => {
   const [otpError, setOtpError] = useState(null)
   const [otpVisible, setOtpVisible] = useState(false)
   const [fetchedOtp, setFetchedOtp] = useState(null)
+  const [cartModal, setCartModal] = useState(false);
 
   // Receipt state
   const [selectedReceiptOrder, setSelectedReceiptOrder] = useState(null)
@@ -57,6 +60,26 @@ const OrdersPage = () => {
     } finally {
       if (showLoading) setLoading(false)
     }
+  }
+
+  const repeatOrder = async (order) => {
+    try{
+    setCartModal(true);
+    for(const item of order.items){
+      await Promise.all([
+         await AxiosInstance.post(`/api/cart/items/`, 
+          {"drink_id": item.drink_id, "quantity": item.quantity}, 
+          {headers:{Authorization: `Bearer ${accessToken}`}}
+        )
+      ])
+    }
+
+
+      }
+      catch(error){
+        console.error("Could not repeat order, error is", error)
+      }
+
   }
 
   // This function fetches the OTP for a given order ID
@@ -268,6 +291,9 @@ const OrdersPage = () => {
   return (
     <div className="orderswrapper" id={theme}>
       <NavBar />
+      <CartModalBoolean.Provider value={{cartModal, setCartModal}}>
+          {cartModal && <CartModal/>}
+      </CartModalBoolean.Provider>
       <OtpVisiblity />
       {selectedReceiptOrder && (
       <Receipt 
@@ -456,12 +482,21 @@ const OrdersPage = () => {
                     
                     {/* Show receipt button ONLY for completed orders */}
                     {order.status?.toLowerCase() === 'completed' && (
-                      <button 
-                        className="view-receipt-btn"
-                        onClick={() => {setSelectedReceiptOrder(order)}}
-                      >
-                        View Receipt
-                      </button>
+                      <div className='receipt-repeat-btns'>
+                        <button 
+                          className="repeat-order-btn"
+                          onClick={()=>{repeatOrder(order)}}
+                        >
+                          Order Again
+                        </button>
+                        <button 
+                          className="view-receipt-btn"
+                          onClick={() => {setSelectedReceiptOrder(order)}}
+                        >
+                          View Receipt
+                        </button>
+                      </div>
+                      
                     )}
                   </div>
                 </div>

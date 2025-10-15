@@ -1342,7 +1342,27 @@
   width: 100%;
 }
 
+.receipt-repeat-btns{
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
 .view-receipt-btn {
+  padding: 2vw 4vw;
+  background-color: #2563EB;
+  color: white;
+  border: none;
+  border-radius: 1.5vw;
+  font-size: 3vw;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: 'Roboto Slab';
+  margin-top: 2vw;
+}
+
+.repeat-order-btn {
   padding: 2vw 4vw;
   background-color: #2563EB;
   color: white;
@@ -1366,10 +1386,18 @@
     font-size: 3.5vw;
     padding: 2.5vw 4.5vw;
   }
+  .repeat-order-btn {
+    font-size: 3.5vw;
+    padding: 2.5vw 4.5vw;
+  }
 }
 
 @media (max-width: 400px) {
   .view-receipt-btn {
+    font-size: 4vw;
+    padding: 3vw 5vw;
+  }
+  .repeat-order-btn {
     font-size: 4vw;
     padding: 3vw 5vw;
   }
