@@ -439,7 +439,8 @@ class OrderViewset(viewsets.ViewSet):
                     })
                 
                 vat = subtotal * Decimal('0.15')
-                total = subtotal + vat
+                total = subtotal
+                subtotal = total * Decimal('0.85')
                 formatted_date = order.created_at.strftime('%B %d, %Y at %I:%M %p')
                 
                 context = {
