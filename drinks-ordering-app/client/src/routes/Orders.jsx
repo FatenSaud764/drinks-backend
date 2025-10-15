@@ -4,12 +4,13 @@
 */
 import React, { useContext, useEffect, useState, useRef } from 'react'
 import NavBar from '../components/NavBar'
-import { LightDark, ProductList, CartItems } from '../contexts/contexts'
+import { LightDark, ProductList, CartItems, CartModalBoolean } from '../contexts/contexts'
 import { useAuth } from '../contexts/AuthContext'
 import './Orders.css'
 import AxiosInstance from '../components/Axios'
 import { useCallback } from 'react'
 import Receipt from './Receipt'
+import CartModal from '../components/CartModal'
 
 const OrdersPage = () => {
   const { theme } = useContext(LightDark)
@@ -33,6 +34,7 @@ const OrdersPage = () => {
   const [otpError, setOtpError] = useState(null)
   const [otpVisible, setOtpVisible] = useState(false)
   const [fetchedOtp, setFetchedOtp] = useState(null)
+  const [cartModal, setCartModal] = useState(false);
 
   // Receipt state
   const [selectedReceiptOrder, setSelectedReceiptOrder] = useState(null)
@@ -62,9 +64,7 @@ const OrdersPage = () => {
 
   const repeatOrder = async (order) => {
     try{
-    setCartItems(order.items); 
-    alert("Added drinks to cart!")
-
+    setCartModal(true);
     for(const item of order.items){
       await Promise.all([
          await AxiosInstance.post(`/api/cart/items/`, 
@@ -73,6 +73,8 @@ const OrdersPage = () => {
         )
       ])
     }
+
+
       }
       catch(error){
         console.error("Could not repeat order, error is", error)
@@ -289,6 +291,9 @@ const OrdersPage = () => {
   return (
     <div className="orderswrapper" id={theme}>
       <NavBar />
+      <CartModalBoolean.Provider value={{cartModal, setCartModal}}>
+          {cartModal && <CartModal/>}
+      </CartModalBoolean.Provider>
       <OtpVisiblity />
       {selectedReceiptOrder && (
       <Receipt 
