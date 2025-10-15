@@ -79,7 +79,7 @@ Then enter the network URL displayed in your terminal (e.g., `http://192.168.1.x
 
 ## Architecture
 
-- **Backend**: Remote Supabase database hosted on Render
+- **Backend**: Remote Supabase database hosted on Render (also note that all email deliveries are controlled by a thir-party service provider namely SendGrid)
 - **Admin Frontend**: Bar staff/admin interface for managing orders and inventory
 - **Client Frontend**: Customer-facing app for placing orders
 
