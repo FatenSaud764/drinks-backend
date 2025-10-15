@@ -189,7 +189,6 @@ DEFAULT_FILE_STORAGE = "barbackend.storage_backends.SupabaseStorage"
 # Email Configuration
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-else:
-    EMAIL_BACKEND = 'sendgrid_backend.SendGridBackend'
-    DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='fatensaud04@gmail.com')
-    SENDGRID_API_KEY = config('SENDGRID API KEY', default = '')
+
+SENDGRID_API_KEY = config('SENDGRID_API_KEY', default='')  # ← Fixed the space!
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='fatensaud04@gmail.com')

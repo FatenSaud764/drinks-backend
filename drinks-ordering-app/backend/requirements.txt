@@ -93,4 +93,4 @@ gunicorn==23.0.0
 django-storages==1.14.2
 
 #EMAIL
-sendgrid-django==4.2.0
+sendgrid==6.11.0
