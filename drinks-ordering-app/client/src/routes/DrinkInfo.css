@@ -196,7 +196,7 @@
         width: 18vh;
         height: 6.5vh;
         font-size: 16px;
-        margin-top: -1vh;
+        margin-top: -2vh;
     }
 
     .drinkimage-container{
@@ -298,7 +298,7 @@
     .cart_section{
         grid-area: cart;
         width: 100%;
-        max-width: 450px;
+        max-width: 530px;
         margin-top: -25vh; /* shifted up */
     }
 
@@ -308,7 +308,7 @@
         height: 4.5vh;
         font-size: 15px;
         font-weight: 600;
-        margin-top: -9vh;
+        margin-top: -8vh;
         border-radius: 12px;
         transition: all 0.3s ease;
         text-transform: uppercase;
@@ -405,7 +405,7 @@
         width: 100%;
         line-height: 1.6;
         margin-bottom: 1vh;
-        margin-top: -30vh; /* shifted up */
+        margin-top: -27vh; /* shifted up */
     }
 
     .cart_section{
