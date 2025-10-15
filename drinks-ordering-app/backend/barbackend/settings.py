@@ -190,6 +190,6 @@ DEFAULT_FILE_STORAGE = "barbackend.storage_backends.SupabaseStorage"
 if DEBUG:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 else:
-    EMAIL_BACKEND = 'sendgrid_backend.SendGridBackend'
+    EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
     DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='fatensaud04@gmail.com')
     SENDGRID_API_KEY = config('SENDGRID API KEY', default = '')
