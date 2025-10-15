@@ -24,7 +24,7 @@ class DrinkListSerializer(serializers.ModelSerializer):
         model = Drink
         fields = ['id', 'name', 'price', 'category', 'available', 'stock', 'image']
 
-# Update OrderItemSerializer
+
 class OrderItemSerializer(serializers.ModelSerializer):
     drink_id = serializers.PrimaryKeyRelatedField(
         queryset=Drink.objects.all(), source='drink'
@@ -34,6 +34,36 @@ class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
         fields = ['id', 'drink_id', 'drink', 'quantity']
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True)
+    class Meta:
+        model = Order
+        fields = ['id', 'user', 'note', 'status', 'total_price', 'items', 'created_at', 'updated_at']
+        read_only_fields = ['status', 'total_price', 'created_at', 'updated_at']
+    
+    def create(self, validated_data):
+        from decimal import Decimal
+        items_data = validated_data.pop('items', [])
+        
+        drink_ids = [item_data['drink'].id for item_data in items_data]
+        drinks = {d.id: d for d in Drink.objects.filter(id__in=drink_ids)}
+        
+        total = Decimal('0.00')
+        for item_data in items_data:
+            drink = drinks[item_data['drink'].id]
+            total += drink.price * item_data['quantity']
+        
+        order = Order.objects.create(total_price=total, **validated_data)
+        
+        order_items = [
+            OrderItem(order=order, drink=item_data['drink'], quantity=item_data['quantity'])
+            for item_data in items_data
+        ]
+        OrderItem.objects.bulk_create(order_items)
+        
+        return order
+
 
 class CartItemSerializer(serializers.ModelSerializer):
     drink_id = serializers.PrimaryKeyRelatedField(
