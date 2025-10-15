@@ -97,7 +97,7 @@ const InventoryPage = () => {
       errors.category = 'Category is required';
     }
 
-    if (!data.stock || parseInt(data.stock) < 0) {
+    if (data.stock === '' || parseInt(data.stock) < 0) {
       errors.stock = 'Valid stock quantity is required';
     }
 
