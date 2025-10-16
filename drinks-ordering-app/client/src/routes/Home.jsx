@@ -4,24 +4,25 @@ import { IoIosArrowDroprightCircle } from "react-icons/io";
 import { DrinkCategory, LightDark, Orders, ProductList } from '../contexts/contexts'
 import NavBar from '../components/NavBar';
 import { useAuth } from '../contexts/AuthContext';
-import {DRINK_CATEGORIES} from '../../../packages/shared/types';
+import { DRINK_CATEGORIES } from '../../../packages/shared/types';
 import AxiosInstance from '../components/Axios';
 import { useNavigate } from 'react-router-dom';
 import Slider from 'react-slick';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { supabase } from '../../lib/supabaseClient';
 
 const Home = () => {
-  const {theme, setTheme} = useContext(LightDark);
-  const {user} = useAuth();
-  const {category, setCategory} = useContext(DrinkCategory);
+  const { theme, setTheme } = useContext(LightDark);
+  const { user } = useAuth();
+  const { category, setCategory } = useContext(DrinkCategory);
   const navigate = useNavigate();
-  const {products, setProducts} = useContext(ProductList);
-  const {orders, setOrders} = useContext(Orders);
-  const {isLoggedIn, accessToken} = useAuth();
+  const { products, setProducts } = useContext(ProductList);
+  const { orders, setOrders } = useContext(Orders);
+  const { isLoggedIn, accessToken } = useAuth();
 
   const GetOrderData = async () => {
-    if(!isLoggedIn || !accessToken) {
+    if (!isLoggedIn || !accessToken) {
       setOrders([]);
       return;
     }
@@ -37,12 +38,21 @@ const Home = () => {
   };
 
   useEffect(() => {
-    GetOrderData(); // Always fetch products
-    const interval = setInterval(() => {
-      GetOrderData();
-    }, 3000)
-    return () => clearInterval(interval);
-  }, [])
+    GetOrderData();
+
+
+    const subscription = supabase
+      .channel('order')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'barbackend_order' },
+        () => {
+          GetOrderData();
+        }
+      )
+      .subscribe();
+
+    return () => supabase.removeChannel(subscription);
+  }, [isLoggedIn, accessToken])
 
   console.log('drinks', products)
 
@@ -70,24 +80,24 @@ const Home = () => {
     infinite: true,
     autoplay: true,
     autoplaySpeed: 2000,
-    slidesToShow: slidesToShow, // ✅ Use state value
+    slidesToShow: slidesToShow,
     slidesToScroll: 1,
     arrows: false,
     draggable: true,
     touchMove: true,
     pauseOnDotsHover: false,
     pauseOnHover: true,
-    centerMode: slidesToShow < 3, // Only center mode for mobile/tablet
+    centerMode: slidesToShow < 3,
     centerPadding: '0px',
   };
 
 
 
-  const sortedOrders = orders.filter(order => order.status!="completed").sort((a, b) => {
-        const dateA = new Date(a.created_at || a.date)
-        const dateB = new Date(b.created_at || b.date)
-        return dateB - dateA
-      })
+  const sortedOrders = orders.filter(order => order.status != "completed").sort((a, b) => {
+    const dateA = new Date(a.created_at || a.date)
+    const dateB = new Date(b.created_at || b.date)
+    return dateB - dateA
+  })
 
   const getStatusColor = (status) => {
     switch (status?.toLowerCase()) {
@@ -105,38 +115,38 @@ const Home = () => {
         return '#F59E0B'
     }
   }
-  const statusColor = sortedOrders.length>0 ? getStatusColor(sortedOrders[0].status) : getStatusColor('preparing');
+  const statusColor = sortedOrders.length > 0 ? getStatusColor(sortedOrders[0].status) : getStatusColor('preparing');
 
 
 
   return (
     <div className='homewrapper' id={theme}>
       <NavBar />
-      <div className='greeting'>Welcome back {user?user.username:''}!</div>
-      <div className='orderwrapper' role='button' tabIndex={0} onClick={() => {navigate('/orders')}}>
+      <div className='greeting'>Welcome back {user ? user.username : ''}!</div>
+      <div className='orderwrapper' role='button' tabIndex={0} onClick={() => { navigate('/orders') }}>
         <div className='orderrow'>
-          <div style={{fontFamily:'Nunito', fontSize:'20px', fontWeight: '800'}}>Your latest order:</div>
+          <div style={{ fontFamily: 'Nunito', fontSize: '20px', fontWeight: '800' }}>Your latest order:</div>
         </div>
-        {sortedOrders.length<=0 ? <h3 className='no_orders'>You have no active orders!</h3> : <div className='orderrow'>
-          <div style={{fontFamily: 'Nunito', fontSize: '17px', fontWeight:'700'}}>Order #{sortedOrders[0].id}</div>
-          <div style={{fontFamily: 'Nunito', fontSize: '17px', border: 'none', borderRadius: '2vh', background: `${statusColor}`, width: '13vh', height: '3.5vh', display:'flex', justifyContent:'center', justifyItems:'center', color:'white', alignContent: 'center', alignItems: 'center'}}>{sortedOrders[0].status}</div>
-          </div>}
+        {sortedOrders.length <= 0 ? <h3 className='no_orders'>You have no active orders!</h3> : <div className='orderrow'>
+          <div style={{ fontFamily: 'Nunito', fontSize: '17px', fontWeight: '700' }}>Order #{sortedOrders[0].id}</div>
+          <div style={{ fontFamily: 'Nunito', fontSize: '17px', border: 'none', borderRadius: '2vh', background: `${statusColor}`, width: '13vh', height: '3.5vh', display: 'flex', justifyContent: 'center', justifyItems: 'center', color: 'white', alignContent: 'center', alignItems: 'center' }}>{sortedOrders[0].status}</div>
+        </div>}
       </div>
       <div className='carousel-list'>
-        {Object.values(DRINK_CATEGORIES).map(category => 
-        <div className='carousel-wrapper' key={category}>
-        <div className='category-header'>
-          <h4 className='category-name'>{category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}</h4>
-          <button className='category-button' onClick={() => {setCategory(category); navigate('/products')}}><IoIosArrowDroprightCircle className='category-button'/></button>
-        </div>
-        <Slider {...settings} className='slide-container'>
-          {products.filter(drink => drink.category==category).map(drink => <div className='carousel-drink'>
-            <img className='carousel-image' src={`${drink.image}`} loading='lazy' />
-            <h5 className='drink-name'>{drink.name}</h5>
-            </div>)}
-        </Slider>
-        </div>
-          )}
+        {Object.values(DRINK_CATEGORIES).map(category =>
+          <div className='carousel-wrapper' key={category}>
+            <div className='category-header'>
+              <h4 className='category-name'>{category.charAt(0).toUpperCase() + category.slice(1).toLowerCase()}</h4>
+              <button className='category-button' onClick={() => { setCategory(category); navigate('/products') }}><IoIosArrowDroprightCircle className='category-button' /></button>
+            </div>
+            <Slider {...settings} className='slide-container'>
+              {products.filter(drink => drink.category == category).map(drink => <div className='carousel-drink'>
+                <img className='carousel-image' src={`${drink.image}`} loading='lazy' />
+                <h5 className='drink-name'>{drink.name}</h5>
+              </div>)}
+            </Slider>
+          </div>
+        )}
       </div>
       <br />
       <footer className='global-footer'>@ 2025 SwiftServe</footer>

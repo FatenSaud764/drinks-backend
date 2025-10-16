@@ -93,7 +93,7 @@ useEffect(() => {
   GetData(); // Initial fetch
 
   const subscription = supabase
-    .channel('drinks')
+    .channel('drink')
     .on('postgres_changes', 
       { event: '*', schema: 'public', table: 'barbackend_drink' },
       () => {

@@ -4,19 +4,19 @@ import { CartModalBoolean } from '../contexts/contexts.jsx'
 import { SiTicktick } from "react-icons/si";
 
 const CartModal = () => {
-  const {cartModal, setCartModal} = useContext(CartModalBoolean);
+  const { cartModal, setCartModal } = useContext(CartModalBoolean);
 
   useEffect(() => {
-      let timerId;
-      if (cartModal) {
-        timerId = setInterval(() => {
-          setCartModal(false);
-        }, 1000); 
-      }
-      return () => {
-        clearInterval(timerId);
-      };
-    }, [cartModal]);
+    let timerId;
+    if (cartModal) {
+      timerId = setInterval(() => {
+        setCartModal(false);
+      }, 1000);
+    }
+    return () => {
+      clearInterval(timerId);
+    };
+  }, [cartModal]);
 
   return (
     <div className='cartmodalwrapper'>

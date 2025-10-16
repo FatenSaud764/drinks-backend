@@ -9,7 +9,7 @@ import Notification from './Notification.jsx';
 import { useNotifications } from '../contexts/NotificationContext.jsx';
 
 export default function NavBar() {
-  const {theme, setTheme} = useContext(LightDark);
+  const { theme, setTheme } = useContext(LightDark);
   const navigate = useNavigate();
   const menuRef = useRef(null);
   const navRef = useRef(null);
@@ -67,74 +67,74 @@ export default function NavBar() {
 
   return (
     <>
-      <Notification 
+      <Notification
         isDisplaying={!!displayedNotification}
         onClose={handleCloseNotification}
         orderStatus={displayedNotification?.newStatus}
         orderNumber={displayedNotification?.orderNumber}
       />
-    <nav ref={navRef} className="nav" id={theme}>
-      <div className="nav-left">
-        <details className="hamburger" ref={menuRef} role="navigation">
-          <summary aria-label="Menu" aria-expanded={menuRef.current?.open ? 'true' : 'false'} aria-controls="hamburger-sidebar" role="button">
-            <span className={`summary-hamburger ${menuRef.current?.open ? 'open' : 'closed'}`}>
-              <span></span>
-              <span></span>
-              <span></span>
-            </span>
-          </summary>
-          <div className="sidebar-backdrop" onClick={closeMenu} />
-          <aside id="hamburger-sidebar" className="sidebar opaque" aria-label="Mobile menu">
-            <div className="menu-pane">
-              <h2 className="menu-title" style={{fontFamily: 'Roboto Slab', fontSize: '20px'}}>Menu</h2>
-              <nav className="menu-buttons">
-                {isLoggedIn && <div className="menu-user-info">Welcome, {user?.username || 'User'}!</div>}
-                <NavLink to="/home" className="menu-btn" onClick={closeMenu}>Home</NavLink>
-                <NavLink to="/products" className="menu-btn" onClick={closeMenu}>Products</NavLink>
-                {isLoggedIn && <NavLink to="/orders" className="menu-btn" onClick={closeMenu}>Orders</NavLink>}
+      <nav ref={navRef} className="nav" id={theme}>
+        <div className="nav-left">
+          <details className="hamburger" ref={menuRef} role="navigation">
+            <summary aria-label="Menu" aria-expanded={menuRef.current?.open ? 'true' : 'false'} aria-controls="hamburger-sidebar" role="button">
+              <span className={`summary-hamburger ${menuRef.current?.open ? 'open' : 'closed'}`}>
+                <span></span>
+                <span></span>
+                <span></span>
+              </span>
+            </summary>
+            <div className="sidebar-backdrop" onClick={closeMenu} />
+            <aside id="hamburger-sidebar" className="sidebar opaque" aria-label="Mobile menu">
+              <div className="menu-pane">
+                <h2 className="menu-title" style={{ fontFamily: 'Roboto Slab', fontSize: '20px' }}>Menu</h2>
+                <nav className="menu-buttons">
+                  {isLoggedIn && <div className="menu-user-info">Welcome, {user?.username || 'User'}!</div>}
+                  <NavLink to="/home" className="menu-btn" onClick={closeMenu}>Home</NavLink>
+                  <NavLink to="/products" className="menu-btn" onClick={closeMenu}>Products</NavLink>
+                  {isLoggedIn && <NavLink to="/orders" className="menu-btn" onClick={closeMenu}>Orders</NavLink>}
 
-                <div className="menu-divider"></div>
-                {accessToken && refreshToken && accessToken !== 'null' && refreshToken !== 'null' ? (
-                  <button className="menu-btn menu-logout" onClick={handleLogout}>Logout</button>
-                ) : (
-                  <button className="menu-btn menu-login" onClick={handleLogin}>Login</button>
-                )}
-              </nav>
-            </div>
-          </aside>
-        </details>
-        
-        <Link to="/home" className="brand" aria-label="SwiftServe">
-          <span className="brand-text">SwiftServe</span>
-        </Link>
-      </div>
+                  <div className="menu-divider"></div>
+                  {accessToken && refreshToken && accessToken !== 'null' && refreshToken !== 'null' ? (
+                    <button className="menu-btn menu-logout" onClick={handleLogout}>Logout</button>
+                  ) : (
+                    <button className="menu-btn menu-login" onClick={handleLogin}>Login</button>
+                  )}
+                </nav>
+              </div>
+            </aside>
+          </details>
 
-      <nav className="nav-center" aria-label="Primary">
-        <NavLink to="/home" className="menu-btn" onClick={closeMenu}>Home</NavLink>
-        <NavLink to="/products" className="menu-btn">Products</NavLink>
-        {user && <NavLink to="/orders" className="menu-btn">Orders</NavLink>}
-      </nav>
-
-      <div className='nav-right'>
-        <div className='navbuttons'>
-          <div className='themeprod'>
-            <ThemeButton />
-          </div>
-          <button className='cart' onClick={() => {navigate('/cart')}}>
-            <TiShoppingCart className='carticon'/>
-          </button>
-          
-          {user ? (
-            <>
-              <span className="logged-in-username hide-sm">Hi, {user.username}</span>
-              <button className="user-btn hide-sm" onClick={handleLogout}>Logout</button>
-            </>
-          ) : (
-            <button className="user-btn hide-sm" onClick={handleLogin}>Login</button>
-          )}
+          <Link to="/home" className="brand" aria-label="SwiftServe">
+            <span className="brand-text">SwiftServe</span>
+          </Link>
         </div>
-      </div>
-    </nav>
+
+        <nav className="nav-center" aria-label="Primary">
+          <NavLink to="/home" className="menu-btn" onClick={closeMenu}>Home</NavLink>
+          <NavLink to="/products" className="menu-btn">Products</NavLink>
+          {user && <NavLink to="/orders" className="menu-btn">Orders</NavLink>}
+        </nav>
+
+        <div className='nav-right'>
+          <div className='navbuttons'>
+            <div className='themeprod'>
+              <ThemeButton />
+            </div>
+            <button className='cart' onClick={() => { navigate('/cart') }}>
+              <TiShoppingCart className='carticon' />
+            </button>
+
+            {user ? (
+              <>
+                <span className="logged-in-username hide-sm">Hi, {user.username}</span>
+                <button className="user-btn hide-sm" onClick={handleLogout}>Logout</button>
+              </>
+            ) : (
+              <button className="user-btn hide-sm" onClick={handleLogin}>Login</button>
+            )}
+          </div>
+        </div>
+      </nav>
     </>
   )
 }

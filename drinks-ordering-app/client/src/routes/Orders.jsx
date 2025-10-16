@@ -11,17 +11,18 @@ import AxiosInstance from '../components/Axios'
 import { useCallback } from 'react'
 import Receipt from './Receipt'
 import CartModal from '../components/CartModal'
+import { supabase } from '../../lib/supabaseClient'
 
 const OrdersPage = () => {
   const { theme } = useContext(LightDark)
   const { products } = useContext(ProductList)
-  
+
   const [activeTab, setActiveTab] = useState('active')
   const [orders, setOrders] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const intervalRef = useRef(null)
-  const {cartItems, setCartItems} = useContext(CartItems);
+  const { cartItems, setCartItems } = useContext(CartItems);
   const { accessToken, isLoggedIn } = useAuth();
 
   // Filter states
@@ -43,16 +44,16 @@ const OrdersPage = () => {
     try {
       if (showLoading) setLoading(true)
       setError(null)
-      
+
       const res = await AxiosInstance.get('/api/orders/')
       console.log('Fetched orders:', res.data)
-      
+
       const sortedOrders = res.data.sort((a, b) => {
         const dateA = new Date(a.created_at || a.date)
         const dateB = new Date(b.created_at || b.date)
         return dateB - dateA
       })
-      
+
       setOrders(sortedOrders)
     } catch (err) {
       console.error('Error fetching orders:', err)
@@ -63,24 +64,25 @@ const OrdersPage = () => {
   }
 
   const repeatOrder = async (order) => {
-    try{
-    setCartModal(true);
-    for(const item of order.items){
-      await Promise.all([
-         await AxiosInstance.post(`/api/cart/items/`, 
-          {"drink_id": item.drink_id, "quantity": item.quantity}, 
-          {headers:{Authorization: `Bearer ${accessToken}`}}
-        )
-      ])
+    try {
+      setCartModal(true);
+      for (const item of order.items) {
+        await Promise.all([
+          await AxiosInstance.post(`/api/cart/items/`,
+            { "drink_id": item.drink_id, "quantity": item.quantity },
+            { headers: { Authorization: `Bearer ${accessToken}` } }
+          )
+        ])
+      }
+
+
+    }
+    catch (error) {
+      console.error("Could not repeat order, error is", error)
     }
 
-
-      }
-      catch(error){
-        console.error("Could not repeat order, error is", error)
-      }
-
   }
+
 
   // This function fetches the OTP for a given order ID
   const fetchOrderOtp = useCallback(async (orderId) => {
@@ -102,7 +104,7 @@ const OrdersPage = () => {
     } finally {
       setOtpLoading(false)
     }
-  },[])
+  }, [])
 
   const cancelOrder = async (orderId) => {
     try {
@@ -111,7 +113,7 @@ const OrdersPage = () => {
       fetchOrders()
     } catch (err) {
       console.error('Error cancelling order:', err)
-      
+
       if (err.response?.status === 404) {
         alert('Order not found or already cancelled')
       } else if (err.response?.status === 403) {
@@ -123,29 +125,26 @@ const OrdersPage = () => {
   }
 
   useEffect(() => {
-    if (isLoggedIn) {
-      fetchOrders()
+    fetchOrders();
 
-      intervalRef.current = setInterval(() => {
-        fetchOrders(false);
-      }, 4000)
 
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current)
+    const subscription = supabase
+      .channel('cart')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'barbackend_order' },
+        () => {
+          fetchOrders();
         }
-      }
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-      }
-    }
-  }, [isLoggedIn, selectedOrderId, otpVisible])
+      )
+      .subscribe();
+
+    return () => supabase.removeChannel(subscription);
+  }, [])
 
   useEffect(() => {
     const order = orders.find(order => order.id === selectedOrderId)
-    if(order) {
-      if(order.status?.toLowerCase()==='completed'){setOtpVisible(false)}
+    if (order) {
+      if (order.status?.toLowerCase() === 'completed') { setOtpVisible(false) }
     }
   }, [orders, selectedOrderId])
 
@@ -202,14 +201,14 @@ const OrdersPage = () => {
     }
   }
 
-  const activeOrders = orders.filter(order => 
-    order.status?.toLowerCase() === 'pending' || 
+  const activeOrders = orders.filter(order =>
+    order.status?.toLowerCase() === 'pending' ||
     order.status?.toLowerCase() === 'preparing' ||
     order.status?.toLowerCase() === 'ready'
   )
 
-  const pastOrders = orders.filter(order => 
-    order.status?.toLowerCase() === 'completed' || 
+  const pastOrders = orders.filter(order =>
+    order.status?.toLowerCase() === 'completed' ||
     order.status?.toLowerCase() === 'cancelled'
   )
 
@@ -221,17 +220,17 @@ const OrdersPage = () => {
 
   // Apply filters
   let currentOrders = activeTab === 'active' ? activeOrders : pastOrders
-  
+
   // Filter by search order ID
   if (searchOrderId.trim()) {
-    currentOrders = currentOrders.filter(order => 
+    currentOrders = currentOrders.filter(order =>
       order.id.toString().includes(searchOrderId.trim())
     )
   }
-  
+
   // Filter by status
   if (statusFilter !== 'all') {
-    currentOrders = currentOrders.filter(order => 
+    currentOrders = currentOrders.filter(order =>
       order.status?.toLowerCase() === statusFilter.toLowerCase()
     )
   }
@@ -256,11 +255,11 @@ const OrdersPage = () => {
             <h2>Order Pickup Code</h2>
             <button className="close-button" onClick={() => setOtpVisible(false)}>×</button>
           </div>
-          
+
           {selectedOrderId && (
             <div className="order-subtitle">Order #{selectedOrderId}</div>
           )}
-          
+
           <div className="otp-body">
             {fetchedOtp ? (
               <>
@@ -275,7 +274,7 @@ const OrdersPage = () => {
             ) : (
               <div className="loading">Loading your pickup code...</div>
             )}
-            
+
             {otpError && (
               <div className="otp-error">{otpError}</div>
             )}
@@ -291,27 +290,27 @@ const OrdersPage = () => {
   return (
     <div className="orderswrapper" id={theme}>
       <NavBar />
-      <CartModalBoolean.Provider value={{cartModal, setCartModal}}>
-          {cartModal && <CartModal/>}
+      <CartModalBoolean.Provider value={{ cartModal, setCartModal }}>
+        {cartModal && <CartModal />}
       </CartModalBoolean.Provider>
       <OtpVisiblity />
       {selectedReceiptOrder && (
-      <Receipt 
-        order={selectedReceiptOrder} 
-        onClose={() => setSelectedReceiptOrder(null)}
-      />
-    )}
+        <Receipt
+          order={selectedReceiptOrder}
+          onClose={() => setSelectedReceiptOrder(null)}
+        />
+      )}
       <div className="orders-content">
         <h1 className="orders-title">My Orders</h1>
-        
+
         <div className="orders-tabs">
-          <button 
+          <button
             className={`tab-button ${activeTab === 'active' ? 'active' : ''}`}
             onClick={() => setActiveTab('active')}
           >
             Active ({activeOrders.length})
           </button>
-          <button 
+          <button
             className={`tab-button ${activeTab === 'past' ? 'active' : ''}`}
             onClick={() => setActiveTab('past')}
           >
@@ -329,7 +328,7 @@ const OrdersPage = () => {
               className="search-input"
             />
             {searchOrderId && (
-              <button 
+              <button
                 className="clear-search"
                 onClick={() => setSearchOrderId('')}
               >
@@ -337,7 +336,7 @@ const OrdersPage = () => {
               </button>
             )}
           </div>
-          
+
           <div className="status-filter">
             <select
               value={statusFilter}
@@ -377,8 +376,8 @@ const OrdersPage = () => {
                 <p>
                   {searchOrderId || statusFilter !== 'all'
                     ? "No orders match your filters."
-                    : activeTab === 'active' 
-                      ? "You don't have any active orders at the moment." 
+                    : activeTab === 'active'
+                      ? "You don't have any active orders at the moment."
                       : "You don't have any past orders yet."}
                 </p>
                 {activeTab === 'active' && orders.length === 0 && !searchOrderId && statusFilter === 'all' && (
@@ -394,15 +393,15 @@ const OrdersPage = () => {
                       <span className="order-date">{formatDate(order.created_at || order.date)}</span>
                     </div>
                     <div className="order-status-section">
-                      <span 
+                      <span
                         className="order-status"
                         style={{ backgroundColor: getStatusColor(order.status) }}
                       >
                         {order.status || 'Pending'}
                       </span>
-                      
+
                       {activeTab === 'active' && order.status?.toLowerCase() === 'pending' && (
-                        <button 
+                        <button
                           className="cancel-button"
                           onClick={() => {
                             if (window.confirm('Are you sure you want to cancel this order?')) {
@@ -415,7 +414,7 @@ const OrdersPage = () => {
                       )}
 
                       {activeTab === 'active' && order.status?.toLowerCase() === 'ready' && (
-                        <button 
+                        <button
                           className="otp-button"
                           onClick={() => fetchOrderOtp(order.id)}
                           disabled={otpLoading}
@@ -433,7 +432,7 @@ const OrdersPage = () => {
                         const quantity = item.quantity || 1
                         const unitPrice = getProductPrice(drinkId)
                         const totalPrice = unitPrice * quantity
-                        
+
                         return (
                           <div key={index} className="order-item">
                             <div className="item-display">
@@ -462,41 +461,41 @@ const OrdersPage = () => {
                     <div className="order-summary">
                       <span className="order-total">
                         Total: <span className="vat-label">(VAT incl.)</span> R{
-                          order.total_price 
+                          order.total_price
                             ? parseFloat(order.total_price).toFixed(2)
                             : order.items && order.items.length > 0
                               ? order.items.reduce((sum, item) => {
-                                  const drinkId = item.drink_id || item.drink || item.product_id
-                                  const price = getProductPrice(drinkId)
-                                  const quantity = item.quantity || 1
-                                  return sum + (price * quantity)
-                                }, 0).toFixed(2)
+                                const drinkId = item.drink_id || item.drink || item.product_id
+                                const price = getProductPrice(drinkId)
+                                const quantity = item.quantity || 1
+                                return sum + (price * quantity)
+                              }, 0).toFixed(2)
                               : '0.00'
                         }
                       </span>
-                      
+
                       <span className="item-count">
                         ({getTotalItemCount(order.items)} {getTotalItemCount(order.items) === 1 ? 'item' : 'items'})
                       </span>
                     </div>
-                    
+
                     {/* Show receipt button ONLY for completed orders */}
                     {order.status?.toLowerCase() === 'completed' && (
                       <div className='receipt-repeat-btns'>
-                        <button 
+                        <button
                           className="repeat-order-btn"
-                          onClick={()=>{repeatOrder(order)}}
+                          onClick={() => { repeatOrder(order) }}
                         >
                           Order Again
                         </button>
-                        <button 
+                        <button
                           className="view-receipt-btn"
-                          onClick={() => {setSelectedReceiptOrder(order)}}
+                          onClick={() => { setSelectedReceiptOrder(order) }}
                         >
                           View Receipt
                         </button>
                       </div>
-                      
+
                     )}
                   </div>
                 </div>

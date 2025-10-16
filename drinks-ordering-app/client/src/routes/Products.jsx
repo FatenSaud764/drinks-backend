@@ -19,17 +19,17 @@ import { supabase } from '../../lib/supabaseClient.jsx';
 
 
 const Products = () => {
-  const {products, setProducts} = useContext(ProductList);
-  const {theme, setTheme} = useContext(LightDark);
+  const { products, setProducts } = useContext(ProductList);
+  const { theme, setTheme } = useContext(LightDark);
   const navigate = useNavigate();
-  const {search, setSearch} = useContext(Search);
-  const {selecteddrink, setSelectedDrink} = useContext(SelectedProduct);
-  const {alcoholicfilter, setAlcoholicFilter} = useContext(AlcoholicFilter);
-  const {category, setCategory} = useContext(DrinkCategory);
+  const { search, setSearch } = useContext(Search);
+  const { selecteddrink, setSelectedDrink } = useContext(SelectedProduct);
+  const { alcoholicfilter, setAlcoholicFilter } = useContext(AlcoholicFilter);
+  const { category, setCategory } = useContext(DrinkCategory);
   const keys = ['name'];
   const [cartModal, setCartModal] = useState(false);
   const [drinkAdded, setDrinkAdded] = useState('');
-  const {cartItems, setCartItems} = useContext(CartItems);
+  const { cartItems, setCartItems } = useContext(CartItems);
 
   const { accessToken, isLoggedIn } = useAuth();
 
@@ -46,22 +46,22 @@ const Products = () => {
 
   const sortedProducts = [...filtered].sort((a, b) => {
     return (a.available === b.available) ? 0 : a.available ? -1 : 1;
-  }).sort((a,b) => {if(a.available && b.available) {return a.name.localeCompare(b.name)}}).filter((a) => {return category.toLowerCase() == "all" ? true : a.category.toLowerCase() == category.toLowerCase()});
+  }).sort((a, b) => { if (a.available && b.available) { return a.name.localeCompare(b.name) } }).filter((a) => { return category.toLowerCase() == "all" ? true : a.category.toLowerCase() == category.toLowerCase() });
 
-const addToCart = async (e) => {
-    if(isLoggedIn && accessToken){
+  const addToCart = async (e) => {
+    if (isLoggedIn && accessToken) {
       // Show modal IMMEDIATELY (optimistic)
-      
+
       try {
         // Add to backend in background
         setCartModal(true)
-        await AxiosInstance.post('/api/cart/items/', 
-          {"drink_id": e, "quantity": 1}, 
-          {headers:{Authorization: `Bearer ${accessToken}`}}
+        await AxiosInstance.post('/api/cart/items/',
+          { "drink_id": e, "quantity": 1 },
+          { headers: { Authorization: `Bearer ${accessToken}` } }
         )
         // Silently refetch to sync state (user already saw feedback)
         fetchdata()
-        
+
       } catch (error) {
         console.error('Failed to add to cart:', error)
         // Revert optimistic update on error
@@ -71,11 +71,11 @@ const addToCart = async (e) => {
     } else {
       alert('Log in to add to cart and place orders')
     }
-}
+  }
 
   const fetchdata = async () => {
     if (!isLoggedIn || !accessToken) return;
-    
+
     try {
       const res = await AxiosInstance.get('api/cart/', {
         headers: {
@@ -89,22 +89,22 @@ const addToCart = async (e) => {
   }
 
 
-useEffect(()=>{
-  fetchdata();
+  useEffect(() => {
+    fetchdata();
 
 
-  const subscription = supabase
-    .channel('cart')
-    .on('postgres_changes', 
-      { event: '*', schema: 'public', table: 'barbackend_cart' },
-      () => {
-        fetchdata(); 
-      }
-    )
-    .subscribe();
+    const subscription = supabase
+      .channel('cart')
+      .on('postgres_changes',
+        { event: '*', schema: 'public', table: 'barbackend_cart' },
+        () => {
+          fetchdata();
+        }
+      )
+      .subscribe();
 
-  return () => supabase.removeChannel(subscription);
-},[])
+    return () => supabase.removeChannel(subscription);
+  }, [])
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -113,28 +113,28 @@ useEffect(()=>{
   return (
     <div className='prodwrapper' id={theme}>
       <NavBar />
-      <CartModalBoolean.Provider value={{cartModal, setCartModal}}>
-        {cartModal && <CartModal/>}
+      <CartModalBoolean.Provider value={{ cartModal, setCartModal }}>
+        {cartModal && <CartModal />}
       </CartModalBoolean.Provider>
       <div className='prodplussearch'>
         <div><SearchBar /></div>
         <div className='prodlist'>
-        {sortedProducts.map((product) => {
-          
-          return (
+          {sortedProducts.map((product) => {
+
+            return (
               <div key={product.id} className='productdisplay'>
-              <button className='productbutton' onClick={() => {if(product.available && isLoggedIn && accessToken){setSelectedDrink(product); navigate('/drinkinfo');}}}>
-                <img src={product.available ? `${product.image}` : nostock} className='drinkcard'/>
-                <span className='category-tag'>{product.category.charAt(0).toUpperCase() + product.category.slice(1).toLowerCase()}</span>
-              </button>
-              <div className='productdesc'>{product.name}</div>
-              <div className='additemwrapper'>
-              <div className='productprice'>R{product.price}</div>
-              {product.available && <button className='additem' onClick={() => {if(cartItems || cartItems.find(item => item.drink_id===product.id).quantity<product.stock){addToCart(product.id)}}}>+</button>}
+                <button className='productbutton' onClick={() => { if (product.available && isLoggedIn && accessToken) { setSelectedDrink(product); navigate('/drinkinfo'); } }}>
+                  <img src={product.available ? `${product.image}` : nostock} className='drinkcard' />
+                  <span className='category-tag'>{product.category.charAt(0).toUpperCase() + product.category.slice(1).toLowerCase()}</span>
+                </button>
+                <div className='productdesc'>{product.name}</div>
+                <div className='additemwrapper'>
+                  <div className='productprice'>R{product.price}</div>
+                  {product.available && <button className='additem' onClick={() => { if (cartItems || cartItems.find(item => item.drink_id === product.id).quantity < product.stock) { addToCart(product.id) } }}>+</button>}
+                </div>
               </div>
-              </div>
-          )
-        })}
+            )
+          })}
         </div>
         <br />
         <br />

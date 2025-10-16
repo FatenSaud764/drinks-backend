@@ -16,18 +16,17 @@ const DrinkInfo = () => {
   const [cartModal, setCartModal] = useState(false);
   const [selectedSize, setSelectedSize] = useState(null);
   const navigate = useNavigate();
-  // Use the new auth context
   const { accessToken, isLoggedIn } = useAuth();
 
   const addToCart = async (e, num) => {
-    if(!isLoggedIn || !accessToken) return;
-    if (num>0) {
+    if (!isLoggedIn || !accessToken) return;
+    if (num > 0) {
       setCartModal(true);
       const request = async () => {
         await AxiosInstance.post(
           '/api/cart/items/',
-          {"drink_id": e, "quantity": num},
-          {headers:{Authorization: `Bearer ${accessToken}`}})
+          { "drink_id": e, "quantity": num },
+          { headers: { Authorization: `Bearer ${accessToken}` } })
       }
       await request();
     } else {
@@ -38,33 +37,33 @@ const DrinkInfo = () => {
 
   return (
     <div className='drinkinfowrapper' id={theme}>
-        <CartModalBoolean.Provider value={{cartModal, setCartModal}}>
+      <CartModalBoolean.Provider value={{ cartModal, setCartModal }}>
         <NavBar />
-          {cartModal && <CartModal />}
-        </CartModalBoolean.Provider>
-        <div className='return'>
-          <FaArrowLeft className='return_button' onClick={()=>{navigate('/products')}}/>
-          <div style={{fontFamily:'Nunito', fontWeight:'600'}}>Return to products page</div>
+        {cartModal && <CartModal />}
+      </CartModalBoolean.Provider>
+      <div className='return'>
+        <FaArrowLeft className='return_button' onClick={() => { navigate('/products') }} />
+        <div style={{ fontFamily: 'Nunito', fontWeight: '600' }}>Return to products page</div>
+      </div>
+      <div className='drinkimage-container'>
+        <img src={`${selecteddrink.image}`} className='drinkimage' />
+        <span className='category-tag-info'>{selecteddrink.category.charAt(0).toUpperCase() + selecteddrink.category.slice(1).toLowerCase()}</span>
+      </div>
+      <div className='drink_name_price'>
+        <div className='drinkname'>
+          {selecteddrink.name}
         </div>
-        <div className='drinkimage-container'>
-          <img src= {`${selecteddrink.image}`} className='drinkimage' />
-          <span className='category-tag-info'>{selecteddrink.category.charAt(0).toUpperCase() + selecteddrink.category.slice(1).toLowerCase()}</span>
+        <div className='drinkprice'>
+          R{selecteddrink.price}
         </div>
-        <div className='drink_name_price'>
-          <div className='drinkname'>
-            {selecteddrink.name}
-          </div>  
-          <div className='drinkprice'>
-            R{selecteddrink.price}
-          </div>
-        </div>
-        <div className='drinkdesc'>
-          {selecteddrink.description}
-        </div>
-        <div className='cart_section'>
+      </div>
+      <div className='drinkdesc'>
+        {selecteddrink.description}
+      </div>
+      <div className='cart_section'>
         <AddItems prod={selecteddrink} num={num} setNum={setNum} />
-        <button className='addtocart' onClick={() => {addToCart(selecteddrink.id, num)}}>Add to cart</button>
-        </div>
+        <button className='addtocart' onClick={() => { addToCart(selecteddrink.id, num) }}>Add to cart</button>
+      </div>
     </div>
   )
 }

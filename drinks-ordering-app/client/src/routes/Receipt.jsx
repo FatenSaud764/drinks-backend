@@ -73,55 +73,83 @@ const Receipt = ({ order, onClose }) => {
   };
 
   useEffect(() => {
-            if (receiptRef.current) {
-              setContentHeight(receiptRef.current.offsetHeight);
-            }
-          }, [receiptRef]);
-
-  const handlePrint = () => {
-  const input = document.getElementById('receipt');
-
-  html2canvas(input, {
-    scrollY: -window.scrollY,
-    scrollX: -window.scrollX,
-    width: input.scrollWidth,
-    height: input.scrollHeight,
-    windowWidth: input.scrollWidth,
-    windowHeight: input.scrollHeight
-  }).then((canvas) => {
-    const imgData = canvas.toDataURL('image/png');
-    
-
-    const imgWidth = 125; 
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    
-    const pdf = new jsPDF('p', 'mm', 'a6');
-    
-    let heightLeft = imgHeight;
-    let position = 0;
-    
-    // Add first page
-    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    heightLeft -= 150; 
-    
-
-    while (heightLeft > 0) {
-      position = heightLeft - imgHeight;
-      pdf.addPage();
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= 150;
+    if (receiptRef.current) {
+      setContentHeight(receiptRef.current.offsetHeight);
     }
-    
-    pdf.save('receipt.pdf');
-  });
-};
+  }, [receiptRef]);
+
+  const handlePrint = async () => {
+    const input = document.getElementById('receipt');
+
+    // Add class to remove constraints
+    input.classList.add('generating-pdf');
+    input.style.maxHeight = 'none';
+    input.style.height = 'auto';
+    input.style.overflow = 'visible';
+
+    // Force reflow
+    input.offsetHeight;
+
+    await new Promise(resolve => setTimeout(resolve, 200));
+
+    try {
+      // Get actual scrollable content height
+      const actualHeight = input.scrollHeight;
+
+      console.log('Actual content height:', actualHeight);
+
+      const canvas = await html2canvas(input, {
+        scale: 2,
+        height: actualHeight,
+        windowHeight: actualHeight,
+        useCORS: true,
+        logging: true,
+        backgroundColor: '#ffffff',
+      });
+
+      console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
+
+      const imgData = canvas.toDataURL('image/png');
+
+      const pdf = new jsPDF('p', 'mm', 'a6');
+      const pageWidth = 105;
+      const pageHeight = 148;
+
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * pageWidth) / canvas.width;
+
+      console.log('PDF image height:', imgHeight, 'mm');
+      console.log('Pages needed:', Math.ceil(imgHeight / pageHeight));
+
+      let yOffset = 0;
+
+      while (yOffset < imgHeight) {
+        if (yOffset > 0) pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, -yOffset, imgWidth, imgHeight);
+        yOffset += pageHeight;
+      }
+
+      pdf.save(`receipt-${order.id}.pdf`);
+
+    } catch (error) {
+      console.error('Error:', error);
+      alert('PDF generation failed');
+    } finally {
+      // Restore original state
+      input.classList.remove('generating-pdf');
+      input.style.maxHeight = '';
+      input.style.height = '';
+      input.style.overflow = '';
+    }
+  };
+
 
 
   return (
     <div className="receipt-overlay" onClick={onClose}>
       <div className="receipt-container" id={'receipt'} onClick={(e) => e.stopPropagation()} ref={receiptRef}>
         <button className="receipt-close" onClick={onClose} data-html2canvas-ignore>×</button>
-        
+
         <div className="receipt-content">
           {/* Header */}
           <div className="receipt-header">

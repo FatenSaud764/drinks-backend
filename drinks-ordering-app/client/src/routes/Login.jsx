@@ -16,7 +16,6 @@ const Login = () => {
   const { theme, setTheme } = useContext(LightDark);
   const { signupmodal, setSignUpModal } = useContext(SignUpModal);
 
-  // Use the new auth context
   const { login, isLoading } = useAuth();
 
   const checklogin = async (e) => {
@@ -53,27 +52,27 @@ const Login = () => {
   return (
     <>
       <div className='wrapper' id={theme}>
-        <div className='togglebutton'><ThemeButton/></div>
+        <div className='togglebutton'><ThemeButton /></div>
         <div className='content'>
           <h1 className='swiftserve'>SwiftServe</h1>
           <h4>Skip the queue!</h4>
-          <form onSubmit={(e) => {checklogin(e); e.preventDefault();}} style={{display: 'flex', flexDirection:'column', alignContent:'center', alignItems:'center'}}>
+          <form onSubmit={(e) => { checklogin(e); e.preventDefault(); }} style={{ display: 'flex', flexDirection: 'column', alignContent: 'center', alignItems: 'center' }}>
             <div className='input-container'>
               <PersonIcon className='input-icon' />
-              <input type='text' placeholder='Username' required className='username' ref={username}/>
+              <input type='text' placeholder='Username' required className='username' ref={username} />
             </div>
-            
+
             <div className='input-container'>
               <LockIcon className='input-icon' />
-              <input type='password' placeholder='Password' className='password' ref={password} required/>
+              <input type='password' placeholder='Password' className='password' ref={password} required />
             </div>
-            
+
             <button type='submit' className='login' disabled={isLoading}>
               {isLoading ? 'Logging in...' : 'Log in'}
             </button>
           </form>
           <h5 className='no-account'>Don't have an account?</h5>
-          <button className='signup' onClick={() => {setSignUpModal(true)}}>Sign up</button>
+          <button className='signup' onClick={() => { setSignUpModal(true) }}>Sign up</button>
           {signupmodal && <SignUp />}
         </div>
       </div>
